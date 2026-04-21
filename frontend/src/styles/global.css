@@ -1,0 +1,29 @@
+/* Global table styling used across household detail sections and any other v-table instances */
+.v-table > .v-table__wrapper > table > tbody > tr > td {
+  padding: 2px 8px !important;
+  height: 24px;
+  line-height: 1.1;
+}
+
+.v-table > .v-table__wrapper > table > thead > tr > th {
+  padding: 2px 8px !important;
+  height: 24px;
+  line-height: 1.1;
+}
+
+.table-heading {
+  background-color: rgba(25, 118, 210, 0.16);
+  color: rgb(21, 101, 192);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+p {
+  line-height: 1.2;
+  margin-bottom: 0.35rem;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}

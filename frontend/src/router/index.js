@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '@/views/LoginView.vue'
 import HomeView from '@/views/HomeView.vue'
 import HouseholdsView from '@/views/HouseholdsView.vue'
+import HouseholdDetailsView from '@/views/HouseholdDetailsView.vue'
 
 const routes = [
   {
@@ -28,6 +29,12 @@ const routes = [
     path: '/households',
     name: 'Households',
     component: HouseholdsView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/households/:pah',
+    name: 'HouseholdDetails',
+    component: HouseholdDetailsView,
     meta: { requiresAuth: true }
   }
 ]

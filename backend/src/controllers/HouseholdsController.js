@@ -5,8 +5,15 @@ module.exports = {
   index (req, res) {
     Common.debug(req, 'index')
 
-    const queryText = (req.query.q || '').trim()
-    const safeQuery = queryText.slice(0, 120)
+    const pah = (req.query.pah || '').trim().slice(0, 120)
+    const householdHead = (req.query.household_head || '').trim().slice(0, 120)
+    const nrc = (req.query.nrc || '').trim().slice(0, 120)
+    const villageIdRaw = String(req.query.village_id || '').trim()
+    const villageId = /^\d+$/.test(villageIdRaw) ? Number(villageIdRaw) : null
+
+    const vulnerableOnly = req.query.vulnerable === 'true'
+    const physicallyDisplacedOnly = req.query.physically_displaced === 'true'
+    const nonaffectedOnly = req.query.nonaffected === 'true'
 
     let query = Knex('v_households')
       .select(
@@ -19,14 +26,32 @@ module.exports = {
       )
       .orderBy('pah', 'asc')
 
-    if (safeQuery.length > 0) {
-      const likeTerm = `%${safeQuery}%`
-      query = query.where((qb) => {
-        qb.whereILike('pah', likeTerm)
-          .orWhereILike('household_head', likeTerm)
-          .orWhereILike('nrc', likeTerm)
-          .orWhereILike('village', likeTerm)
-      })
+    if (pah.length > 0) {
+      query = query.whereILike('pah', `%${pah}%`)
+    }
+
+    if (householdHead.length > 0) {
+      query = query.whereILike('household_head', `%${householdHead}%`)
+    }
+
+    if (nrc.length > 0) {
+      query = query.whereILike('nrc', `%${nrc}%`)
+    }
+
+    if (villageId !== null) {
+      query = query.where('village_id', villageId)
+    }
+
+    if (vulnerableOnly) {
+      query = query.where('vulnerable', true)
+    }
+
+    if (physicallyDisplacedOnly) {
+      query = query.where('physically_displaced', true)
+    }
+
+    if (nonaffectedOnly) {
+      query = query.where('nonaffected', true)
     }
 
     query
@@ -36,6 +61,31 @@ module.exports = {
       .catch((err) => {
         Common.error(req, 'index', err)
         res.status(500).send({ error: 'an error has occurred trying to fetch households: ' + err })
+      })
+  },
+
+  show (req, res) {
+    Common.debug(req, 'show')
+
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+
+    if (!pah) {
+      return res.status(400).send({ error: 'pah is required' })
+    }
+
+    return Knex('v_households')
+      .where({ pah })
+      .first()
+      .then((household) => {
+        if (!household) {
+          return res.status(404).send({ error: 'household not found' })
+        }
+
+        return res.send(household)
+      })
+      .catch((err) => {
+        Common.error(req, 'show', err)
+        return res.status(500).send({ error: 'an error has occurred trying to fetch the household: ' + err })
       })
   }
 }
