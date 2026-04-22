@@ -2,7 +2,7 @@ const Knex = require('../services/db')
 const Common = require('./CommonDebug')('Households')
 
 module.exports = {
-  index (req, res) {
+  async index (req, res) {
     Common.debug(req, 'index')
 
     const pah = (req.query.pah || '').trim().slice(0, 120)
@@ -54,17 +54,16 @@ module.exports = {
       query = query.where('nonaffected', true)
     }
 
-    query
-      .then((households) => {
-        res.send(households)
-      })
-      .catch((err) => {
-        Common.error(req, 'index', err)
-        res.status(500).send({ error: 'an error has occurred trying to fetch households: ' + err })
-      })
+    try {
+      const households = await query
+      return res.send(households)
+    } catch (err) {
+      Common.error(req, 'index', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch households: ' + err })
+    }
   },
 
-  show (req, res) {
+  async show (req, res) {
     Common.debug(req, 'show')
 
     const pah = (req.params.pah || '').trim().slice(0, 120)
@@ -73,19 +72,46 @@ module.exports = {
       return res.status(400).send({ error: 'pah is required' })
     }
 
-    return Knex('v_households')
-      .where({ pah })
-      .first()
-      .then((household) => {
-        if (!household) {
-          return res.status(404).send({ error: 'household not found' })
-        }
+    try {
+      const household = await Knex('v_households')
+        .where({ pah })
+        .first()
 
-        return res.send(household)
-      })
-      .catch((err) => {
-        Common.error(req, 'show', err)
-        return res.status(500).send({ error: 'an error has occurred trying to fetch the household: ' + err })
-      })
+      if (!household) {
+        return res.status(404).send({ error: 'household not found' })
+      }
+
+      return res.send(household)
+    } catch (err) {
+      Common.error(req, 'show', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch the household: ' + err })
+    }
+  },
+
+  async indexParcels (req, res) {
+    Common.debug(req, 'indexParcels')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+
+    if (!pah) {
+      return res.status(400).send({ error: 'pah is required' })
+    }
+
+    try {
+      const parcels = await Knex('v_land_parcels')
+        .where({ pah })
+
+      // For each parcel load associated v_land_assets rows
+      for (const parcel of parcels) {
+        const assets = await Knex('v_land_assets')
+          .where({ land_parcel_id: parcel.land_parcel_id })
+        parcel.assets = assets
+      }
+
+      return res.send(parcels)
+    } catch (err) {
+      Common.error(req, 'indexParcels', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch the parcels for the household: ' + err })
+    }
   }
+
 }

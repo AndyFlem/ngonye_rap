@@ -4,7 +4,6 @@ const auth = require('./services/auth')
 
 const UsersController = require('./controllers/UsersController')
 const HouseholdsController = require('./controllers/HouseholdsController')
-const VillagesController = require('./controllers/VillagesController')
 const RAPController = require('./controllers/RAPController')
 
 module.exports = (app) => {
@@ -29,7 +28,9 @@ module.exports = (app) => {
   // HOUSEHOLDS
   app.get(prefix + '/households', HouseholdsController.index)
   app.get(prefix + '/households/:pah', HouseholdsController.show)
-  app.get(prefix + '/villages', VillagesController.index)
+  app.get(prefix + '/villages', RAPController.indexVillages)
+
+  app.get(prefix + '/households/:pah/parcels', HouseholdsController.indexParcels)
 
   // USER MANAGEMENT
   app.post(prefix + '/user', UsersController.create)

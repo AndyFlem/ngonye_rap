@@ -57,5 +57,19 @@ module.exports = {
       Common.error(req, 'householdsSummary', err)
       res.status(500).send({ error: 'an error has occurred trying to fetch households summary: ' + err })
     }
+  },
+  indexVillages (req, res) {
+    Common.debug(req, 'indexVillages')
+
+    return Knex('villages')
+      .select('village_id', 'village')
+      .orderBy('village', 'asc')
+      .then((villages) => {
+        res.send(villages)
+      })
+      .catch((err) => {
+        Common.error(req, 'indexVillages', err)
+        res.status(500).send({ error: 'an error has occurred trying to fetch villages: ' + err })
+      })
   }
 }

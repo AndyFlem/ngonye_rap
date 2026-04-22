@@ -214,6 +214,9 @@ onMounted(() => {
             loading-text="Loading households..."
             no-data-text="No households found"
           >
+            <template #[`item.pah`]="{ item }">
+              <router-link class="primary white--text" :to="{ name: 'HouseholdDetails', params: { pah: item.pah } }">{{ item.pah }}</router-link>
+            </template>
             <template #[`item.vulnerable`]="{ item }">
               <v-chip size="small" :color="item.vulnerable ? 'warning' : 'default'" variant="tonal">
                 {{ item.vulnerable ? 'Yes' : 'No' }}

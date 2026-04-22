@@ -10,6 +10,7 @@ const route = useRoute()
 const router = useRouter()
 
 const pah = ref(null)
+const parcels = ref([])
 const loading = ref(false)
 const error = ref('')
 
@@ -19,6 +20,11 @@ const formatCurrency = (value) => {
   if (value == null || isNaN(value)) return '0'
   return Math.round(Number(value)).toLocaleString('en-US')
 }
+const formatArea = (value) => {
+  if (value == null || isNaN(value)) return '0'
+  return Math.round(Number(value)).toLocaleString('en-US') + ' sqm'
+}
+
 
 const hasIcaOption = (value) => {
   if (value === null || value === undefined) return false
@@ -33,6 +39,12 @@ const formatIcaOption = (value) => {
   return String(value)
 }
 
+const formatYesNo = (value) => {
+  if (value === true) return 'Yes'
+  if (value === false) return 'No'
+  return 'N/A'
+}
+
 const loadHousehold = async () => {
   loading.value = true
   error.value = ''
@@ -40,6 +52,13 @@ const loadHousehold = async () => {
   try {
     const response = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}`)
     pah.value = response.data || null
+
+    // load the land parcels for this PAH
+    if (pah.value) {
+      const parcelsResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/parcels`)
+      parcels.value = Array.isArray(parcelsResponse.data) ? parcelsResponse.data : []
+    }
+
   } catch (err) {
     error.value = 'Failed to load pah details.'
     console.error('Failed to load pah details:', err)
@@ -174,8 +193,8 @@ onMounted(() => {
                   </tbody>
                 </v-table>
               </v-col>
-              </v-row>
-              <v-row>
+            </v-row>
+            <v-row>
               <v-col cols="12" md="6" lg="4">
                 <v-table v-if="pah" density="compact">
                   <thead>
@@ -247,6 +266,76 @@ onMounted(() => {
                 </v-table>
               </v-col>
             </v-row>
+
+            <v-row v-if="parcels.length > 0" class="mt-4">
+              <v-col cols="12">
+                <v-table density="compact">
+                  <thead>
+                    <tr>
+                      <th colspan="9" class="table-heading">Land</th>
+                    </tr>
+                    <tr>
+                      <th>ID</th>
+                      <th>Land Class</th>
+                      <th>Zone</th>
+                      <th>Cultivated</th>
+                      <th>Area (sqm)</th>
+                      <th>Acquired (sqm)</th>
+                      <th>Compensation / Acquisition</th>
+                      <th>Cost</th>
+                      <th>Replacement Land</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template v-for="parcel in parcels" :key="parcel.land_parcel_id">
+                      <tr class="parcel-row">
+                        <td>{{ parcel.land_parcel_id }}</td>
+                        <td>{{ parcel.land_class || 'N/A' }}</td>
+                        <td>{{ parcel.land_zone || 'N/A' }}</td>
+                        <td>{{ formatYesNo(parcel.cultivated) }}</td>
+                        <td class="">{{ formatArea(parcel.area_sqm) }}</td>
+                        <td class="">{{ formatArea(parcel.area_acquired) }}</td>
+                        <td>{{ parcel.remaining_viable === false ? 'Remaining not viable' : 'Remaining viable / N/A' }}</td>
+                        <td class="">K{{ formatCurrency(parcel.cash_cost_total) }}</td>
+                        <td class="">{{ formatArea(parcel.replacement_land_area) }}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="8">
+                          <v-table density="compact">
+                            <tr
+                              v-for="asset in parcel.assets"
+                              :key="asset.land_asset_id"
+                              class="asset-row"
+                            >
+                              <td>{{  asset.land_asset_id }}</td>
+                              <td>Impact: {{ asset.acquisition_class }}</td>
+                              <td>{{ asset.compensation_option }}</td>
+
+                              <template v-if="asset.acquisition_class=='Permanent'">
+                                <td class="">{{ formatArea(asset.area_sqm) }} <span v-if="asset.compensation_option!='2: Land Allocation'">@ K{{ asset.rate_acquisition }}/sqm</span></td>
+                                <td></td>
+                                <td></td>
+                                <td v-if="asset.compensation_option=='2: Land Allocation'">Replacement Land: {{ formatArea(asset.area_sqm) }}</td>
+                                <td v-else-if="asset.compensation_value>0">Acquisition Cost: K{{ formatCurrency(asset.compensation_value) }}</td>
+                              </template>
+                              <template v-if="asset.acquisition_class=='Temporary'">
+                                <td class="">{{ formatArea(asset.area_sqm) }} @ K{{ asset.rate_lease }}/sqm/year</td>
+                                <td>K{{ asset.lease_cost }}/year</td>
+                                <td>{{ asset.lease_years }} years</td>
+                                <td class="">Lease Cost: K{{ formatCurrency(asset.lease_cost_total) }}</td>
+                              </template>
+                              <template v-if="asset.acquisition_class=='None'">
+                                <td colspan="4"></td>
+                              </template>
+                            </tr>
+                          </v-table>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </v-table>
+              </v-col>
+            </v-row>
           </v-card-text>
           <v-card-actions>
             <v-btn color="primary" @click="goBack">Back to Households</v-btn>
@@ -278,5 +367,17 @@ onMounted(() => {
 
 .table-total .table-value {
   color: rgb(25, 118, 210);
+}
+
+.parcel-row {
+  font-weight: 600;
+  background-color: rgba(25, 210, 133, 0.06);
+}
+.asset-row {
+  font-size: small;
+  font-family: monospace;
+}
+.asset-row td:first-child {
+  padding: 0 8px;
 }
 </style>
