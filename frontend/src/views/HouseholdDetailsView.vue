@@ -11,6 +11,8 @@ const router = useRouter()
 
 const pah = ref(null)
 const parcels = ref([])
+const structures = ref([])
+const replacements = ref([])
 const loading = ref(false)
 const error = ref('')
 
@@ -24,7 +26,6 @@ const formatArea = (value) => {
   if (value == null || isNaN(value)) return '0'
   return Math.round(Number(value)).toLocaleString('en-US') + ' sqm'
 }
-
 
 const hasIcaOption = (value) => {
   if (value === null || value === undefined) return false
@@ -42,7 +43,23 @@ const formatIcaOption = (value) => {
 const formatYesNo = (value) => {
   if (value === true) return 'Yes'
   if (value === false) return 'No'
-  return 'N/A'
+  return 'No'
+}
+
+const isTrueValue = (value) => {
+  if (value === true || value === 1) return true
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase()
+    return normalized === 'true' || normalized === '1' || normalized === 'yes' || normalized === 'y'
+  }
+  return false
+}
+
+const getSafeExternalUrl = (value) => {
+  if (!value) return null
+  const url = String(value).trim()
+  if (/^https?:\/\//i.test(url)) return url
+  return null
 }
 
 const loadHousehold = async () => {
@@ -57,6 +74,20 @@ const loadHousehold = async () => {
     if (pah.value) {
       const parcelsResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/parcels`)
       parcels.value = Array.isArray(parcelsResponse.data) ? parcelsResponse.data : []
+
+      const structuresResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/structures`)
+      // Order structures by structure_class and then structure_type for consistent display
+      structures.value = structuresResponse.data.sort((a, b) => {
+        if (a.structure_class === b.structure_class) {
+          return a.structure_type.localeCompare(b.structure_type)
+        }
+        return a.structure_class.localeCompare(b.structure_class)
+      })
+      structures.value = structuresResponse.data
+
+      const replacementsResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/replacements`)
+      replacements.value = Array.isArray(replacementsResponse.data) ? replacementsResponse.data : []
+
     }
 
   } catch (err) {
@@ -81,42 +112,65 @@ onMounted(() => {
     <TopBar />
     <v-main>
       <v-container class="pa-6">
-
-
         <v-alert v-if="error" type="error" variant="tonal" class="mb-4">
           {{ error }}
         </v-alert>
 
         <v-card elevation="1">
           <v-card-title class="d-flex">
-            {{ pahno }} {{ pah?.household_head || '' }}
+            {{ pahno }}&nbsp;<span v-if="pah">{{ pah.lastname }}, {{ pah.firstname }}{{ pah.middlename }}</span>
             <v-spacer/>
             <v-chip v-if="pah?.vulnerable" color="red" text-color="white">Vulnerable</v-chip>
           </v-card-title>
           <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4" />
           <v-card-text v-if="pah">
             <v-row>
-              <v-col cols="12">
-                <p :style="{ color: pah?.date_signed ? 'inherit' : 'red' }">
-                  <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah?.date_signed || 'not signed' }}</span>
-                </p>
-                <p v-if="pah.physically_displaced"><strong>Physically Displaced: </strong><span class="table-value">{{ pah.physically_displaced }}</span></p>
-                <p v-if="pah.no_ica_required"><strong>No ICA Required: </strong><span class="table-value">{{ pah.no_ica_required }}</span></p>
-                <p v-if="pah.nonaffected"><strong>Non-affected: </strong><span class="table-value">{{ pah.nonaffected }}</span></p>
+              <v-col cols="12" md="6">
+                <div><strong>Village:</strong> <span class="table-value">{{ pah?.village || 'none' }}</span></div>
+                <div><strong>Contact:</strong> <span class="table-value">{{ pah?.contact || 'none' }}</span></div>
+                <div><strong>NRC:</strong> <span class="table-value">{{ pah?.nrc || 'none' }}</span></div>
+              </v-col>
+            <v-col v-if="pah.cosignatory" cols="12" md="6">
+                <div><strong>Cosignatory:</strong> <span class="table-value">{{ pah.cosignatory }}</span></div>
+                <div><strong>Contact:</strong> <span class="table-value">{{ pah?.cosignatory_contact || 'none' }}</span></div>
+                <div><strong>NRC:</strong> <span class="table-value">{{ pah?.cosignatory_nrc || 'none' }}</span></div>
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12" md="6">
-                <p><strong>Village:</strong> <span class="table-value">{{ pah?.village || 'none' }}</span></p>
-                <p><strong>Contact:</strong> <span class="table-value">{{ pah?.contact || 'none' }}</span></p>
-                <p><strong>NRC:</strong> <span class="table-value">{{ pah?.nrc || 'none' }}</span></p>
+              <v-col cols="12">
+                <div :style="{ color: pah?.date_signed ? 'inherit' : 'red' }">
+                  <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah?.date_signed || 'not signed' }}</span>
+                  <v-btn
+                    v-if="getSafeExternalUrl(pah?.ica_link)"
+                    :href="getSafeExternalUrl(pah?.ica_link)"
+                    icon="mdi-open-in-new"
+                    variant="text"
+                    size="x-small"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="ml-2"
+                    title="Open ICA link"
+                  ></v-btn> Open ICA Link
+                </div>
               </v-col>
-            <v-col v-if="pah.cosignatory" cols="12" md="6">
-                <p><strong>Cosignatory:</strong> <span class="table-value">{{ pah.cosignatory }}</span></p>
-                <p><strong>Contact:</strong> <span class="table-value">{{ pah?.cosignatory_contact || 'none' }}</span></p>
-                <p><strong>NRC:</strong> <span class="table-value">{{ pah?.cosignatory_nrc || 'none' }}</span></p>
+            </v-row>            
+            <v-row>
+              <v-col cols="12" md="6">
+                <div><strong>Physically Displaced: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.physically_displaced) }">{{ formatYesNo(pah.physically_displaced) }}</span></div>
+                <div><strong>Landholding only: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.landholding_only) }">{{ formatYesNo(pah.landholding_only) }}</span></div>
+                <div><strong>No ICA Required: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.no_ica_required) }">{{ formatYesNo(pah.no_ica_required) }}</span></div>
+                <div><strong>New ICA Required: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.new_ica_required) }">{{ formatYesNo(pah.new_ica_required) }}</span></div>
+                <div><strong>Non-affected: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.nonaffected) }">{{ formatYesNo(pah.nonaffected) }}</span></div>
+                <div><strong>Is Silumesii: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.is_silumesii) }">{{ formatYesNo(pah.is_silumesii) }}</span></div>
+                <div><strong>Flagged: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.followup_flag) }">{{ formatYesNo(pah.followup_flag) }}</span></div>
+              </v-col>              
+              <v-col cols="12" md="6">
+                <div><strong>Cash Compensation:</strong> <span class="table-value">K{{ formatCurrency(pah.compensation?.total_cash_compensation || 0) }}</span></div>
+                <div v-if="pah.replacement_land_area>0"><strong>Replacement Land:</strong> <span class="table-value">{{ formatArea(pah.replacement_land_area) }} ({{ pah.icaoption_landholding }})</span></div>
+                <div v-if="pah.replacement_structures_value>0"><strong>Replacement Structures:</strong> <span class="table-value">{{ replacements.length }} <span>(K{{ formatCurrency(pah.replacement_structures_value) }})</span></span></div>                
               </v-col>
             </v-row>
+   
             <v-row class="pb-5">
               <v-col cols="12" md="6" lg="4">
                 <v-table v-if="pah" density="compact">
@@ -126,29 +180,33 @@ onMounted(() => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-if="pah.secondary_structures_compensation_value > 0">
+                    <tr v-if="pah.compensation.secondary_structures_compensation_value > 0">
                       <td class="table-label">Secondary Structures</td>
-                      <td class="table-value">K{{ formatCurrency(pah.secondary_structures_compensation_value) }}</td>
+                      <td class="table-value">K{{ formatCurrency(pah.compensation.secondary_structures_compensation_value) }}</td>
                     </tr>
-                    <tr v-if="pah.permanent_land_value > 0">
+                    <tr v-if="pah.compensation.land_compensation_value > 0">
                       <td class="table-label">Permanent Land</td>
-                      <td class="table-value">K{{ formatCurrency(pah.permanent_land_value) }}</td>
+                      <td class="table-value">K{{ formatCurrency(pah.compensation.land_compensation_value) }}</td>
                     </tr>
-                    <tr v-if="pah.lease_cost_total > 0">
+                    <tr v-if="pah.compensation.lease_cost_total > 0">
                       <td class="table-label">Lease Cost</td>
-                      <td class="table-value">K{{ formatCurrency(pah.lease_cost_total) }}</td>
+                      <td class="table-value">K{{ formatCurrency(pah.compensation.lease_cost_total) }}</td>
                     </tr>
-                    <tr v-if="pah.crop_value > 0">
+                    <tr v-if="pah.compensation.crop_value > 0">
                       <td class="table-label">Crops</td>
-                      <td class="table-value">K{{ formatCurrency(pah.crop_value) }}</td>
+                      <td class="table-value">K{{ formatCurrency(pah.compensation.crop_value) }}</td>
                     </tr>
-                    <tr v-if="pah.trees_compensation > 0">
+                    <tr v-if="pah.compensation.trees_compensation > 0">
                       <td class="table-label">Trees</td>
-                      <td class="table-value">K{{ formatCurrency(pah.trees_compensation) }}</td>
+                      <td class="table-value">K{{ formatCurrency(pah.compensation.trees_compensation) }}</td>
                     </tr>
-                    <tr v-if="pah.allowance_total">
+                    <tr v-if="pah.compensation.allowance_total > 0">
+                      <td class="table-label">Allowances</td>
+                      <td class="table-value">K{{ formatCurrency(pah.compensation.allowance_total) }}</td>
+                    </tr>                    
+                    <tr class="table-total" v-if="pah.compensation.total_cash_compensation > 0">
                       <td class="table-label">Total</td>
-                      <td class="table-value">K{{ formatCurrency(pah.allowance_total) }}</td>
+                      <td class="table-value">K{{ formatCurrency(pah.compensation.total_cash_compensation) }}</td>
                     </tr>
 
                   </tbody>
@@ -266,7 +324,6 @@ onMounted(() => {
                 </v-table>
               </v-col>
             </v-row>
-
             <v-row v-if="parcels.length > 0" class="mt-4">
               <v-col cols="12">
                 <v-table density="compact">
@@ -325,7 +382,8 @@ onMounted(() => {
                                 <td class="">Lease Cost: K{{ formatCurrency(asset.lease_cost_total) }}</td>
                               </template>
                               <template v-if="asset.acquisition_class=='None'">
-                                <td colspan="4"></td>
+                                <td class="">{{ formatArea(asset.area_sqm) }}</td>
+                                <td colspan="3"></td>
                               </template>
                             </tr>
                           </v-table>
@@ -334,6 +392,134 @@ onMounted(() => {
                     </template>
                   </tbody>
                 </v-table>
+              </v-col>
+            </v-row>
+            <v-row v-if="replacements.length > 0" >
+              <v-col cols="12">
+                <v-table>
+                  <thead>
+                    <tr>
+                      <th colspan="6" class="table-heading">Replacement Structures (location: {{ pah.icaoption_structure_location }})</th>
+                    </tr>
+                    <tr>
+                      <th>ID</th>
+                      <th>Structure ID</th>
+                      <th>Class</th>
+                      <th>Option</th>
+                      <th>Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="replacement in replacements" :key="replacement.replacement_structure_id">
+                      <td class="table-value left">{{ replacement.replacement_structure_id }}</td>
+                      <td class="table-value left">{{ replacement.structure_id }}</td>
+                      <td class="table-value left">{{ replacement.replacement_class }}</td>
+                      <td class="table-value left">{{ replacement.replacement_option }}</td>
+                      <td class="table-value left">K{{ formatCurrency(replacement.replacement_value) }}</td>
+                    </tr>
+                    <tr class="table-total">
+                      <td class="table-value" colspan="5">
+                        K{{ formatCurrency(pah.replacement_structures_value) }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </v-table>
+              </v-col>
+            </v-row>
+            <v-row v-if="structures.length > 0" class="mt-4">
+              <v-col cols="12">
+                <v-card>
+                  <v-card-title class="table-heading card-heading">Structures ({{ structures.length }})</v-card-title>
+                  <v-card-text>
+                    <v-expansion-panels>
+                      <v-expansion-panel
+                        v-for="structure in structures"
+                        :key="structure.structure_id"
+                        class="mt-1 mb-0"
+                      >
+                        <v-expansion-panel-title class="">
+                          <div class="structure-panel-title">
+                            <span>{{ structure.structure_id }} </span>&nbsp;
+                            <span>{{ structure.structure_class }}</span> - <span><strong>{{ structure.structure_type }}</strong></span>
+                          </div>
+                          <v-spacer/>
+                          <span class="pr-5" v-if="structure.replacement_structure_id">
+                            <span class="table-value highlight">{{ structure.replacement_structure_id }}</span>
+                          </span>
+                          <span class="pr-5 table-value" v-else>K{{ formatCurrency(structure.structure_value) }}</span>
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                          <v-row no-gutters>
+                            <v-col cols="12" md="6">
+                              <div v-if="structure.secondary_description"><strong>Description:</strong> <span class="table-value">{{ structure.secondary_description }}</span></div>
+                              <div v-if="structure.rooms && structure.rooms>0"><strong>Rooms:</strong> <span class="table-value">{{ structure.rooms }}</span></div>
+                              <div><strong>Dimensions:</strong> <span class="table-value">{{ structure.dimensions }}sqm</span></div>
+                              <div v-if="structure.secondary_rate"><strong>Rate:</strong> <span class="table-value">K{{ structure.secondary_rate }}/sqm</span></div>
+                              <div><strong>Value:</strong> <span class="table-value">K{{ formatCurrency(structure.structure_value) }}</span></div>
+                              <div><strong>Zone:</strong> <span class="table-value">{{ structure.land_zone }}</span></div>
+                            </v-col>
+                          </v-row>
+                          <v-row v-if="!structure.secondary_rate">
+                            <v-col cols="12" md="6">
+                              <v-table density="compact">
+                                <thead>
+                                  <tr>
+                                    <th class="table-heading"></th>
+                                    <th class="table-heading">Type</th>
+                                    <th class="table-heading">No</th>
+                                    <th class="table-heading">Rate</th>
+                                    <th class="table-heading">Value</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr v-if="structure.roof_value>0">
+                                    <td>Roof</td>
+                                    <td>{{ structure.roof_type }}</td>
+                                    <td></td>
+                                    <td>{{ structure.roof_rate }}</td>
+                                    <td>K{{ formatCurrency(structure.roof_value) }}</td>
+                                  </tr>
+                                  <tr v-if="structure.wall_value>0">
+                                    <td>Walls</td>
+                                    <td>{{ structure.walls_type }}</td>
+                                    <td></td>
+                                    <td>{{ structure.walls_rate }}</td>
+                                    <td>K{{ formatCurrency(structure.wall_value) }}</td>
+                                  </tr>
+                                  <tr v-if="structure.floor_value>0">
+                                    <td>Floor</td>
+                                    <td>{{ structure.floor_type }}</td>
+                                    <td></td>
+                                    <td>{{ structure.floor_rate }}</td>
+                                    <td>K{{ formatCurrency(structure.floor_value) }}</td>
+                                  </tr>
+                                  <tr v-if="structure.door_value>0">
+                                    <td>Doors</td>
+                                    <td>{{ structure.door_type }}</td>
+                                    <td>{{ structure.doors }}</td>
+                                    <td>{{ structure.door_rate }}</td>
+                                    <td>K{{ formatCurrency(structure.door_value) }}</td>
+                                  </tr>
+                                  <tr v-if="structure.window_value>0">
+                                    <td>Windows</td>
+                                    <td>{{ structure.window_type }}</td>
+                                    <td>{{ structure.windows }}</td>
+                                    <td>{{ structure.window_rate }}</td>
+                                    <td>K{{ formatCurrency(structure.window_value) }}</td>
+                                  </tr>
+                                  <tr class="table-total">
+                                    <td colspan="4">Total</td>
+                                    <td class="table-value">K{{ formatCurrency(structure.structure_value)}}</td>
+                                  </tr>
+                                </tbody>
+                              </v-table>
+                            </v-col>
+                          </v-row>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+                  </v-card-text>
+                </v-card>
               </v-col>
             </v-row>
           </v-card-text>
@@ -359,6 +545,9 @@ onMounted(() => {
   text-align: right;
   font-family: monospace;
 }
+.left {
+  text-align: left;
+}
 
 .table-total {
   background-color: rgba(25, 118, 210, 0.1);
@@ -380,4 +569,30 @@ onMounted(() => {
 .asset-row td:first-child {
   padding: 0 8px;
 }
+
+.structure-panel-title {
+  width: 100%;
+  gap: 6px;
+}
+.v-expansion-panel-title {
+    padding: 0px 15px 0px 15px;
+    min-height: 30px;
+}
+.card-heading {
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 3px 15px 3px 10px;
+}
+
+.highlight {
+  background-color: rgba(255, 200, 200, 0.3);
+  border-radius: 8px;
+}
+
+.highlight-true {
+  background-color: rgba(255, 200, 200, 0.3);
+  border-radius: 8px;
+  padding: 0 6px;
+}
+
 </style>

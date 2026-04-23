@@ -31,6 +31,8 @@ module.exports = (app) => {
   app.get(prefix + '/villages', RAPController.indexVillages)
 
   app.get(prefix + '/households/:pah/parcels', HouseholdsController.indexParcels)
+  app.get(prefix + '/households/:pah/structures', HouseholdsController.indexStructures)
+  app.get(prefix + '/households/:pah/replacements', HouseholdsController.indexReplacements)
 
   // USER MANAGEMENT
   app.post(prefix + '/user', UsersController.create)

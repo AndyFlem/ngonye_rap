@@ -81,6 +81,11 @@ module.exports = {
         return res.status(404).send({ error: 'household not found' })
       }
 
+      const comp = await Knex('v_household_compensation')
+        .where({ pah })
+        .first()
+      household.compensation = comp || null
+
       return res.send(household)
     } catch (err) {
       Common.error(req, 'show', err)
@@ -112,6 +117,43 @@ module.exports = {
       Common.error(req, 'indexParcels', err)
       return res.status(500).send({ error: 'an error has occurred trying to fetch the parcels for the household: ' + err })
     }
-  }
+  },
 
+  async indexStructures (req, res) {
+    Common.debug(req, 'indexStructures')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+
+    if (!pah) {
+      return res.status(400).send({ error: 'pah is required' })
+    }
+
+    try {
+      const structures = await Knex('v_structures')
+        .where({ pah })
+
+      return res.send(structures)
+    } catch (err) {
+      Common.error(req, 'indexStructures', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch the structures for the household: ' + err })
+    }
+  },
+
+  async indexReplacements (req, res) {
+    Common.debug(req, 'indexReplacements')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+
+    if (!pah) {
+      return res.status(400).send({ error: 'pah is required' })
+    }
+    
+    try {
+      const replacements = await Knex('v_replacement_structures')
+        .where({ pah })
+
+      return res.send(replacements)
+    } catch (err) {
+      Common.error(req, 'indexReplacements', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch the replacement structures for the household: ' + err })
+    }
+  }
 }
