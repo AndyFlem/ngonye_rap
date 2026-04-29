@@ -240,6 +240,7 @@ module.exports = {
         .select()
         .transacting(trx)
         .then(users => {
+          console.log(users)
           if (users.length === 0) {
             Common.debug(null, 'signin','User not found with email: ' + req.body.email)
             throw new Error('Not authorised!')

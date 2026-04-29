@@ -10,5 +10,9 @@ const router = useRouter()
   </v-app>
 </template>
 
-<style scoped>
+<style>
+.table-value {
+  text-align: right;
+  font-family: monospace;
+}
 </style>

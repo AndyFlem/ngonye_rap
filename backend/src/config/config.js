@@ -11,7 +11,7 @@ const config = {
         database: 'ngonye_rap',
         user: 'postgres',
         password: 'extramild20',
-        schema: 'rap'
+        schema: 'public'
     },
 }
 

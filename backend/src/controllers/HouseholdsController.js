@@ -2,64 +2,34 @@ const Knex = require('../services/db')
 const Common = require('./CommonDebug')('Households')
 
 module.exports = {
-  async index (req, res) {
-    Common.debug(req, 'index')
-
-    const pah = (req.query.pah || '').trim().slice(0, 120)
-    const householdHead = (req.query.household_head || '').trim().slice(0, 120)
-    const nrc = (req.query.nrc || '').trim().slice(0, 120)
-    const villageIdRaw = String(req.query.village_id || '').trim()
-    const villageId = /^\d+$/.test(villageIdRaw) ? Number(villageIdRaw) : null
-
-    const vulnerableOnly = req.query.vulnerable === 'true'
-    const physicallyDisplacedOnly = req.query.physically_displaced === 'true'
-    const nonaffectedOnly = req.query.nonaffected === 'true'
-
-    let query = Knex('v_households')
-      .select(
-        'pah',
-        'household_head',
-        'nrc',
-        'village',
-        'vulnerable',
-        'physically_displaced'
-      )
-      .orderBy('pah', 'asc')
-
-    if (pah.length > 0) {
-      query = query.whereILike('pah', `%${pah}%`)
-    }
-
-    if (householdHead.length > 0) {
-      query = query.whereILike('household_head', `%${householdHead}%`)
-    }
-
-    if (nrc.length > 0) {
-      query = query.whereILike('nrc', `%${nrc}%`)
-    }
-
-    if (villageId !== null) {
-      query = query.where('village_id', villageId)
-    }
-
-    if (vulnerableOnly) {
-      query = query.where('vulnerable', true)
-    }
-
-    if (physicallyDisplacedOnly) {
-      query = query.where('physically_displaced', true)
-    }
-
-    if (nonaffectedOnly) {
-      query = query.where('nonaffected', true)
-    }
+  async search (req, res) {
+    Common.debug(req, 'search')
 
     try {
-      const households = await query
-      return res.send(households)
+      const defn = req.body
+      const params = []
+      let qry = 'SELECT pah FROM public.a_households_search('
+
+      if (defn.household_head) { params.push(`p_household_head=> '${defn.household_head.replace(`'`, `''`)}'`) }
+      if (defn.pah) { params.push(`p_pah=> '${defn.pah.replace(`'`, `''`)}'`) }      
+      if (defn.vulnerable === 'true') { params.push(`p_vulnerable=> true`) }
+      if (defn.nonaffected === 'true') { params.push(`p_nonaffected=> true`) }
+      if (defn.landholding_only === 'true') { params.push(`p_landholding_only=> true`) }
+      if (defn.silumesii === 'true') { params.push(`p_silumesii=> true`) }
+      if (defn.new_ica_required === 'true') { params.push(`p_new_ica_required=> true`) }
+      if (defn.followup_flag === 'true') { params.push(`p_followup_flag=> true`) }
+      if (defn.physically_displaced === 'true') { params.push(`p_physically_displaced=> true`) }
+
+      qry += params.join() + ')'
+      if (defn.orderby) { qry += ' ORDER BY ' + defn.orderby }
+
+      Common.debug(null, 'doSearch', 'Query: ' + qry)
+
+      const rws = await Knex.raw(qry)
+      return res.send(rws.rows)
     } catch (err) {
-      Common.error(req, 'index', err)
-      return res.status(500).send({ error: 'an error has occurred trying to fetch households: ' + err })
+      Common.error(req, 'search', err)
+      return res.status(500).send({ error: 'an error has occured trying to search the households: ' + err })
     }
   },
 

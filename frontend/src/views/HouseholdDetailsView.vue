@@ -118,7 +118,7 @@ onMounted(() => {
 
         <v-card elevation="1">
           <v-card-title class="d-flex">
-            {{ pahno }}&nbsp;<span v-if="pah">{{ pah.lastname }}, {{ pah.firstname }}{{ pah.middlename }}</span>
+            {{ pahno }}&nbsp;<span v-if="pah">{{ pah.householdhead_fullname }}</span>
             <v-spacer/>
             <v-chip v-if="pah?.vulnerable" color="red" text-color="white">Vulnerable</v-chip>
           </v-card-title>
@@ -143,17 +143,17 @@ onMounted(() => {
                   <v-btn
                     v-if="getSafeExternalUrl(pah?.ica_link)"
                     :href="getSafeExternalUrl(pah?.ica_link)"
-                    icon="mdi-open-in-new"
+                    prepend-icon="mdi-open-in-new"
                     variant="text"
                     size="x-small"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="ml-2"
                     title="Open ICA link"
-                  ></v-btn> Open ICA Link
+                  >Open ICA Link</v-btn>
                 </div>
               </v-col>
-            </v-row>            
+            </v-row>
             <v-row>
               <v-col cols="12" md="6">
                 <div><strong>Physically Displaced: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.physically_displaced) }">{{ formatYesNo(pah.physically_displaced) }}</span></div>
@@ -163,14 +163,14 @@ onMounted(() => {
                 <div><strong>Non-affected: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.nonaffected) }">{{ formatYesNo(pah.nonaffected) }}</span></div>
                 <div><strong>Is Silumesii: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.is_silumesii) }">{{ formatYesNo(pah.is_silumesii) }}</span></div>
                 <div><strong>Flagged: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.followup_flag) }">{{ formatYesNo(pah.followup_flag) }}</span></div>
-              </v-col>              
+              </v-col>
               <v-col cols="12" md="6">
                 <div><strong>Cash Compensation:</strong> <span class="table-value">K{{ formatCurrency(pah.compensation?.total_cash_compensation || 0) }}</span></div>
                 <div v-if="pah.replacement_land_area>0"><strong>Replacement Land:</strong> <span class="table-value">{{ formatArea(pah.replacement_land_area) }} ({{ pah.icaoption_landholding }})</span></div>
-                <div v-if="pah.replacement_structures_value>0"><strong>Replacement Structures:</strong> <span class="table-value">{{ replacements.length }} <span>(K{{ formatCurrency(pah.replacement_structures_value) }})</span></span></div>                
+                <div v-if="pah.replacement_structures_value>0"><strong>Replacement Structures:</strong> <span class="table-value">{{ replacements.length }} <span>(K{{ formatCurrency(pah.replacement_structures_value) }})</span></span></div>
               </v-col>
             </v-row>
-   
+
             <v-row class="pb-5">
               <v-col cols="12" md="6" lg="4">
                 <v-table v-if="pah" density="compact">
@@ -203,7 +203,7 @@ onMounted(() => {
                     <tr v-if="pah.compensation.allowance_total > 0">
                       <td class="table-label">Allowances</td>
                       <td class="table-value">K{{ formatCurrency(pah.compensation.allowance_total) }}</td>
-                    </tr>                    
+                    </tr>
                     <tr class="table-total" v-if="pah.compensation.total_cash_compensation > 0">
                       <td class="table-label">Total</td>
                       <td class="table-value">K{{ formatCurrency(pah.compensation.total_cash_compensation) }}</td>
@@ -541,10 +541,6 @@ onMounted(() => {
   width: 40%;
 }
 
-.table-value {
-  text-align: right;
-  font-family: monospace;
-}
 .left {
   text-align: left;
 }

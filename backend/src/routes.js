@@ -26,7 +26,7 @@ module.exports = (app) => {
   app.get(prefix + '/households_summary', RAPController.householdsSummary)
 
   // HOUSEHOLDS
-  app.get(prefix + '/households', HouseholdsController.index)
+  app.post(prefix + '/households_search', HouseholdsController.search)
   app.get(prefix + '/households/:pah', HouseholdsController.show)
   app.get(prefix + '/villages', RAPController.indexVillages)
 

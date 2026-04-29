@@ -21,7 +21,7 @@ const knexData = require('knex')({
   client: 'pg',
   version: '10',
   debug: false,//config.development_mode,
-  searchPath: [config.db.schema || 'rap', 'public'],
+  //searchPath: [config.db.schema || 'rap', 'public'],
   connection: {
     host: config.db.host,
     port: config.db.port,
