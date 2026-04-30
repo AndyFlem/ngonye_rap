@@ -1,10 +1,13 @@
 <script setup>
-import { computed, inject, onMounted, ref } from 'vue'
+import { computed, inject, onMounted, ref, watch } from 'vue'
 
 import TopBar from '@/components/TopBar.vue'
 import HouseholdSearchResult from '@/views/HouseholdSearchResult.vue'
 
 const axiosSecure = inject('axiosSecure')
+
+
+const icarequired = ref(true)
 
 const search = ref({
   params: {
@@ -12,17 +15,28 @@ const search = ref({
     household_head: '',
     nrc: '',
     village_id: 'all',
-    vulnerable: false,
-    physically_displaced: false,
-    nonaffected: false
+    vulnerable: null,
+    physically_displaced: null,
+    nonaffected: null,
+    no_ica_required: false,
+    icasigned: null
   }
 })
+
+const getICARequiredIndet = computed(() => icarequired.value === null)
 const villages = ref([])
 const loading = ref(false)
 const error = ref('')
 const page = ref(1)
 const pahs = ref([])
 
+watch(icarequired, (newValue) => {
+  if (newValue === null) {
+    search.value.params.no_ica_required = null
+  } else {
+    search.value.params.no_ica_required = !newValue
+  }
+}, { immediate: true })
 
 const villageOptions = computed(() => [
   { village_id: 'all', village: 'All villages' },
@@ -120,33 +134,93 @@ onMounted(() => {
 
             <v-row>
               <v-col cols="12" md="8" class="d-flex flex-wrap align-center ga-4">
-                <v-checkbox
-                  v-model="search.params.vulnerable"
-                  label="Vulnerable"
-                  hide-details
-                  :indeterminate="true"
-                  density="comfortable"
-                />
-                <v-checkbox
-                  v-model="search.params.physically_displaced"
-                  label="Physically displaced"
-                  hide-details
-                  :indeterminate="true"
-                  density="comfortable"
-                />
-                <v-checkbox
-                  v-model="search.params.nonaffected"
-                  label="Nonaffected"
-                  hide-details
-                  density="comfortable"
-                />
-              </v-col>
-              <v-col cols="12" md="4" class="d-flex align-center ga-2 justify-md-end">
-                <v-btn color="primary" :loading="loading" @click="doSearch">Search</v-btn>
-
+                <div class="d-flex align-center ga-1 pr-4 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.nonaffected"
+                    label="Non-affected"
+                    hide-details
+                    density="comfortable"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 pr-4 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="icarequired"
+                    label="ICA Required"
+                    hide-details
+                    :indeterminate="getICARequiredIndet"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="icarequired = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.icasigned"
+                    label="ICA Signed"
+                    hide-details
+                    :indeterminate="search.params.icasigned === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    :loading="loading"
+                    variant="text"
+                    @click="search.params.icasigned = null"
+                  />
+                </div>
               </v-col>
             </v-row>
-
+            <v-row>
+              <v-col cols="12" md="8" class="d-flex flex-wrap align-center ga-4">
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.vulnerable"
+                    label="Vulnerable"
+                    hide-details
+                    :indeterminate="search.params.vulnerable === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.vulnerable = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.physically_displaced"
+                    label="Physically displaced"
+                    hide-details
+                    :indeterminate="search.params.physically_displaced === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.physically_displaced = null"
+                  />
+                </div>
+              </v-col>
+            </v-row>
+            <v-row >
+              <v-col cols="6">
+                {{ pahs.length }} result(s) found.
+              </v-col>
+              <v-col cols="6" class="d-flex align-center ga-2 justify-end">
+                <v-btn color="primary" :loading="loading" @click="doSearch">Search</v-btn>
+              </v-col>
+            </v-row>
 
             <v-alert v-if="error" type="error" variant="tonal" class="mt-2">
               {{ error }}
@@ -154,21 +228,22 @@ onMounted(() => {
           </v-card-text>
         </v-card>
 
-        <v-card elevation="1">
+        <v-card elevation="0">
             <v-data-iterator
               v-if="pahs"
               :items="pahs"
               :loading="loading"
               :page="page"
-              :items-per-page="10"
+              :items-per-page="30"
             >
               <template v-slot:default="props">
-                <v-row>
+                <v-row no-gutters>
                   <v-col
                     v-for="item in props.items"
                     :key="item.raw.pah"
                     cols="12"
-                  >{{ item.raw}}
+                    class="pl-1 pr-1 pt-1 pb-1"
+                  >
                     <household-search-result :pah-no="item.raw.pah" />
                   </v-col>
                 </v-row>

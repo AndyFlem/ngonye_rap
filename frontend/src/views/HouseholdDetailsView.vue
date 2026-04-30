@@ -43,7 +43,7 @@ const formatIcaOption = (value) => {
 const formatYesNo = (value) => {
   if (value === true) return 'Yes'
   if (value === false) return 'No'
-  return 'No'
+  return 'Unknown'
 }
 
 const isTrueValue = (value) => {

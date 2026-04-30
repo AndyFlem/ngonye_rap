@@ -12,13 +12,15 @@ module.exports = {
 
       if (defn.household_head) { params.push(`p_household_head=> '${defn.household_head.replace(`'`, `''`)}'`) }
       if (defn.pah) { params.push(`p_pah=> '${defn.pah.replace(`'`, `''`)}'`) }      
-      if (defn.vulnerable === 'true') { params.push(`p_vulnerable=> true`) }
-      if (defn.nonaffected === 'true') { params.push(`p_nonaffected=> true`) }
-      if (defn.landholding_only === 'true') { params.push(`p_landholding_only=> true`) }
-      if (defn.silumesii === 'true') { params.push(`p_silumesii=> true`) }
-      if (defn.new_ica_required === 'true') { params.push(`p_new_ica_required=> true`) }
-      if (defn.followup_flag === 'true') { params.push(`p_followup_flag=> true`) }
-      if (defn.physically_displaced === 'true') { params.push(`p_physically_displaced=> true`) }
+      if (defn.vulnerable !== undefined && defn.vulnerable !== null) { params.push(`p_vulnerable=> ${defn.vulnerable}`) }
+      if (defn.nonaffected !== undefined && defn.nonaffected !== null) { params.push(`p_nonaffected=> ${defn.nonaffected}`) }
+      if (defn.landholding_only !== undefined && defn.landholding_only !== null) { params.push(`p_landholding_only=> ${defn.landholding_only}`) }
+      if (defn.silumesii !== undefined && defn.silumesii !== null) { params.push(`p_silumesii=> ${defn.silumesii}`) }
+      if (defn.new_ica_required !== undefined && defn.new_ica_required !== null) { params.push(`p_new_ica_required=> ${defn.new_ica_required}`) }
+      if (defn.followup_flag !== undefined && defn.followup_flag !== null) { params.push(`p_followup_flag=> ${defn.followup_flag}`) }
+      if (defn.physically_displaced !== undefined && defn.physically_displaced !== null) { params.push(`p_physically_displaced=> ${defn.physically_displaced}`) }
+      if (defn.no_ica_required !== undefined && defn.no_ica_required !== null) { params.push(`p_no_ica_required=> ${defn.no_ica_required}`) }
+      if (defn.icasigned !== undefined && defn.icasigned !== null) { params.push(`p_icasigned=> ${defn.icasigned}`) }
 
       qry += params.join() + ')'
       if (defn.orderby) { qry += ' ORDER BY ' + defn.orderby }

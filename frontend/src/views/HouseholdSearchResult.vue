@@ -22,6 +22,13 @@ const getSafeExternalUrl = (value) => {
   return null
 }
 
+const formatYesNo = (value) => {
+  if (value === true) return 'Yes'
+  if (value === false) return 'No'
+  return 'Unknown'
+}
+
+
 // When pah is updated, load the pah data
 watch(() => props.pahNo, async (newPah) => {
   if (newPah) {
@@ -48,11 +55,25 @@ watch(() => props.pahNo, async (newPah) => {
     <v-alert v-if="error" type="error" variant="tonal" class="mt-2">
       {{ error }}
     </v-alert>
-    <v-card-title class="d-flex">
-      <router-link :to="`/households/${props.pahNo}`">{{ props.pahNo }} - {{ pah ? pah.household_head_fullname : 'Loading...' }}</router-link>
+    <v-card-title class="d-flex text-title-medium pt-1 pb-1">
+      <v-row no-gutters>
+        <v-col cols="8">
+          <router-link :to="`/households/${props.pahNo}`">{{ props.pahNo }} - {{ pah ? pah.household_head_fullname : 'Loading...' }}</router-link>
+        </v-col>
+        <v-col cols="4" class="d-flex justify-end">
+          <v-chip color="red" class="mr-2" size="small" v-if="pah && pah.vulnerable">
+            Vulnerable
+          </v-chip>
+          <v-chip color="" class="mr-2" size="small" v-if="pah && pah.no_ica_required">
+            ICA Not Required
+          </v-chip>
+          <v-chip color="" class="mr-2" size="small" v-if="pah && pah.nonaffected">
+            Non-affected
+          </v-chip>
+        </v-col>
+      </v-row>
     </v-card-title>
     <v-card-text v-if="pah">
-      {{ pah }}
       <v-row>
         <v-col cols="12" sm="6">
           <div :style="{ color: pah?.date_signed ? 'inherit' : 'red' }">
@@ -68,6 +89,9 @@ watch(() => props.pahNo, async (newPah) => {
               class="ml-2"
               title="Open ICA link"
             >Open ICA Link</v-btn>
+          </div>
+          <div>
+            <b>Physically Displaced:</b> <span class="table-value">{{ formatYesNo(pah?.physically_displaced) }}</span>
           </div>
         </v-col>
       </v-row>
