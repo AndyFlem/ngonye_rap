@@ -2,6 +2,7 @@
 import { computed, inject, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TopBar from '@/components/TopBar.vue'
+import { formatCurrency, formatArea, formatYesNo } from '@/utils/formatters'
 
 
 
@@ -18,14 +19,6 @@ const error = ref('')
 
 const pahno = computed(() => String(route.params.pah || '').trim())
 
-const formatCurrency = (value) => {
-  if (value == null || isNaN(value)) return '0'
-  return Math.round(Number(value)).toLocaleString('en-US')
-}
-const formatArea = (value) => {
-  if (value == null || isNaN(value)) return '0'
-  return Math.round(Number(value)).toLocaleString('en-US') + ' sqm'
-}
 
 const hasIcaOption = (value) => {
   if (value === null || value === undefined) return false
@@ -38,12 +31,6 @@ const hasIcaOption = (value) => {
 const formatIcaOption = (value) => {
   if (typeof value === 'boolean') return value ? 'Yes' : 'No'
   return String(value)
-}
-
-const formatYesNo = (value) => {
-  if (value === true) return 'Yes'
-  if (value === false) return 'No'
-  return 'Unknown'
 }
 
 const isTrueValue = (value) => {

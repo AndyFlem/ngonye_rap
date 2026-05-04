@@ -27,6 +27,7 @@ module.exports = (app) => {
 
   // HOUSEHOLDS
   app.post(prefix + '/households_search', HouseholdsController.search)
+  app.get(prefix + '/households_ica_options', HouseholdsController.indexIcaOptions)
   app.get(prefix + '/households/:pah', HouseholdsController.show)
   app.get(prefix + '/villages', RAPController.indexVillages)
 

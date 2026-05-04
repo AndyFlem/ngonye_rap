@@ -21,6 +21,15 @@ module.exports = {
       if (defn.physically_displaced !== undefined && defn.physically_displaced !== null) { params.push(`p_physically_displaced=> ${defn.physically_displaced}`) }
       if (defn.no_ica_required !== undefined && defn.no_ica_required !== null) { params.push(`p_no_ica_required=> ${defn.no_ica_required}`) }
       if (defn.icasigned !== undefined && defn.icasigned !== null) { params.push(`p_icasigned=> ${defn.icasigned}`) }
+      if (defn.nrc) { params.push(`p_nrc=> '${defn.nrc.replace(/'/g, "''")}'`) }
+      if (defn.village_id && defn.village_id !== 'all') {
+        const villageId = parseInt(defn.village_id)
+        if (!isNaN(villageId)) { params.push(`p_village_id=> ${villageId}`) }
+      }
+      const icaOptionFields = ['icaoption_primary_structure', 'icaoption_structure_location', 'icaoption_landholding', 'icaoption_dryland', 'icaoption_garden', 'icaoption_transport']
+      for (const field of icaOptionFields) {
+        if (defn[field]) { params.push(`p_${field}=> '${defn[field].replace(/'/g, "''")}'`) }
+      }
 
       qry += params.join() + ')'
       if (defn.orderby) { qry += ' ORDER BY ' + defn.orderby }
@@ -107,6 +116,22 @@ module.exports = {
     } catch (err) {
       Common.error(req, 'indexStructures', err)
       return res.status(500).send({ error: 'an error has occurred trying to fetch the structures for the household: ' + err })
+    }
+  },
+
+  async indexIcaOptions (req, res) {
+    Common.debug(req, 'indexIcaOptions')
+    const fields = ['icaoption_primary_structure', 'icaoption_structure_location', 'icaoption_landholding', 'icaoption_dryland', 'icaoption_garden', 'icaoption_transport']
+    try {
+      const result = {}
+      for (const field of fields) {
+        const rows = await Knex('v_households').distinct(field).whereNotNull(field).orderBy(field)
+        result[field] = rows.map(r => r[field])
+      }
+      return res.send(result)
+    } catch (err) {
+      Common.error(req, 'indexIcaOptions', err)
+      return res.status(500).send({ error: 'an error has occurred fetching ICA options: ' + err })
     }
   },
 

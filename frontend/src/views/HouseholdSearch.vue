@@ -19,7 +19,13 @@ const search = ref({
     physically_displaced: null,
     nonaffected: null,
     no_ica_required: false,
-    icasigned: null
+    icasigned: null,
+    icaoption_primary_structure: null,
+    icaoption_structure_location: null,
+    icaoption_landholding: null,
+    icaoption_dryland: null,
+    icaoption_garden: null,
+    icaoption_transport: null
   }
 })
 
@@ -38,6 +44,8 @@ watch(icarequired, (newValue) => {
   }
 }, { immediate: true })
 
+const icaOptions = ref({})
+
 const villageOptions = computed(() => [
   { village_id: 'all', village: 'All villages' },
   ...villages.value
@@ -49,6 +57,15 @@ const loadVillages = async () => {
     villages.value = Array.isArray(response.data) ? response.data : []
   } catch (err) {
     console.error('Failed to load villages:', err)
+  }
+}
+
+const loadIcaOptions = async () => {
+  try {
+    const response = await axiosSecure.get('/households_ica_options')
+    icaOptions.value = response.data
+  } catch (err) {
+    console.error('Failed to load ICA options:', err)
   }
 }
 
@@ -73,6 +90,7 @@ function doSearch () {
 
 onMounted(() => {
   loadVillages()
+  loadIcaOptions()
 })
 </script>
 
@@ -86,12 +104,18 @@ onMounted(() => {
             <h1 class="text-h4 mb-2">Households (PAHs)</h1>
           </v-col>
         </v-row>
-
         <v-card class="mb-4" elevation="1">
           <v-card-text>
             <v-row>
+              <v-col cols="12">
+                <strong>Household:</strong>
+              </v-col>
+            </v-row>
+            <v-row>
               <v-col cols="12" md="3">
                 <v-text-field
+                  density="compact"
+                  hide-details
                   v-model="search.params.pah"
                   label="PAH"
                   placeholder="PAH No"
@@ -102,6 +126,8 @@ onMounted(() => {
               </v-col>
               <v-col cols="12" md="3">
                 <v-text-field
+                  density="compact"
+                  hide-details
                   v-model="search.params.household_head"
                   label="Household Head"
                   placeholder="Enter household head"
@@ -111,6 +137,8 @@ onMounted(() => {
               </v-col>
               <v-col cols="12" md="2">
                 <v-text-field
+                  density="compact"
+                  hide-details
                   v-model="search.params.nrc"
                   label="NRC"
                   placeholder="Enter NRC"
@@ -120,6 +148,8 @@ onMounted(() => {
               </v-col>
               <v-col cols="12" md="4">
                 <v-autocomplete
+                  density="compact"
+                  hide-details
                   v-model="search.params.village_id"
                   :items="villageOptions"
                   item-title="village"
@@ -131,7 +161,84 @@ onMounted(() => {
                 />
               </v-col>
             </v-row>
-
+            <v-row>
+              <v-col cols="12">
+                <strong>ICA Options:</strong>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-select
+                  density="compact"
+                  hide-details
+                  v-model="search.params.icaoption_primary_structure"
+                  :items="icaOptions.icaoption_primary_structure"
+                  label="Primary Structure Option"
+                  placeholder="Any"
+                  clearable
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-select
+                  density="compact"
+                  hide-details
+                  v-model="search.params.icaoption_structure_location"
+                  :items="icaOptions.icaoption_structure_location"
+                  label="Structure Location Option"
+                  placeholder="Any"
+                  clearable
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-select
+                  density="compact"
+                  hide-details
+                  v-model="search.params.icaoption_landholding"
+                  :items="icaOptions.icaoption_landholding"
+                  label="Landholding Option"
+                  placeholder="Any"
+                  clearable
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-select
+                  density="compact"
+                  hide-details
+                  v-model="search.params.icaoption_dryland"
+                  :items="icaOptions.icaoption_dryland"
+                  label="Dryland Option"
+                  placeholder="Any"
+                  clearable
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-select
+                  density="compact"
+                  hide-details
+                  v-model="search.params.icaoption_garden"
+                  :items="icaOptions.icaoption_garden"
+                  label="Garden Option"
+                  placeholder="Any"
+                  clearable
+                />
+              </v-col>
+              <v-col cols="12" md="4">
+                <v-select
+                  density="compact"
+                  hide-details
+                  v-model="search.params.icaoption_transport"
+                  :items="icaOptions.icaoption_transport"
+                  label="Transport Option"
+                  placeholder="Any"
+                  clearable
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12">
+                <strong>Flags:</strong>
+              </v-col>
+            </v-row>
             <v-row>
               <v-col cols="12" md="8" class="d-flex flex-wrap align-center ga-4">
                 <div class="d-flex align-center ga-1 pr-4 bg-grey-lighten-4 rounded">
@@ -139,7 +246,7 @@ onMounted(() => {
                     v-model="search.params.nonaffected"
                     label="Non-affected"
                     hide-details
-                    density="comfortable"
+                    density="compact"
                   />
                 </div>
                 <div class="d-flex align-center ga-1 pr-4 bg-grey-lighten-4 rounded">
@@ -148,7 +255,7 @@ onMounted(() => {
                     label="ICA Required"
                     hide-details
                     :indeterminate="getICARequiredIndet"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -164,7 +271,8 @@ onMounted(() => {
                     label="ICA Signed"
                     hide-details
                     :indeterminate="search.params.icasigned === null"
-                    density="comfortable"
+                    density="compact"
+
                   />
                   <v-btn
                     icon="mdi-close-circle"

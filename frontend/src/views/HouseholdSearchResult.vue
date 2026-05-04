@@ -1,5 +1,6 @@
 <script setup>
 import { inject, ref, watch } from 'vue'
+import { formatCurrency, formatArea, formatYesNo } from '@/utils/formatters'
 
 const axiosSecure = inject('axiosSecure')
 
@@ -21,13 +22,6 @@ const getSafeExternalUrl = (value) => {
   if (/^https?:\/\//i.test(url)) return url
   return null
 }
-
-const formatYesNo = (value) => {
-  if (value === true) return 'Yes'
-  if (value === false) return 'No'
-  return 'Unknown'
-}
-
 
 // When pah is updated, load the pah data
 watch(() => props.pahNo, async (newPah) => {
@@ -93,6 +87,11 @@ watch(() => props.pahNo, async (newPah) => {
           <div>
             <b>Physically Displaced:</b> <span class="table-value">{{ formatYesNo(pah?.physically_displaced) }}</span>
           </div>
+        </v-col>
+        <v-col cols="12" sm="6">
+          <div><strong>Cash Compensation:</strong> <span class="table-value">K{{ formatCurrency(pah.compensation?.total_cash_compensation || 0) }}</span></div>
+          <div v-if="pah.replacement_land_area>0"><strong>Replacement Land:</strong> <span class="table-value">{{ formatArea(pah.replacement_land_area) }} ({{ pah.icaoption_landholding }})</span></div>
+          <div v-if="pah.replacement_structures_value>0"><strong>Replacement Structures:</strong> <span class="table-value">{{ 0 }} <span>(K{{ formatCurrency(pah.replacement_structures_value) }})</span></span></div>
         </v-col>
       </v-row>
     </v-card-text>
