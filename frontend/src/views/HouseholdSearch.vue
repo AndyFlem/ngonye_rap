@@ -25,13 +25,19 @@ const search = ref({
     icaoption_landholding: null,
     icaoption_dryland: null,
     icaoption_garden: null,
-    icaoption_transport: null
+    icaoption_transport: null,
+    has_replacement_structures: null,
+    has_replacement_land: null,
+    followup_flag: null,
+    silumesii: null,
+    new_ica_required: null
   }
 })
 
 const getICARequiredIndet = computed(() => icarequired.value === null)
 const villages = ref([])
 const loading = ref(false)
+const downloading = ref(false)
 const error = ref('')
 const page = ref(1)
 const pahs = ref([])
@@ -85,6 +91,28 @@ function doSearch () {
     })
     .finally(() => {
       loading.value = false
+    })
+}
+
+function downloadCsv () {
+  downloading.value = true
+  axiosSecure.post('/households_export', search.value.params, { responseType: 'blob' })
+    .then(response => {
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv' }))
+      const link = document.createElement('a')
+      link.href = url
+      const name = `${new Date().toISOString().slice(0, 10)}_households_export.csv`
+      link.setAttribute('download', name)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    })
+    .catch(err => {
+      console.error('Export failed:', err)
+    })
+    .finally(() => {
+      downloading.value = false
     })
 }
 
@@ -286,7 +314,7 @@ onMounted(() => {
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12" md="8" class="d-flex flex-wrap align-center ga-4">
+              <v-col cols="12" class="d-flex flex-wrap align-center ga-4">
                 <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
                   <v-checkbox
                     v-model="search.params.vulnerable"
@@ -319,6 +347,90 @@ onMounted(() => {
                     @click="search.params.physically_displaced = null"
                   />
                 </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.followup_flag"
+                    label="Follow-Up Flag"
+                    hide-details
+                    :indeterminate="search.params.followup_flag === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.followup_flag = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.silumesii"
+                    label="Silumesii"
+                    hide-details
+                    :indeterminate="search.params.silumesii === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.silumesii = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.new_ica_required"
+                    label="New ICA Required"
+                    hide-details
+                    :indeterminate="search.params.new_ica_required === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.new_ica_required = null"
+                  />
+                </div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="8" class="d-flex flex-wrap align-center ga-4">
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_replacement_structures"
+                    label="Has replacement structures"
+                    hide-details
+                    :indeterminate="search.params.has_replacement_structures === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_replacement_structures = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_replacement_land"
+                    label="Has replacement land"
+                    hide-details
+                    :indeterminate="search.params.has_replacement_land === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_replacement_land = null"
+                  />
+                </div>
               </v-col>
             </v-row>
             <v-row >
@@ -326,7 +438,8 @@ onMounted(() => {
                 {{ pahs.length }} result(s) found.
               </v-col>
               <v-col cols="6" class="d-flex align-center ga-2 justify-end">
-                <v-btn color="primary" :loading="loading" @click="doSearch">Search</v-btn>
+                <v-btn color="primary" :loading="loading" append-icon="mdi-magnify" @click="doSearch">Search</v-btn>
+                <v-btn color="primary" :loading="downloading" append-icon="mdi-download" @click="downloadCsv">Download</v-btn>
               </v-col>
             </v-row>
 

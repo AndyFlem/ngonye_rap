@@ -5,6 +5,7 @@ const auth = require('./services/auth')
 const UsersController = require('./controllers/UsersController')
 const HouseholdsController = require('./controllers/HouseholdsController')
 const RAPController = require('./controllers/RAPController')
+const ReplacementsController = require('./controllers/ReplacementsController')
 
 module.exports = (app) => {
   const prefix = '/api/' + config.api_version
@@ -22,18 +23,25 @@ module.exports = (app) => {
   // Require authentication
   // ************************************************  
 
-  // SUMMARY DATA
-  app.get(prefix + '/households_summary', RAPController.householdsSummary)
+  app.get(prefix + '/villages', RAPController.indexVillages)
+
 
   // HOUSEHOLDS
+  app.get(prefix + '/households_summary', HouseholdsController.summary)
   app.post(prefix + '/households_search', HouseholdsController.search)
+  app.post(prefix + '/households_export', HouseholdsController.exportSearch)
   app.get(prefix + '/households_ica_options', HouseholdsController.indexIcaOptions)
   app.get(prefix + '/households/:pah', HouseholdsController.show)
-  app.get(prefix + '/villages', RAPController.indexVillages)
 
   app.get(prefix + '/households/:pah/parcels', HouseholdsController.indexParcels)
   app.get(prefix + '/households/:pah/structures', HouseholdsController.indexStructures)
-  app.get(prefix + '/households/:pah/replacements', HouseholdsController.indexReplacements)
+
+  // REPLACEMENT STRUCTURES
+  app.get(prefix + '/households/:pah/replacements', ReplacementsController.indexForPAH)
+  app.get(prefix + '/replacements/summary', ReplacementsController.summary)
+
+  // LAND
+  app.get(prefix + '/land/summary', RAPController.summaryLandAquisition)
 
   // USER MANAGEMENT
   app.post(prefix + '/user', UsersController.create)

@@ -58,6 +58,12 @@ watch(() => props.pahNo, async (newPah) => {
           <v-chip color="red" class="mr-2" size="small" v-if="pah && pah.vulnerable">
             Vulnerable
           </v-chip>
+          <v-chip color="purple" class="mr-2" size="small" v-if="pah && pah.household_followup_flag">
+            Flagged
+          </v-chip>
+          <v-chip color="orange" class="mr-2" size="small" v-if="pah && pah.new_ica_required">
+            New ICA Required
+          </v-chip>
           <v-chip color="" class="mr-2" size="small" v-if="pah && pah.no_ica_required">
             ICA Not Required
           </v-chip>
@@ -70,8 +76,14 @@ watch(() => props.pahNo, async (newPah) => {
     <v-card-text v-if="pah">
       <v-row>
         <v-col cols="12" sm="6">
-          <div :style="{ color: pah?.date_signed ? 'inherit' : 'red' }">
-            <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah?.date_signed || 'not signed' }}</span>
+          <div>
+            <span v-if="!pah.no_ica_required" :style="{ color: pah?.date_signed ? 'inherit' : 'red' }">
+              <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah?.date_signed || 'not signed' }}</span>
+            </span>
+            <span v-else>
+              <strong>ICA:</strong> <span class="table-value">Not Required</span>
+            </span>
+
             <v-btn
               v-if="getSafeExternalUrl(pah?.ica_link)"
               :href="getSafeExternalUrl(pah?.ica_link)"
@@ -91,7 +103,7 @@ watch(() => props.pahNo, async (newPah) => {
         <v-col cols="12" sm="6">
           <div><strong>Cash Compensation:</strong> <span class="table-value">K{{ formatCurrency(pah.compensation?.total_cash_compensation || 0) }}</span></div>
           <div v-if="pah.replacement_land_area>0"><strong>Replacement Land:</strong> <span class="table-value">{{ formatArea(pah.replacement_land_area) }} ({{ pah.icaoption_landholding }})</span></div>
-          <div v-if="pah.replacement_structures_value>0"><strong>Replacement Structures:</strong> <span class="table-value">{{ 0 }} <span>(K{{ formatCurrency(pah.replacement_structures_value) }})</span></span></div>
+          <div v-if="pah.replacement_structures_count>0"><strong>Replacement Structures:</strong> <span class="table-value">{{ pah.replacement_structures_count }} <span>({{ pah.icaoption_structure_location }})</span></span></div>
         </v-col>
       </v-row>
     </v-card-text>

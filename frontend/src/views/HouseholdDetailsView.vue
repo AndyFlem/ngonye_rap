@@ -3,6 +3,7 @@ import { computed, inject, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TopBar from '@/components/TopBar.vue'
 import { formatCurrency, formatArea, formatYesNo } from '@/utils/formatters'
+import TableCopyFooter from '@/components/TableCopyFooter.vue'
 
 
 
@@ -92,6 +93,7 @@ const goBack = () => {
 onMounted(() => {
   loadHousehold()
 })
+
 </script>
 
 <template>
@@ -105,9 +107,23 @@ onMounted(() => {
 
         <v-card elevation="1">
           <v-card-title class="d-flex">
-            {{ pahno }}&nbsp;<span v-if="pah">{{ pah.householdhead_fullname }}</span>
+            {{ pahno }}&nbsp;<span v-if="pah"> - {{ pah.household_head_fullname }}</span>
             <v-spacer/>
-            <v-chip v-if="pah?.vulnerable" color="red" text-color="white">Vulnerable</v-chip>
+            <v-chip color="red" class="mr-2" size="small" v-if="pah && pah.vulnerable">
+              Vulnerable
+            </v-chip>
+            <v-chip color="purple" class="mr-2" size="small" v-if="pah && pah.household_followup_flag">
+              Flagged
+            </v-chip>
+            <v-chip color="orange" class="mr-2" size="small" v-if="pah && pah.new_ica_required">
+              New ICA Required
+            </v-chip>
+            <v-chip color="" class="mr-2" size="small" v-if="pah && pah.no_ica_required">
+              ICA Not Required
+            </v-chip>
+            <v-chip color="" class="mr-2" size="small" v-if="pah && pah.nonaffected">
+              Non-affected
+            </v-chip>
           </v-card-title>
           <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4" />
           <v-card-text v-if="pah">
@@ -124,7 +140,7 @@ onMounted(() => {
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12">
+              <v-col v-if="!pah.no_ica_required" cols="12">
                 <div :style="{ color: pah?.date_signed ? 'inherit' : 'red' }">
                   <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah?.date_signed || 'not signed' }}</span>
                   <v-btn
@@ -140,6 +156,9 @@ onMounted(() => {
                   >Open ICA Link</v-btn>
                 </div>
               </v-col>
+              <v-col v-else cols="12">
+                <div><strong>ICA:</strong> <span class="table-value">Not Required</span></div>
+              </v-col>
             </v-row>
             <v-row>
               <v-col cols="12" md="6">
@@ -148,16 +167,20 @@ onMounted(() => {
                 <div><strong>No ICA Required: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.no_ica_required) }">{{ formatYesNo(pah.no_ica_required) }}</span></div>
                 <div><strong>New ICA Required: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.new_ica_required) }">{{ formatYesNo(pah.new_ica_required) }}</span></div>
                 <div><strong>Non-affected: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.nonaffected) }">{{ formatYesNo(pah.nonaffected) }}</span></div>
-                <div><strong>Is Silumesii: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.is_silumesii) }">{{ formatYesNo(pah.is_silumesii) }}</span></div>
+                <div><strong>Is Silumesii: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.silumesii) }">{{ formatYesNo(pah.silumesii) }}</span></div>
                 <div><strong>Flagged: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.followup_flag) }">{{ formatYesNo(pah.followup_flag) }}</span></div>
               </v-col>
               <v-col cols="12" md="6">
                 <div><strong>Cash Compensation:</strong> <span class="table-value">K{{ formatCurrency(pah.compensation?.total_cash_compensation || 0) }}</span></div>
                 <div v-if="pah.replacement_land_area>0"><strong>Replacement Land:</strong> <span class="table-value">{{ formatArea(pah.replacement_land_area) }} ({{ pah.icaoption_landholding }})</span></div>
-                <div v-if="pah.replacement_structures_value>0"><strong>Replacement Structures:</strong> <span class="table-value">{{ replacements.length }} <span>(K{{ formatCurrency(pah.replacement_structures_value) }})</span></span></div>
+                <div v-if="pah.replacement_structures_count>0"><strong>Replacement Structures:</strong> <span class="table-value">{{ pah.replacement_structures_count }} <span>({{ pah.icaoption_structure_location }})</span></span></div>
               </v-col>
             </v-row>
-
+            <v-row v-if="pah.notes">
+              <v-col cols="12">
+                <b>Note:</b> {{ pah.notes }}
+              </v-col>
+            </v-row>
             <v-row class="pb-5">
               <v-col cols="12" md="6" lg="4">
                 <v-table v-if="pah" density="compact">
@@ -167,6 +190,10 @@ onMounted(() => {
                     </tr>
                   </thead>
                   <tbody>
+                    <tr v-if="pah.compensation.primary_structures_compensation_value > 0">
+                      <td class="table-label">Primary Structures</td>
+                      <td class="table-value">K{{ formatCurrency(pah.compensation.primary_structures_compensation_value) }}</td>
+                    </tr>
                     <tr v-if="pah.compensation.secondary_structures_compensation_value > 0">
                       <td class="table-label">Secondary Structures</td>
                       <td class="table-value">K{{ formatCurrency(pah.compensation.secondary_structures_compensation_value) }}</td>
@@ -195,8 +222,8 @@ onMounted(() => {
                       <td class="table-label">Total</td>
                       <td class="table-value">K{{ formatCurrency(pah.compensation.total_cash_compensation) }}</td>
                     </tr>
-
                   </tbody>
+                  <TableCopyFooter :colspan="2" />
                 </v-table>
               </v-col>
               <v-col cols="12" md="6" lg="4">
@@ -236,6 +263,7 @@ onMounted(() => {
                       <td class="table-value">K{{ formatCurrency(pah.allowance_total) }}</td>
                     </tr>
                   </tbody>
+                  <TableCopyFooter :colspan="2" />
                 </v-table>
               </v-col>
             </v-row>
@@ -273,6 +301,7 @@ onMounted(() => {
                       <td class="table-value">{{ formatIcaOption(pah.icaoption_transport) }}</td>
                     </tr>
                   </tbody>
+                  <TableCopyFooter :colspan="2" />
                 </v-table>
               </v-col>
               <v-col cols="12" md="6" lg="4">
@@ -308,6 +337,7 @@ onMounted(() => {
                       <td class="table-value">{{ formatIcaOption(pah.lr_agricultureinputs) }}</td>
                     </tr>
                   </tbody>
+                  <TableCopyFooter :colspan="2" />
                 </v-table>
               </v-col>
             </v-row>
@@ -378,6 +408,7 @@ onMounted(() => {
                       </tr>
                     </template>
                   </tbody>
+                  <TableCopyFooter :colspan="9" />
                 </v-table>
               </v-col>
             </v-row>
@@ -410,6 +441,7 @@ onMounted(() => {
                       </td>
                     </tr>
                   </tbody>
+                  <TableCopyFooter :colspan="5" />
                 </v-table>
               </v-col>
             </v-row>
@@ -499,6 +531,7 @@ onMounted(() => {
                                     <td class="table-value">K{{ formatCurrency(structure.structure_value)}}</td>
                                   </tr>
                                 </tbody>
+                                <TableCopyFooter :colspan="5" />
                               </v-table>
                             </v-col>
                           </v-row>
@@ -521,25 +554,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
-
-.table-label {
-  font-weight: 500;
-  width: 40%;
-}
-
-.left {
-  text-align: left;
-}
-
-.table-total {
-  background-color: rgba(25, 118, 210, 0.1);
-  font-weight: 600;
-}
-
-.table-total .table-value {
-  color: rgb(25, 118, 210);
-}
 
 .parcel-row {
   font-weight: 600;

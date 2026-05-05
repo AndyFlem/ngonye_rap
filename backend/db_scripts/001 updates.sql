@@ -17,7 +17,9 @@ CREATE OR REPLACE FUNCTION public.a_households_search(
   p_icaoption_landholding character varying DEFAULT NULL::character varying,
   p_icaoption_dryland character varying DEFAULT NULL::character varying,
   p_icaoption_garden character varying DEFAULT NULL::character varying,
-  p_icaoption_transport character varying DEFAULT NULL::character varying
+  p_icaoption_transport character varying DEFAULT NULL::character varying,
+  p_has_replacement_structures boolean DEFAULT NULL::boolean,
+  p_has_replacement_land boolean DEFAULT NULL::boolean
 )
 RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
 LANGUAGE plpgsql
@@ -50,6 +52,8 @@ BEGIN
 		(h.icaoption_dryland = p_icaoption_dryland OR p_icaoption_dryland IS NULL) AND
 		(h.icaoption_garden = p_icaoption_garden OR p_icaoption_garden IS NULL) AND
 		(h.icaoption_transport = p_icaoption_transport OR p_icaoption_transport IS NULL) AND
+		((COALESCE(h.replacement_structures_count, 0) > 0) = p_has_replacement_structures OR p_has_replacement_structures IS NULL) AND
+		((COALESCE(h.replacement_land_area, 0) > 0) = p_has_replacement_land OR p_has_replacement_land IS NULL) AND
 		(
 			(SIMILARITY(h.firstname,p_household_head) > 0.4 OR p_household_head IS NULL) OR
 			(SIMILARITY(h.lastname,p_household_head) > 0.4 OR p_household_head IS NULL) OR
