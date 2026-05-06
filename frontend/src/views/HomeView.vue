@@ -1,9 +1,9 @@
 <script setup>
 import { inject } from 'vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import TopBar from '@/components/TopBar.vue'
 import TableCopyFooter from '@/components/TableCopyFooter.vue'
-import { formatCurrency } from '@/utils/formatters'
+import { formatCurrency, formatArea } from '@/utils/formatters'
 
 const households = ref(null)
 const replacementStructs = ref(null)
@@ -12,7 +12,58 @@ const landAquisition = ref(null)
 const loading = ref(false)
 const error = ref('')
 
-const user = inject('user')
+
+const landClassRows = computed(() => {
+  const classes = landAquisition.value?.landClasses ?? []
+  const groups = new Map()
+  for (const item of classes) {
+    if (!groups.has(item.land_class)) groups.set(item.land_class, [])
+    groups.get(item.land_class).push(item)
+  }
+  const rows = []
+  let grandTotal = 0
+  let grandPermTotal = 0
+  let grandTempTotal = 0
+  for (const [landClass, items] of groups) {
+    const groupTotal = items.reduce((sum, i) => sum + i.total, 0)
+    const groupPermTotal = items.reduce((sum, i) => sum + i.permanent_total, 0)
+    const groupTempTotal = items.reduce((sum, i) => sum + i.temporary_total, 0)
+    grandTotal += groupTotal
+    grandPermTotal += groupPermTotal
+    grandTempTotal += groupTempTotal
+    rows.push({ type: 'group', label: landClass })
+    for (const item of [...items].sort((a, b) => b.total - a.total)) {
+      rows.push({ type: 'item', land_zone: item.land_zone, total: item.total, permanent_total: item.permanent_total, temporary_total: item.temporary_total })
+    }
+    rows.push({ type: 'subtotal', label: landClass, total: groupTotal, permanent_total: groupPermTotal, temporary_total: groupTempTotal })
+  }
+  rows.push({ type: 'grand-total', total: grandTotal, permanent_total: grandPermTotal, temporary_total: grandTempTotal })
+  return rows
+})
+
+const replacementLandRows = computed(() => {
+  const classes = replacementLand.value?.classes ?? []
+  const groups = new Map()
+  for (const item of classes) {
+    if (!groups.has(item.land_class)) groups.set(item.land_class, [])
+    groups.get(item.land_class).push(item)
+  }
+  const rows = []
+  let grandTotal = 0
+  for (const [landClass, items] of groups) {
+    const groupTotal = items.reduce((sum, i) => sum + (i.total ?? 0), 0)
+    grandTotal += groupTotal
+    rows.push({ type: 'group', label: landClass })
+    for (const item of [...items].sort((a, b) => (b.total ?? 0) - (a.total ?? 0))) {
+      rows.push({ type: 'item', land_zone: item.land_zone, total: item.total })
+    }
+    rows.push({ type: 'subtotal', label: landClass, total: groupTotal })
+  }
+  rows.push({ type: 'grand-total', total: grandTotal })
+  return rows
+})
+
+//const user = inject('user')
 const axiosSecure = inject('axiosSecure')
 
 const load = async () => {
@@ -173,8 +224,41 @@ onMounted(() => {
             <h3 class="text-h3 mb-4">
               Land Aquisition
             </h3>
-            <v-table v-if="landAquisition">
-              {{ landAquisition }}
+            <v-table v-if="landAquisition" density="compact">
+              <thead>
+                <tr>
+                  <th class="table-heading">Zone</th>
+                  <th class="table-heading right">Permanent</th>
+                  <th class="table-heading right">Temporary</th>
+                  <th class="table-heading right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template v-for="(row, i) in landClassRows" :key="i">
+                  <tr v-if="row.type === 'group'" class="bg-grey-lighten-3">
+                    <td colspan="4"><strong>{{ row.label }}</strong></td>
+                  </tr>
+                  <tr v-else-if="row.type === 'item'">
+                    <td>{{ row.land_zone }}</td>
+                    <td class="table-value">{{ formatArea(row.permanent_total) }}</td>
+                    <td class="table-value">{{ formatArea(row.temporary_total) }}</td>
+                    <td class="table-value">{{ formatArea(row.total) }}</td>
+                  </tr>
+                  <tr v-else-if="row.type === 'subtotal'" class="table-total">
+                    <td>{{ row.label }} Total</td>
+                    <td class="table-value">{{ formatArea(row.permanent_total) }}</td>
+                    <td class="table-value">{{ formatArea(row.temporary_total) }}</td>
+                    <td class="table-value">{{ formatArea(row.total) }}</td>
+                  </tr>
+                  <tr v-else-if="row.type === 'grand-total'" class="table-total">
+                    <td>Total</td>
+                    <td class="table-value">{{ formatArea(row.permanent_total) }}</td>
+                    <td class="table-value">{{ formatArea(row.temporary_total) }}</td>
+                    <td class="table-value">{{ formatArea(row.total) }}</td>
+                  </tr>
+                </template>
+              </tbody>
+              <TableCopyFooter :colspan="4" />
             </v-table>
           </v-col>
         </v-row>
@@ -183,8 +267,33 @@ onMounted(() => {
             <h3 class="text-h3 mb-4">
               Replacement Land
             </h3>
-            <v-table v-if="replacementLand">
-              {{ replacementLand }}
+            <v-table v-if="replacementLand" density="compact">
+              <thead>
+                <tr>
+                  <th class="table-heading">Zone</th>
+                  <th class="table-heading right">Area</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template v-for="(row, i) in replacementLandRows" :key="i">
+                  <tr v-if="row.type === 'group'" class="bg-grey-lighten-3">
+                    <td colspan="2"><strong>{{ row.label }}</strong></td>
+                  </tr>
+                  <tr v-else-if="row.type === 'item'">
+                    <td>{{ row.land_zone }}</td>
+                    <td class="table-value">{{ formatArea(row.total) }}</td>
+                  </tr>
+                  <tr v-else-if="row.type === 'subtotal'" class="table-total">
+                    <td>{{ row.label }} Total</td>
+                    <td class="table-value">{{ formatArea(row.total) }}</td>
+                  </tr>
+                  <tr v-else-if="row.type === 'grand-total'" class="table-total">
+                    <td>Total</td>
+                    <td class="table-value">{{ formatArea(row.total) }}</td>
+                  </tr>
+                </template>
+              </tbody>
+              <TableCopyFooter :colspan="2" />
             </v-table>
           </v-col>
         </v-row>

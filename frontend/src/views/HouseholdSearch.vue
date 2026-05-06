@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, onMounted, ref, watch } from 'vue'
+import { computed, inject, nextTick, onMounted, ref, watch } from 'vue'
 
 import TopBar from '@/components/TopBar.vue'
 import HouseholdSearchResult from '@/views/HouseholdSearchResult.vue'
@@ -28,6 +28,7 @@ const search = ref({
     icaoption_transport: null,
     has_replacement_structures: null,
     has_replacement_land: null,
+    has_protected: null,
     followup_flag: null,
     silumesii: null,
     new_ica_required: null
@@ -42,6 +43,27 @@ const error = ref('')
 const page = ref(1)
 const pahs = ref([])
 
+const STORAGE_KEY = 'household_search_state'
+
+function saveSearchState () {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    params: search.value.params,
+    icarequired: icarequired.value
+  }))
+}
+
+function restoreSearchState () {
+  const saved = localStorage.getItem(STORAGE_KEY)
+  if (!saved) return
+  try {
+    const { params, icarequired: savedIca } = JSON.parse(saved)
+    search.value.params = params
+    icarequired.value = savedIca
+  } catch {
+    localStorage.removeItem(STORAGE_KEY)
+  }
+}
+
 watch(icarequired, (newValue) => {
   if (newValue === null) {
     search.value.params.no_ica_required = null
@@ -49,6 +71,35 @@ watch(icarequired, (newValue) => {
     search.value.params.no_ica_required = !newValue
   }
 }, { immediate: true })
+
+watch([() => search.value.params, icarequired], saveSearchState, { deep: true })
+
+let autoSearchReady = false
+
+const autoSearchFields = [
+  () => search.value.params.village_id,
+  () => search.value.params.vulnerable,
+  () => search.value.params.physically_displaced,
+  () => search.value.params.nonaffected,
+  () => search.value.params.icasigned,
+  () => search.value.params.icaoption_primary_structure,
+  () => search.value.params.icaoption_structure_location,
+  () => search.value.params.icaoption_landholding,
+  () => search.value.params.icaoption_dryland,
+  () => search.value.params.icaoption_garden,
+  () => search.value.params.icaoption_transport,
+  () => search.value.params.has_replacement_structures,
+  () => search.value.params.has_replacement_land,
+  () => search.value.params.has_protected,
+  () => search.value.params.followup_flag,
+  () => search.value.params.silumesii,
+  () => search.value.params.new_ica_required,
+  icarequired,
+]
+
+watch(autoSearchFields, () => {
+  if (autoSearchReady) doSearch()
+})
 
 const icaOptions = ref({})
 
@@ -94,6 +145,34 @@ function doSearch () {
     })
 }
 
+function clearSearch () {
+  localStorage.removeItem(STORAGE_KEY)
+  icarequired.value = true
+  search.value.params = {
+    pah: '',
+    household_head: '',
+    nrc: '',
+    village_id: 'all',
+    vulnerable: null,
+    physically_displaced: null,
+    nonaffected: null,
+    no_ica_required: false,
+    icasigned: null,
+    icaoption_primary_structure: null,
+    icaoption_structure_location: null,
+    icaoption_landholding: null,
+    icaoption_dryland: null,
+    icaoption_garden: null,
+    icaoption_transport: null,
+    has_replacement_structures: null,
+    has_replacement_land: null,
+    has_protected: null,
+    followup_flag: null,
+    silumesii: null,
+    new_ica_required: null
+  }
+}
+
 function downloadCsv () {
   downloading.value = true
   axiosSecure.post('/households_export', search.value.params, { responseType: 'blob' })
@@ -117,8 +196,11 @@ function downloadCsv () {
 }
 
 onMounted(() => {
+  restoreSearchState()
   loadVillages()
   loadIcaOptions()
+  doSearch()
+  nextTick(() => { autoSearchReady = true })
 })
 </script>
 
@@ -306,7 +388,6 @@ onMounted(() => {
                     icon="mdi-close-circle"
                     color="grey"
                     size="x-small"
-                    :loading="loading"
                     variant="text"
                     @click="search.params.icasigned = null"
                   />
@@ -431,6 +512,22 @@ onMounted(() => {
                     @click="search.params.has_replacement_land = null"
                   />
                 </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_protected"
+                    label="Has protected"
+                    hide-details
+                    :indeterminate="search.params.has_protected === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_protected = null"
+                  />
+                </div>
               </v-col>
             </v-row>
             <v-row >
@@ -438,6 +535,7 @@ onMounted(() => {
                 {{ pahs.length }} result(s) found.
               </v-col>
               <v-col cols="6" class="d-flex align-center ga-2 justify-end">
+                <v-btn color="primary" append-icon="mdi-close" @click="clearSearch">Clear</v-btn>
                 <v-btn color="primary" :loading="loading" append-icon="mdi-magnify" @click="doSearch">Search</v-btn>
                 <v-btn color="primary" :loading="downloading" append-icon="mdi-download" @click="downloadCsv">Download</v-btn>
               </v-col>

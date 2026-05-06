@@ -4,8 +4,9 @@ export const formatCurrency = (value) => {
 }
 
 export const formatArea = (value) => {
-  if (value == null || isNaN(value)) return '0'
-  return Math.round(Number(value)).toLocaleString('en-US') + ' sqm'
+  if (!value) return '-'
+  if (value >= 10000) return `${(value / 10000).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ha`
+  return `${Math.round(value).toLocaleString('en-US')} sqm`
 }
 
 export const formatYesNo = (value) => {

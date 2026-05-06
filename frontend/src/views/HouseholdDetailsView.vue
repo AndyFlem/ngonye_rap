@@ -15,6 +15,8 @@ const pah = ref(null)
 const parcels = ref([])
 const structures = ref([])
 const replacements = ref([])
+const trees = ref([])
+const crops = ref([])
 const loading = ref(false)
 const error = ref('')
 
@@ -76,6 +78,10 @@ const loadHousehold = async () => {
       const replacementsResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/replacements`)
       replacements.value = Array.isArray(replacementsResponse.data) ? replacementsResponse.data : []
 
+      const treesResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/trees`)
+      trees.value = Array.isArray(treesResponse.data) ? treesResponse.data : []
+      const cropsResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/crops`)
+      crops.value = Array.isArray(cropsResponse.data) ? cropsResponse.data : []
     }
 
   } catch (err) {
@@ -424,7 +430,7 @@ onMounted(() => {
                       <th>Structure ID</th>
                       <th>Class</th>
                       <th>Option</th>
-                      <th>Value</th>
+                      <th>Est Cost</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -456,9 +462,10 @@ onMounted(() => {
                         :key="structure.structure_id"
                         class="mt-1 mb-0"
                       >
-                        <v-expansion-panel-title class="">
+                        <v-expansion-panel-title :class="structure.protected ? 'bg-green-lighten-4' : ''">
+
                           <div class="structure-panel-title">
-                            <span>{{ structure.structure_id }} </span>&nbsp;
+                            <span><span v-if="structure.protected"><b>[PROTECTED]</b>&nbsp;</span>{{ structure.structure_id }} </span>&nbsp;
                             <span>{{ structure.structure_class }}</span> - <span><strong>{{ structure.structure_type }}</strong></span>
                           </div>
                           <v-spacer/>
@@ -540,6 +547,72 @@ onMounted(() => {
                     </v-expansion-panels>
                   </v-card-text>
                 </v-card>
+              </v-col>
+            </v-row>
+            <v-row v-if="trees.length > 0" >
+              <v-col cols="12">
+                <v-table>
+                  <thead>
+                    <tr>
+                      <th colspan="5" class="table-heading">Trees</th>
+                    </tr>
+                    <tr>
+                      <th>Tree Type</th>
+                      <th class="center">Juvenile</th>
+                      <th class="center">Productive</th>
+                      <th class="center">Replacement<br/>Saplings</th>
+                      <th class="right">Compensation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="tree in trees" :key="tree.tree_type">
+                      <td class="table-value left">{{ tree.tree_type }}</td>
+                      <td class="table-value center">{{ tree.juvenile_count }}</td>
+                      <td class="table-value center">{{ tree.productive_count }}</td>
+                      <td class="table-value center">{{ tree.replacement_saplings }}</td>
+                      <td class="table-value right">K{{ formatCurrency(tree.compensation) }}</td>
+                    </tr>
+                    <tr class="table-total">
+                      <td class="table-value" colspan="4">Total</td>
+                      <td class="table-value">K{{ formatCurrency(trees.reduce((sum, t) => sum + (t.compensation || 0), 0)) }}</td>
+                    </tr>
+                  </tbody>
+                  <TableCopyFooter :colspan="5" />
+                </v-table>
+              </v-col>
+            </v-row>
+            <v-row v-if="crops.length > 0" >
+              <v-col cols="12">
+                <v-table>
+                  <thead>
+                    <tr>
+                      <th colspan="6" class="table-heading">Crops</th>
+                    </tr>
+                    <tr>
+                      <th>Crop Type</th>
+                      <th class="right">Field Size (sqm)</th>
+                      <th class="center">Coverage</th>
+                      <th class="right">Rate (K/sqm)</th>
+                      <th class="right">Crop Size (sqm)</th>
+                      <th class="right">Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(crop, index) in crops" :key="index">
+                      <td class="table-value left">{{ crop.crop_type }}</td>
+                      <td class="table-value right">{{ formatArea(crop.field_size) }}</td>
+                      <td class="table-value center">{{ (crop.coverage * 100).toFixed(0) }}%</td>
+                      <td class="table-value right">K{{ formatCurrency(crop.rate) }}</td>
+                      <td class="table-value right">{{ formatArea(crop.crop_size) }}</td>
+                      <td class="table-value right">K{{ formatCurrency(crop.crop_value) }}</td>
+                    </tr>
+                    <tr class="table-total">
+                      <td class="table-value" colspan="5">Total</td>
+                      <td class="table-value right">K{{ formatCurrency(crops.reduce((sum, c) => sum + (c.crop_value || 0), 0)) }}</td>
+                    </tr>
+                  </tbody>
+                  <TableCopyFooter :colspan="6" />
+                </v-table>
               </v-col>
             </v-row>
           </v-card-text>

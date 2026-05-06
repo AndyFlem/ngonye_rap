@@ -27,18 +27,12 @@ module.exports = {
       const landClasses =  Knex('v_land_assets')
       .select('land_class', 'land_zone')
       .sum('area_sqm as total')
+      .select(Knex.raw("SUM(CASE WHEN acquisition_class = 'Permanent' THEN area_sqm ELSE 0 END) as permanent_total"))
+      .select(Knex.raw("SUM(CASE WHEN acquisition_class = 'Temporary' THEN area_sqm ELSE 0 END) as temporary_total"))
       .whereNot('acquisition_class', 'None')
       .groupBy('land_class','land_zone')
 
       summary.landClasses = await landClasses
-
-      const acquisitionClasses = Knex('v_land_assets')
-        .select('acquisition_class')
-        .sum('area_sqm as total')
-        .whereNot('acquisition_class', 'None')
-        .groupBy('acquisition_class')
-
-      summary.acquisitionClasses = await acquisitionClasses
 
       return res.send(summary)
 

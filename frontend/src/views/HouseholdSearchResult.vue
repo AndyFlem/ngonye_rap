@@ -97,6 +97,9 @@ watch(() => props.pahNo, async (newPah) => {
             >Open ICA Link</v-btn>
           </div>
           <div>
+            <b>Village:</b> <span class="table-value">{{ pah?.village }}</span>
+          </div>
+          <div>
             <b>Physically Displaced:</b> <span class="table-value">{{ formatYesNo(pah?.physically_displaced) }}</span>
           </div>
         </v-col>

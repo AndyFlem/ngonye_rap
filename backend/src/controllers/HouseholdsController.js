@@ -87,6 +87,7 @@ function buildSearchParams (defn) {
   }
   if (defn.has_replacement_structures !== undefined && defn.has_replacement_structures !== null) { params.push(`p_has_replacement_structures=> ${defn.has_replacement_structures}`) }
   if (defn.has_replacement_land !== undefined && defn.has_replacement_land !== null) { params.push(`p_has_replacement_land=> ${defn.has_replacement_land}`) }
+  if (defn.has_protected !== undefined && defn.has_protected !== null) { params.push(`p_has_protected=> ${defn.has_protected}`) }
   return params
 }
 
@@ -272,7 +273,6 @@ module.exports = {
       return res.status(500).send({ error: 'an error has occurred trying to fetch the household: ' + err })
     }
   },
-
   async indexParcels (req, res) {
     Common.debug(req, 'indexParcels')
     const pah = (req.params.pah || '').trim().slice(0, 120)
@@ -298,7 +298,6 @@ module.exports = {
       return res.status(500).send({ error: 'an error has occurred trying to fetch the parcels for the household: ' + err })
     }
   },
-
   async indexStructures (req, res) {
     Common.debug(req, 'indexStructures')
     const pah = (req.params.pah || '').trim().slice(0, 120)
@@ -317,7 +316,6 @@ module.exports = {
       return res.status(500).send({ error: 'an error has occurred trying to fetch the structures for the household: ' + err })
     }
   },
-
   async indexIcaOptions (req, res) {
     Common.debug(req, 'indexIcaOptions')
     const fields = ['icaoption_primary_structure', 'icaoption_structure_location', 'icaoption_landholding', 'icaoption_dryland', 'icaoption_garden', 'icaoption_transport']
@@ -331,6 +329,40 @@ module.exports = {
     } catch (err) {
       Common.error(req, 'indexIcaOptions', err)
       return res.status(500).send({ error: 'an error has occurred fetching ICA options: ' + err })
+    }
+  },
+  async indexTrees (req, res) {
+    Common.debug(req, 'indexTrees')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+    
+    if (!pah) {
+      return res.status(400).send({ error: 'pah is required' })
+    }
+    try {
+      const trees = await Knex('v_trees_summary')
+        .where({ pah })
+
+      return res.send(trees)
+    } catch (err) {
+      Common.error(req, 'indexTrees', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch the trees for the household: ' + err })
+    }
+  },
+  async indexCrops (req, res) {
+    Common.debug(req, 'indexCrops')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+    
+    if (!pah) {
+      return res.status(400).send({ error: 'pah is required' })
+    }
+    try {
+      const crops = await Knex('v_crops')
+        .where({ pah })
+
+      return res.send(crops)
+    } catch (err) {
+      Common.error(req, 'indexCrops', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch the crops for the household: ' + err })
     }
   },
 }

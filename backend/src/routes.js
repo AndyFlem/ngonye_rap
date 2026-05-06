@@ -35,6 +35,8 @@ module.exports = (app) => {
 
   app.get(prefix + '/households/:pah/parcels', HouseholdsController.indexParcels)
   app.get(prefix + '/households/:pah/structures', HouseholdsController.indexStructures)
+  app.get(prefix + '/households/:pah/trees', HouseholdsController.indexTrees)
+  app.get(prefix + '/households/:pah/crops', HouseholdsController.indexCrops)
 
   // REPLACEMENT STRUCTURES
   app.get(prefix + '/households/:pah/replacements', ReplacementsController.indexForPAH)
