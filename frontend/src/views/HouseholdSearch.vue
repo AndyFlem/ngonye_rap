@@ -126,6 +126,15 @@ const loadIcaOptions = async () => {
   }
 }
 
+function sanitizePah () {
+  const val = (search.value.params.pah || '').trim()
+  if (!val) return
+  const digits = val.replace(/^PAH0*/i, '').replace(/\D/g, '') || val.replace(/\D/g, '')
+  if (digits) {
+    search.value.params.pah = 'PAH' + digits.padStart(3, '0')
+  }
+}
+
 function doSearch () {
   loading.value = true
   error.value = ''
@@ -231,7 +240,8 @@ onMounted(() => {
                   placeholder="PAH No"
                   prepend-inner-icon="mdi-magnify"
                   clearable
-                  @keyup.enter="doSearch"
+                  @blur="sanitizePah"
+                  @keyup.enter="sanitizePah(); doSearch()"
                 />
               </v-col>
               <v-col cols="12" md="3">

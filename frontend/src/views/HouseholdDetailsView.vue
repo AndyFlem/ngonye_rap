@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import TopBar from '@/components/TopBar.vue'
 import { formatCurrency, formatArea, formatYesNo } from '@/utils/formatters'
 import TableCopyFooter from '@/components/TableCopyFooter.vue'
+import PersonView from '@/components/PersonView.vue'
 
 
 
@@ -113,7 +114,7 @@ onMounted(() => {
 
         <v-card elevation="1">
           <v-card-title class="d-flex">
-            {{ pahno }}&nbsp;<span v-if="pah"> - {{ pah.household_head_fullname }}</span>
+            {{ pahno }}&nbsp;<span v-if="pah"> - {{ pah.fullname }}</span>
             <v-spacer/>
             <v-chip color="red" class="mr-2" size="small" v-if="pah && pah.vulnerable">
               Vulnerable
@@ -135,16 +136,15 @@ onMounted(() => {
           <v-card-text v-if="pah">
             <v-row>
               <v-col cols="12" md="6">
+                <person-view :person-id="pah.householdhead_id" title="Head of Household:" />
                 <div><strong>Village:</strong> <span class="table-value">{{ pah?.village || 'none' }}</span></div>
-                <div><strong>Contact:</strong> <span class="table-value">{{ pah?.contact || 'none' }}</span></div>
-                <div><strong>NRC:</strong> <span class="table-value">{{ pah?.nrc || 'none' }}</span></div>
               </v-col>
-            <v-col v-if="pah.cosignatory" cols="12" md="6">
-                <div><strong>Cosignatory:</strong> <span class="table-value">{{ pah.cosignatory }}</span></div>
-                <div><strong>Contact:</strong> <span class="table-value">{{ pah?.cosignatory_contact || 'none' }}</span></div>
-                <div><strong>NRC:</strong> <span class="table-value">{{ pah?.cosignatory_nrc || 'none' }}</span></div>
+              <v-col cols="12" md="6">
+                <template v-if="pah.cosignatory_id">
+                  <person-view :person-id="pah.cosignatory_id" title="Cosignatory:" />
+                </template>
               </v-col>
-            </v-row>
+             </v-row>
             <v-row>
               <v-col v-if="!pah.no_ica_required" cols="12">
                 <div :style="{ color: pah?.date_signed ? 'inherit' : 'red' }">
@@ -165,6 +165,7 @@ onMounted(() => {
               <v-col v-else cols="12">
                 <div><strong>ICA:</strong> <span class="table-value">Not Required</span></div>
               </v-col>
+
             </v-row>
             <v-row>
               <v-col cols="12" md="6">

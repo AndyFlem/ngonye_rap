@@ -90,7 +90,6 @@ function buildSearchParams (defn) {
   if (defn.has_protected !== undefined && defn.has_protected !== null) { params.push(`p_has_protected=> ${defn.has_protected}`) }
   return params
 }
-
 function csvEscape (val) {
   if (val === null || val === undefined) return ''
   const s = String(val)
@@ -115,7 +114,6 @@ module.exports = {
       return res.status(500).send({ error: 'an error has occured trying to search the households: ' + err })
     }
   },
-
   async exportSearch (req, res) {
     Common.debug(req, 'exportSearch')
     try {

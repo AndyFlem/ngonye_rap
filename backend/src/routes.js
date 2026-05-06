@@ -6,6 +6,7 @@ const UsersController = require('./controllers/UsersController')
 const HouseholdsController = require('./controllers/HouseholdsController')
 const RAPController = require('./controllers/RAPController')
 const ReplacementsController = require('./controllers/ReplacementsController')
+const PersonController = require('./controllers/PersonController')
 
 module.exports = (app) => {
   const prefix = '/api/' + config.api_version
@@ -25,6 +26,10 @@ module.exports = (app) => {
 
   app.get(prefix + '/villages', RAPController.indexVillages)
 
+  // PEOPLE
+  app.get(prefix + '/person/:person_id', PersonController.show)
+  app.patch(prefix + '/person/:person_id', PersonController.update)
+  app.put(prefix + '/person/:person_id/reverse-name', PersonController.reverseName)
 
   // HOUSEHOLDS
   app.get(prefix + '/households_summary', HouseholdsController.summary)

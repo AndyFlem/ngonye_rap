@@ -3,9 +3,7 @@ import { inject, ref, watch } from 'vue'
 import { formatCurrency, formatArea, formatYesNo } from '@/utils/formatters'
 
 const axiosSecure = inject('axiosSecure')
-
 const pah = ref(null)
-
 const loading = ref(false)
 const error = ref('')
 
@@ -52,7 +50,7 @@ watch(() => props.pahNo, async (newPah) => {
     <v-card-title class="d-flex text-title-medium pt-1 pb-1">
       <v-row no-gutters>
         <v-col cols="8">
-          <router-link :to="`/households/${props.pahNo}`">{{ props.pahNo }} - {{ pah ? pah.household_head_fullname : 'Loading...' }}</router-link>
+          <router-link :to="`/households/${props.pahNo}`">{{ props.pahNo }} - {{ pah ? pah.fullname : 'Loading...' }}</router-link>
         </v-col>
         <v-col cols="4" class="d-flex justify-end">
           <v-chip color="red" class="mr-2" size="small" v-if="pah && pah.vulnerable">
@@ -83,7 +81,6 @@ watch(() => props.pahNo, async (newPah) => {
             <span v-else>
               <strong>ICA:</strong> <span class="table-value">Not Required</span>
             </span>
-
             <v-btn
               v-if="getSafeExternalUrl(pah?.ica_link)"
               :href="getSafeExternalUrl(pah?.ica_link)"
