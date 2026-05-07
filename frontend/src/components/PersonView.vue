@@ -110,7 +110,7 @@ async function saveNrc () {
 
     <!-- Fullname -->
     <v-col cols="12">
-      <b>{{ title }}</b>&nbsp;{{ person.fullname }}
+      ({{ person.person_id }})<b>{{ title }}</b>&nbsp;{{ person.fullname }}
       <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-swap-horizontal" :loading="reversing" @click="reverseName"
         style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
       <v-btn size="x-small" class="ml-1 text-grey" variant="text" :icon="editingName ? 'mdi-pencil-off' : 'mdi-pencil'"
@@ -132,12 +132,12 @@ async function saveNrc () {
     <!-- Contact -->
     <v-col cols="12" class="d-flex align-center">
       <template v-if="!editingContact">
-        <b>Contact</b>&nbsp;{{ person.contact }}
+        <b>Contact:</b>&nbsp;{{ person.contact }}
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil" @click="startEditContact"
           style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
       </template>
       <template v-else>
-        <b>Contact</b>&nbsp;
+        <b>Contact:</b>&nbsp;
         <v-text-field v-model="draft.contact" density="compact" hide-details variant="underlined"
           style="max-width: 200px" />
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check" :loading="saving.contact"
@@ -149,12 +149,12 @@ async function saveNrc () {
     <!-- NRC -->
     <v-col cols="12" class="d-flex align-center">
       <template v-if="!editingNrc">
-        <b>NRC</b>&nbsp;{{ person.nrc }}
+        <b>NRC:</b>&nbsp;{{ person.nrc }}
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil" @click="startEditNrc"
           style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
       </template>
       <template v-else>
-        <b>NRC</b>&nbsp;
+        <b>NRC:</b>&nbsp;
         <v-text-field v-model="draft.nrc" density="compact" hide-details variant="underlined"
           style="max-width: 200px" />
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check" :loading="saving.nrc"
