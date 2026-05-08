@@ -1,0 +1,72 @@
+db_column,Title
+pah,PAH No
+survey_date,Date and Time of Survey
+surveyor1,Name of Surveyor 1
+surveyor2,Name of Surveyor 2
+witness_name,Full name of neighbour witness
+hh_present,Are the household head/s present for this survey?
+hh_count,How many household heads are there for this family?
+respondent_lastname,Respondent Last Name
+respondent_middlename,Respondent Middle Name
+respondent_firstname,Respondent First Name
+respondent_relation,Relationship of Respondent to Household Head
+respondent_contact1,Respondent Mobile Number 1
+respondent_contact2,Respondent Mobile Number 2
+Headperson,Headperson or Community Leader
+language,Home Language
+land_access,How did you get access to your household plot
+rent_amount,How much is your monthly rent
+residence_time,Length of time in residence
+residence_reason,Please select the reasons for moving to this land
+no_hospital_reason,"If you do not use the local hospital, please indicate why not"
+families,How many other families (nuclear) in your community do you rely on for support in a year?
+community_support,What support is given to or received from neighbours and the community
+water_drinking_source,Where does your household obtain water for drinking purposes?
+water_washing_source,"Where does your household obtain water for washing household items (clothes, dishes)?"
+energy_cook_source,What is the main energy source that your household uses to cook?
+energy_light_source,What is the main energy source that your household uses for light?
+washing,What is the principle personal washing facility used by your household?
+toilet,What is the principle toilet system used by your household?
+waste,What is the principle waste disposal system used by your household ?
+diseases_year,Which diseases or ailments has any person in your household had in the last 12 months?
+medicine_source,Where does the household buy or obtain medicine from?
+births_year,"How many children were born in the last 12 months, including any that may have died"
+infant_death_year,"Of those born in the last 12 months, how many died in their first year?"
+deaths_year,"How many members of your household, including infant children, died in the last 12 months"
+death_reason,Please indicate the causes of death or select 'Don't Know/Can't Say'
+hunger_months,Please indicate the months in which your household typically goes hungry in a year
+nets,Who in your family sleeps under a mosquito net?
+nets_no_reason,"If anyone does not sleep under a net, why not?"
+hiv_education,Has your household been educated about the disease HIV/AIDs?
+hiv_education_source,How do you usually receive information about HIV/AIDS?
+hiv_prevention,How do you prevent HIV/AIDS?
+farms_gardens_count,How many separate agricultural farms & gardens do you have inside the project area?
+plantations_count,How many plantations of economic trees do you own within the Project Area?
+trees_non_plantation,Do you have any freestanding economic trees that are not part of a plantation
+trees_total,Please enter the total of all trees captured
+business_activities,Select all business activities that your household is involved in that generate a regular monthly income for the household?
+grazing,Does your household use land for grazing
+grazing_owner,Who owns this grazing land
+graves_visit,Does your family visit the graves periodically?
+graves_option,Would you prefer to exhume and relocate the grave if it is impacted?
+graves_ceremony,"In the event of these graves are impacted, what ceremonial requirements would your religion, tradition and/or culture require?"
+graves_compensation,What form of compensation would be acceptable to your household for these graves?
+household_assets,Do you have any of the following available in your household in a working condition?
+resettlement_option,"If given the choice to be resettled or not, what would you choose"
+loss_opinion,"In your opinion, what are some of the non-material things you stand to lose"
+relocation_option,"If you were to be relocated, what would your preference be"
+relocation_area,Which existing village / town did you have in mind
+relocation_reason,Why would you prefer to move to this existing village/town
+relocation_disadvantage,What are the disadvantages of moving to this village/town
+newvillage_location,"If you chose a new town/village, where would you suggest this new town/village be located"
+newvillage_location_reason,Why would you prefer to move to this new village/town
+newvillage_location_disadvantages,What would the disadvantages be of moving to this new village/town
+resettlement_comments,"Do you have any questions, comments or concerns regarding the potential resettlement that could be forwarded to Western Power for their consideration"
+other_assets_concern,Do you own or make use of anything else in the Cut-Off Zone that you are concerned about? Please describe what it is?
+development_priorities,What are the top 3 development priorities of the household? Rank in terms of importance.
+members_count,Members_count
+members_confirmed,Members_confirmed
+members_list,s_Members_list
+lon,Lon
+lat,Lat
+globalid,GlobalID

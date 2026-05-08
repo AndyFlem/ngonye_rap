@@ -1,5 +1,5 @@
 <script setup>
-import { inject, ref, watch } from 'vue'
+import { inject, ref, watch, computed } from 'vue'
 import { formatCurrency, formatArea, formatYesNo } from '@/utils/formatters'
 
 const axiosSecure = inject('axiosSecure')
@@ -12,6 +12,16 @@ const props = defineProps({
     type: String,
     required: true
   }
+})
+
+const landOptions = computed(() => {
+  if (!pah.value) return ''
+  const options = [
+    pah.value.icaoption_dryland,
+    pah.value.icaoption_garden,
+    pah.value.icaoption_landholding
+  ].filter(opt => opt !== null && opt !== undefined && opt !== '')
+  return [...new Set(options)].join(', ')
 })
 
 const getSafeExternalUrl = (value) => {
@@ -39,6 +49,8 @@ watch(() => props.pahNo, async (newPah) => {
     }
   }
 }, { immediate: true })
+
+
 
 </script>
 
@@ -94,6 +106,9 @@ watch(() => props.pahNo, async (newPah) => {
             >Open ICA Link</v-btn>
           </div>
           <div>
+            <strong>Survey Completed:</strong> <span class="table-value">{{ pah?.survey_complete ? 'Yes' : 'No' }}</span>
+          </div>
+          <div>
             <b>Village:</b> <span class="table-value">{{ pah?.village }}</span>
           </div>
           <div>
@@ -102,7 +117,7 @@ watch(() => props.pahNo, async (newPah) => {
         </v-col>
         <v-col cols="12" sm="6">
           <div><strong>Cash Compensation:</strong> <span class="table-value">K{{ formatCurrency(pah.compensation?.total_cash_compensation || 0) }}</span></div>
-          <div v-if="pah.replacement_land_area>0"><strong>Replacement Land:</strong> <span class="table-value">{{ formatArea(pah.replacement_land_area) }} ({{ pah.icaoption_landholding }})</span></div>
+          <div v-if="pah.replacement_land_area>0"><strong>Replacement Land:</strong> <span class="table-value">{{ formatArea(pah.replacement_land_area) }} ({{ landOptions }})</span></div>
           <div v-if="pah.replacement_structures_count>0"><strong>Replacement Structures:</strong> <span class="table-value">{{ pah.replacement_structures_count }} <span>({{ pah.icaoption_structure_location }})</span></span></div>
         </v-col>
       </v-row>

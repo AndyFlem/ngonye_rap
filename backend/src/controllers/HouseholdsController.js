@@ -88,6 +88,7 @@ function buildSearchParams (defn) {
   if (defn.has_replacement_structures !== undefined && defn.has_replacement_structures !== null) { params.push(`p_has_replacement_structures=> ${defn.has_replacement_structures}`) }
   if (defn.has_replacement_land !== undefined && defn.has_replacement_land !== null) { params.push(`p_has_replacement_land=> ${defn.has_replacement_land}`) }
   if (defn.has_protected !== undefined && defn.has_protected !== null) { params.push(`p_has_protected=> ${defn.has_protected}`) }
+  if (defn.survey_complete !== undefined && defn.survey_complete !== null) { params.push(`p_survey_complete=> ${defn.survey_complete}`) }
   return params
 }
 function csvEscape (val) {
@@ -100,6 +101,29 @@ function csvEscape (val) {
 }
 
 module.exports = {
+  async patch (req, res) {
+    Common.debug(req, 'patch')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+    if (!pah) return res.status(400).send({ error: 'pah is required' })
+
+    const allowed = ['village_id']
+    const fields = {}
+    for (const key of allowed) {
+      if (key in req.body) fields[key] = req.body[key]
+    }
+    if (Object.keys(fields).length === 0) {
+      return res.status(400).send({ error: 'no valid fields provided' })
+    }
+
+    try {
+      const count = await Knex('households').where('pah', pah).update(fields)
+      if (!count) return res.status(404).send({ error: 'household not found' })
+      return res.send({ success: true })
+    } catch (err) {
+      Common.error(req, 'patch', err)
+      return res.status(500).send({ error: 'an error has occurred trying to update household: ' + err })
+    }
+  },
   async search (req, res) {
     Common.debug(req, 'search')
     try {
@@ -361,6 +385,45 @@ module.exports = {
     } catch (err) {
       Common.error(req, 'indexCrops', err)
       return res.status(500).send({ error: 'an error has occurred trying to fetch the crops for the household: ' + err })
+    }
+  },
+  async indexMembers (req, res) {
+    Common.debug(req, 'indexMembers')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+
+    if (!pah) {
+      return res.status(400).send({ error: 'pah is required' })
+    }
+
+    try {
+      const members = await Knex('v_person')
+        .where({ pah })
+        .orderBy('household_head', 'desc')
+        .orderBy('cosignatory', 'desc')
+        .orderBy('fullname')
+
+      return res.send(members)
+    } catch (err) {
+      Common.error(req, 'indexMembers', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch the members for the household: ' + err })
+    }
+  },
+  async showSurvey (req, res) {
+    Common.debug(req, 'showSurvey')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+
+    if (!pah) {
+      return res.status(400).send({ error: 'pah is required' })
+    }
+    
+    try {
+      const survey = await Knex('households_survey')
+        .where({ pah })
+        .first()
+      return res.send(survey)
+    } catch (err) {
+      Common.error(req, 'showSurvey', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch the survey for the household: ' + err })
     }
   },
 }

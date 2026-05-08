@@ -15,6 +15,13 @@ export const formatYesNo = (value) => {
   return 'No'
 }
 
+// formatter for a date time string that returns a more human readable format, e.g. "2024-01-01T12:00:00Z" => "Jan 1, 2024"
+export const formatDateTime = (value) => {
+  if (!value) return '-'
+  const date = new Date(value)
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
 export const copyTableAsCsv = (tableEl) => {
   const headerCells = Array.from(tableEl.querySelectorAll('thead tr:last-child th'))
   const headers = headerCells.map(th => tsvEscape(th.innerText.trim()))

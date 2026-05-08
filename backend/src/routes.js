@@ -37,6 +37,9 @@ module.exports = (app) => {
   app.post(prefix + '/households_export', HouseholdsController.exportSearch)
   app.get(prefix + '/households_ica_options', HouseholdsController.indexIcaOptions)
   app.get(prefix + '/households/:pah', HouseholdsController.show)
+  app.patch(prefix + '/households/:pah', HouseholdsController.patch)
+  app.get(prefix + '/households/:pah/survey', HouseholdsController.showSurvey)
+  app.get(prefix + '/households/:pah/members', HouseholdsController.indexMembers)
 
   app.get(prefix + '/households/:pah/parcels', HouseholdsController.indexParcels)
   app.get(prefix + '/households/:pah/structures', HouseholdsController.indexStructures)

@@ -8,6 +8,7 @@ const error = ref('')
 const reversing = ref(false)
 const editingName = ref(false)
 const editingContact = ref(false)
+const editingContact2 = ref(false)
 const editingNrc = ref(false)
 const draft = reactive({})
 const saving = reactive({})
@@ -36,6 +37,7 @@ watch(() => props.personId, async (newPersonId) => {
     person.value = null
     editingName.value = false
     editingContact.value = false
+    editingContact2.value = false
     editingNrc.value = false
     try {
       const response = await axiosSecure.get(`/person/${newPersonId}`)
@@ -75,6 +77,11 @@ function startEditContact () {
   editingContact.value = true
 }
 
+function startEditContact2 () {
+  draft.contact2 = person.value.contact2 ?? ''
+  editingContact2.value = true
+}
+
 function startEditNrc () {
   draft.nrc = person.value.nrc ?? ''
   editingNrc.value = true
@@ -98,7 +105,10 @@ async function saveContact () {
   await saveField('contact')
   editingContact.value = false
 }
-
+async function saveContact2 () {
+  await saveField('contact2')
+  editingContact2.value = false
+}
 async function saveNrc () {
   await saveField('nrc')
   editingNrc.value = false
@@ -110,7 +120,7 @@ async function saveNrc () {
 
     <!-- Fullname -->
     <v-col cols="12">
-      ({{ person.person_id }})<b>{{ title }}</b>&nbsp;{{ person.fullname }}
+      <b>{{ title }}</b>&nbsp;({{ person.person_id }})&nbsp;{{ person.fullname }}
       <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-swap-horizontal" :loading="reversing" @click="reverseName"
         style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
       <v-btn size="x-small" class="ml-1 text-grey" variant="text" :icon="editingName ? 'mdi-pencil-off' : 'mdi-pencil'"
@@ -145,6 +155,22 @@ async function saveNrc () {
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close" @click="editingContact = false" />
       </template>
     </v-col>
+    <!-- Contact -->
+    <v-col cols="12" class="d-flex align-center">
+      <template v-if="!editingContact2">
+        <b>Contact:</b>&nbsp;{{ person.contact2 }}
+        <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil" @click="startEditContact2"
+          style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
+      </template>
+      <template v-else>
+        <b>Contact:</b>&nbsp;
+        <v-text-field v-model="draft.contact2" density="compact" hide-details variant="underlined"
+          style="max-width: 200px" />
+        <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check" :loading="saving.contact2"
+          @click="saveContact2" />
+        <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close" @click="editingContact2 = false" />
+      </template>
+    </v-col>
 
     <!-- NRC -->
     <v-col cols="12" class="d-flex align-center">
@@ -162,6 +188,5 @@ async function saveNrc () {
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close" @click="editingNrc = false" />
       </template>
     </v-col>
-
   </v-row>
 </template>

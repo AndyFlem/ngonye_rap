@@ -31,7 +31,9 @@ const search = ref({
     has_protected: null,
     followup_flag: null,
     silumesii: null,
-    new_ica_required: null
+    new_ica_required: null,
+    survey_complete: null,
+    landholding_only: null
   }
 })
 
@@ -94,6 +96,8 @@ const autoSearchFields = [
   () => search.value.params.followup_flag,
   () => search.value.params.silumesii,
   () => search.value.params.new_ica_required,
+  () => search.value.params.survey_complete,
+  () => search.value.params.landholding_only,
   icarequired,
 ]
 
@@ -178,7 +182,9 @@ function clearSearch () {
     has_protected: null,
     followup_flag: null,
     silumesii: null,
-    new_ica_required: null
+    new_ica_required: null,
+    survey_complete: null,
+    landholding_only: null
   }
 }
 
@@ -486,10 +492,27 @@ onMounted(() => {
                     @click="search.params.new_ica_required = null"
                   />
                 </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.survey_complete"
+                    label="Survey Complete"
+                    hide-details
+                    :indeterminate="search.params.survey_complete === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.survey_complete = null"
+                  />
+                </div>
+
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="12" md="8" class="d-flex flex-wrap align-center ga-4">
+              <v-col cols="12" class="d-flex flex-wrap align-center ga-4">
                 <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
                   <v-checkbox
                     v-model="search.params.has_replacement_structures"
@@ -536,6 +559,22 @@ onMounted(() => {
                     size="x-small"
                     variant="text"
                     @click="search.params.has_protected = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.landholding_only"
+                    label="Landholding Only"
+                    hide-details
+                    :indeterminate="search.params.landholding_only === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.landholding_only = null"
                   />
                 </div>
               </v-col>
