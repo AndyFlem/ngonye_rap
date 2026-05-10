@@ -26,6 +26,16 @@ const handleHouseholdsClick = () => {
   emit('close-drawer')
 }
 
+const handleReplacementsClick = () => {
+  router.push('/replacements')
+  emit('close-drawer')
+}
+
+const handleParcelsClick = () => {
+  router.push('/parcels')
+  emit('close-drawer')
+}
+
 const handleLogout = () => {
   signout()
   router.push('/login')
@@ -50,6 +60,16 @@ const handleLogout = () => {
         prepend-icon="mdi-account-group"
         title="Households"
         @click="handleHouseholdsClick"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-home-city"
+        title="Replacement Structures"
+        @click="handleReplacementsClick"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-map"
+        title="Land Parcels"
+        @click="handleParcelsClick"
       ></v-list-item>
     </v-list>
 

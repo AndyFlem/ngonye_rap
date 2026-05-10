@@ -6,6 +6,7 @@ const UsersController = require('./controllers/UsersController')
 const HouseholdsController = require('./controllers/HouseholdsController')
 const RAPController = require('./controllers/RAPController')
 const ReplacementsController = require('./controllers/ReplacementsController')
+const LandController = require('./controllers/LandController')
 const PersonController = require('./controllers/PersonController')
 
 module.exports = (app) => {
@@ -41,6 +42,11 @@ module.exports = (app) => {
   app.get(prefix + '/households/:pah/survey', HouseholdsController.showSurvey)
   app.get(prefix + '/households/:pah/members', HouseholdsController.indexMembers)
 
+  // NOTES
+  app.get(prefix + '/households/:pah/notes', HouseholdsController.indexNotes)
+  app.post(prefix + '/households/:pah/notes', HouseholdsController.createNote)
+  app.delete(prefix + '/notes/:note_id', HouseholdsController.deleteNote)
+
   app.get(prefix + '/households/:pah/parcels', HouseholdsController.indexParcels)
   app.get(prefix + '/households/:pah/structures', HouseholdsController.indexStructures)
   app.get(prefix + '/households/:pah/trees', HouseholdsController.indexTrees)
@@ -49,9 +55,19 @@ module.exports = (app) => {
   // REPLACEMENT STRUCTURES
   app.get(prefix + '/households/:pah/replacements', ReplacementsController.indexForPAH)
   app.get(prefix + '/replacements/summary', ReplacementsController.summary)
+  app.get(prefix + '/replacements/options', ReplacementsController.indexOptions)
+  app.post(prefix + '/replacements_search', ReplacementsController.search)
+  app.post(prefix + '/replacements_export', ReplacementsController.exportSearch)
+  app.get(prefix + '/replacements', ReplacementsController.index)
+  app.get(prefix + '/replacements/:id', ReplacementsController.show)
 
   // LAND
   app.get(prefix + '/land/summary', RAPController.summaryLandAquisition)
+  app.get(prefix  + '/parcels/options', LandController.indexOptions)
+  app.post(prefix + '/parcels_search',  LandController.search)
+  app.post(prefix + '/parcels_export',  LandController.exportSearch)
+  app.get(prefix  + '/parcels/:id/assets', LandController.indexAssets)
+  app.get(prefix  + '/parcels/:id',     LandController.show)
 
   // USER MANAGEMENT
   app.post(prefix + '/user', UsersController.create)

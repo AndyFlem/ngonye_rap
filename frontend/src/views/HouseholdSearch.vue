@@ -2,7 +2,7 @@
 import { computed, inject, nextTick, onMounted, ref, watch } from 'vue'
 
 import TopBar from '@/components/TopBar.vue'
-import HouseholdSearchResult from '@/views/HouseholdSearchResult.vue'
+import HouseholdSearchResult from '@/components/HouseholdSearchResult.vue'
 
 const axiosSecure = inject('axiosSecure')
 

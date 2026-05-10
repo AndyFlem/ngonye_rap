@@ -25,7 +25,6 @@ const EXPORT_COLUMNS = {
   date_signed: 'ICA Date Signed',
   ica_link: 'ICA Link',
   household_followup_flag: 'Follow-Up Flag',
-  notes: 'Notes',
   icaoption_primary_structure: 'ICA Option: Primary Structure',
   icaoption_structure_location: 'ICA Option: Structure Location',
   icaoption_landholding: 'ICA Option: Landholding',
@@ -207,6 +206,14 @@ module.exports = {
       // Add a count of households the require a new ica
       const newICAHouseholdsResult = await Knex('v_households').where('new_ica_required', true).count('pah as count').first()
       summary.newICARequiredHouseholds = parseInt(newICAHouseholdsResult.count) || 0
+
+      // Add a count of households that are silumesii
+      const silumesiiHouseholdsResult = await Knex('v_households').where('silumesii', true).count('pah as count').first()
+      summary.silumesiiHouseholds = parseInt(silumesiiHouseholdsResult.count) || 0
+
+      // Add a count of households that are landholding only
+      const landholdingOnlyResult = await Knex('v_households').where('landholding_only', true).count('pah as count').first()
+      summary.landholdingOnlyHouseholds = parseInt(landholdingOnlyResult.count) || 0
 
       // Add a count of households that have replacement households (replacement_structures_count>0)
       const replacementHouseholdsResult = await Knex('v_households').where('replacement_structures_count', '>', 0).count('pah as count').first()
@@ -424,6 +431,53 @@ module.exports = {
     } catch (err) {
       Common.error(req, 'showSurvey', err)
       return res.status(500).send({ error: 'an error has occurred trying to fetch the survey for the household: ' + err })
+    }
+  },
+
+  async indexNotes (req, res) {
+    Common.debug(req, 'indexNotes')
+    const pah = (req.params.pah || '').trim()
+    if (!pah) return res.status(400).send({ error: 'pah is required' })
+    try {
+      const notes = await Knex('v_notes').where({ pah }).orderBy('created_at', 'desc')
+      return res.send(notes)
+    } catch (err) {
+      Common.error(req, 'indexNotes', err)
+      return res.status(500).send({ error: 'failed to fetch notes: ' + err })
+    }
+  },
+
+  async createNote (req, res) {
+    Common.debug(req, 'createNote')
+    const pah = (req.params.pah || '').trim()
+    if (!pah) return res.status(400).send({ error: 'pah is required' })
+    const note = (req.body.note || '').trim()
+    if (!note) return res.status(400).send({ error: 'note text is required' })
+    try {
+      const [inserted] = await Knex('notes')
+        .insert({ user_id: req.userId, note, pah, created_at: Knex.fn.now() })
+        .returning('note_id')
+      const full = await Knex('v_notes').where({ note_id: inserted.note_id }).first()
+      return res.status(201).send(full)
+    } catch (err) {
+      Common.error(req, 'createNote', err)
+      return res.status(500).send({ error: 'failed to create note: ' + err })
+    }
+  },
+
+  async deleteNote (req, res) {
+    Common.debug(req, 'deleteNote')
+    const note_id = parseInt(req.params.note_id, 10)
+    if (!note_id || isNaN(note_id)) return res.status(400).send({ error: 'note_id must be a number' })
+    try {
+      const note = await Knex('notes').where({ note_id }).first()
+      if (!note) return res.status(404).send({ error: 'note not found' })
+      if (note.user_id !== req.userId) return res.status(403).send({ error: 'you do not have permission to delete this note' })
+      await Knex('notes').where({ note_id }).delete()
+      return res.send({ success: true })
+    } catch (err) {
+      Common.error(req, 'deleteNote', err)
+      return res.status(500).send({ error: 'failed to delete note: ' + err })
     }
   },
 }

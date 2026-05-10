@@ -3,6 +3,10 @@ import LoginView from '@/views/LoginView.vue'
 import HomeView from '@/views/HomeView.vue'
 import HouseholdSearch from '@/views/HouseholdSearch.vue'
 import HouseholdDetailsView from '@/views/HouseholdDetailsView.vue'
+import ReplacementSearch from '@/views/ReplacementSearch.vue'
+import ReplacementDetails from '@/views/ReplacementDetails.vue'
+import ParcelSearch from '@/views/ParcelSearch.vue'
+import ParcelDetails from '@/views/ParcelDetails.vue'
 
 const routes = [
   {
@@ -35,6 +39,30 @@ const routes = [
     path: '/households/:pah',
     name: 'HouseholdDetails',
     component: HouseholdDetailsView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/replacements',
+    name: 'ReplacementStructures',
+    component: ReplacementSearch,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/replacements/:id',
+    name: 'ReplacementDetails',
+    component: ReplacementDetails,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/parcels',
+    name: 'Parcels',
+    component: ParcelSearch,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/parcels/:id',
+    name: 'ParcelDetails',
+    component: ParcelDetails,
     meta: { requiresAuth: true }
   }
 ]

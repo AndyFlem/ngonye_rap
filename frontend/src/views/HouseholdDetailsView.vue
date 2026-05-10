@@ -5,6 +5,7 @@ import TopBar from '@/components/TopBar.vue'
 import { formatCurrency, formatArea, formatYesNo, formatDateTime } from '@/utils/formatters'
 import TableCopyFooter from '@/components/TableCopyFooter.vue'
 import PersonView from '@/components/PersonView.vue'
+import HouseholdNotes from '@/components/HouseholdNotes.vue'
 
 
 
@@ -78,23 +79,7 @@ const memberFields = [
   ['district', 'District'],
   ['origin', 'Origin'],
 ]
-
-const booleanMemberFields = new Set(['household_head', 'cosignatory', 'pregnant_this_year', 'disabled'])
-
-const formatMemberValue = (key, value) => {
-  if (value === null || value === undefined) return '—'
-  if (booleanMemberFields.has(key)) return formatYesNo(value)
-  return String(value)
-}
-
-const openMemberModal = (member) => {
-  selectedMember.value = member
-  memberDialog.value = true
-}
-
-const pahno = computed(() => String(route.params.pah || '').trim())
-
-const surveyLabels = [
+const surveyFields = [
   ['pah', 'PAH No'],
   ['survey_date', 'Date and Time of Survey'],
   ['surveyor1', 'Name of Surveyor 1'],
@@ -164,6 +149,22 @@ const surveyLabels = [
   ['members_confirmed', 'Members Confirmed'],
   ['members_list', 'Members List']
 ]
+const booleanMemberFields = new Set(['household_head', 'cosignatory', 'pregnant_this_year', 'disabled'])
+
+const formatMemberValue = (key, value) => {
+  if (value === null || value === undefined) return '—'
+  if (booleanMemberFields.has(key)) return formatYesNo(value)
+  return String(value)
+}
+
+const openMemberModal = (member) => {
+  selectedMember.value = member
+  memberDialog.value = true
+}
+
+const pahno = computed(() => String(route.params.pah || '').trim())
+
+
 
 const sortedMembers = computed(() => {
   const rank = (m) => m.household_head ? 0 : m.cosignatory ? 1 : 2
@@ -358,6 +359,7 @@ onMounted(async () => {
                 </template>
               </v-col>
              </v-row>
+                     <HouseholdNotes :pah="pahno" />
             <v-tabs v-model="tab" class="rounded mt-5" bg-color="blue-lighten-4" selected-class="bg-primary">
               <v-tab value="ica">ICA</v-tab>
               <v-tab :disabled="!pah.survey_complete" value="survey">Survey</v-tab>
@@ -387,7 +389,7 @@ onMounted(async () => {
                     <div><strong>New ICA Required: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.new_ica_required) }">{{ formatYesNo(pah.new_ica_required) }}</span></div>
                     <div><strong>Non-affected: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.nonaffected) }">{{ formatYesNo(pah.nonaffected) }}</span></div>
                     <div><strong>Is Silumesii: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.silumesii) }">{{ formatYesNo(pah.silumesii) }}</span></div>
-                    <div><strong>Flagged: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.followup_flag) }">{{ formatYesNo(pah.followup_flag) }}</span></div>
+                    <div><strong>Flagged: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.household_followup_flag) }">{{ formatYesNo(pah.household_followup_flag) }}</span></div>
                   </v-col>
                   <v-col cols="12" md="6">
                     <div><strong>Cash Compensation:</strong> <span class="table-value">K{{ formatCurrency(pah.compensation?.total_cash_compensation || 0) }}</span></div>
@@ -874,7 +876,7 @@ onMounted(async () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="([key, label]) in surveyLabels" :key="key">
+                    <tr v-for="([key, label]) in surveyFields" :key="key">
                       <td class="survey-label">{{ label }}</td>
                       <td class="table-value left">{{ pah_survey[key] ?? '' }}</td>
                     </tr>

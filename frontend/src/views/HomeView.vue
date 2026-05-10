@@ -134,6 +134,14 @@ onMounted(() => {
                 <td>Flagged Households</td>
                 <td class="table-value">{{ households.followUpFlagHouseholds }}</td>
               </tr>
+              <tr>
+                <td>Landholding Only Households</td>
+                <td class="table-value">{{ households.landholdingOnlyHouseholds }}</td>
+              </tr>
+              <tr>
+                <td>Silumesii Households</td>
+                <td class="table-value">{{ households.silumesiiHouseholds }}</td>
+              </tr>
               </tbody>
               <TableCopyFooter :colspan="2" />
             </v-table>

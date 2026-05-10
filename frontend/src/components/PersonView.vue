@@ -27,6 +27,14 @@ const props = defineProps({
   title: {
     type: String,
     default: 'Person:'
+  },
+  slim: {
+    type: Boolean,
+    default: false
+  },
+  readonly: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -121,9 +129,9 @@ async function saveNrc () {
     <!-- Fullname -->
     <v-col cols="12">
       <b>{{ title }}</b>&nbsp;({{ person.person_id }})&nbsp;{{ person.fullname }}
-      <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-swap-horizontal" :loading="reversing" @click="reverseName"
+      <v-btn v-if="!readonly" size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-swap-horizontal" :loading="reversing" @click="reverseName"
         style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
-      <v-btn size="x-small" class="ml-1 text-grey" variant="text" :icon="editingName ? 'mdi-pencil-off' : 'mdi-pencil'"
+      <v-btn v-if="!readonly" size="x-small" class="ml-1 text-grey" variant="text" :icon="editingName ? 'mdi-pencil-off' : 'mdi-pencil'"
         @click="editingName ? (editingName = false) : startEditName()"
         style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
     </v-col>
@@ -140,14 +148,14 @@ async function saveNrc () {
     </template>
 
     <!-- Contact -->
-    <v-col cols="12" class="d-flex align-center">
+    <v-col v-if="!slim" cols="12" class="d-flex align-center pl-3">
       <template v-if="!editingContact">
-        <b>Contact:</b>&nbsp;{{ person.contact }}
-        <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil" @click="startEditContact"
+        Contact:&nbsp;{{ person.contact }}
+        <v-btn v-if="!readonly" size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil" @click="startEditContact"
           style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
       </template>
       <template v-else>
-        <b>Contact:</b>&nbsp;
+        Contact:&nbsp;
         <v-text-field v-model="draft.contact" density="compact" hide-details variant="underlined"
           style="max-width: 200px" />
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check" :loading="saving.contact"
@@ -156,14 +164,14 @@ async function saveNrc () {
       </template>
     </v-col>
     <!-- Contact -->
-    <v-col cols="12" class="d-flex align-center">
+    <v-col v-if="!slim" cols="12" class="d-flex align-center pl-3">
       <template v-if="!editingContact2">
-        <b>Contact:</b>&nbsp;{{ person.contact2 }}
-        <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil" @click="startEditContact2"
+        Contact:&nbsp;{{ person.contact2 }}
+        <v-btn v-if="!readonly" size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil" @click="startEditContact2"
           style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
       </template>
       <template v-else>
-        <b>Contact:</b>&nbsp;
+        Contact:&nbsp;
         <v-text-field v-model="draft.contact2" density="compact" hide-details variant="underlined"
           style="max-width: 200px" />
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check" :loading="saving.contact2"
@@ -173,14 +181,14 @@ async function saveNrc () {
     </v-col>
 
     <!-- NRC -->
-    <v-col cols="12" class="d-flex align-center">
+    <v-col v-if="!slim" cols="12" class="d-flex align-center pl-3">
       <template v-if="!editingNrc">
-        <b>NRC:</b>&nbsp;{{ person.nrc }}
-        <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil" @click="startEditNrc"
+        NRC:&nbsp;{{ person.nrc }}
+        <v-btn v-if="!readonly" size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil" @click="startEditNrc"
           style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
       </template>
       <template v-else>
-        <b>NRC:</b>&nbsp;
+        NRC:&nbsp;
         <v-text-field v-model="draft.nrc" density="compact" hide-details variant="underlined"
           style="max-width: 200px" />
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check" :loading="saving.nrc"
