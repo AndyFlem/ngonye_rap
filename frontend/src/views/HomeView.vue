@@ -180,6 +180,32 @@ onMounted(() => {
         <v-row>
           <v-col cols="12" sm="6" md="4">
             <h3 class="text-h3 mb-4">
+              Socio-economic Surveys
+            </h3>
+            <v-table density="compact" v-if="households">
+              <thead>
+                <tr>
+                <th class="table-heading"></th>
+                <th class="table-heading right"></th>
+                </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Surveys completed</td>
+                <td class="table-value">{{ households.totalSurveys }}</td>
+              </tr>
+              <tr>
+                <td>People surveyed</td>
+                <td class="table-value">{{ households.totalPeople }}</td>
+              </tr>
+              </tbody>
+              <TableCopyFooter :colspan="2" />
+            </v-table>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" sm="6" md="4">
+            <h3 class="text-h3 mb-4">
               Compensation
             </h3>
             <v-table density="compact" v-if="households">

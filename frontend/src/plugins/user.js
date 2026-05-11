@@ -24,9 +24,12 @@ export default {
       _user.first_name = u.first_name
       _user.last_name = u.last_name
       _user.organisation = u.organisation
+      _user.isAdmin = u.isAdmin || false
       app.axios.http.get('/current-user')
         .then(response => {
-          console.log(response.data)
+          const cu = response.data
+          _user.isAdmin = cu.admin || false
+          localStorage.user = JSON.stringify(_user)
         })
         .catch(error => {
           console.error('Error fetching current user:', error)
@@ -81,6 +84,7 @@ export default {
           _user.first_name = u.first_name
           _user.last_name = u.last_name
           _user.organisation = u.organisation
+          _user.isAdmin = u.admin || false
 
           localStorage.user = JSON.stringify(_user)
 

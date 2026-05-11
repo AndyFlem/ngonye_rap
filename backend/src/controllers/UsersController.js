@@ -117,7 +117,8 @@ module.exports = {
           email: req.body.email,
           password_digest: hash,
           can_login: req.body.password ? true : false,
-          organisation: req.body.organisation
+          organisation: req.body.organisation,
+          admin: req.body.admin || false
           })
         .returning('user_id')
         .transacting(trx)
@@ -144,14 +145,15 @@ module.exports = {
     Knex.transaction(trx => {
       Knex('user')
       .where({user_id: req.params.user_id})
-      .transacting(trx)      
+      .transacting(trx)
       .update({
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         email: req.body.email,
         can_login: req.body.can_login,
         organisation: req.body.organisation,
-        is_deleted: req.body.is_deleted
+        is_deleted: req.body.is_deleted,
+        admin: req.body.admin
       })
       // .then(() => {
       //   return Knex('usergroup_user')

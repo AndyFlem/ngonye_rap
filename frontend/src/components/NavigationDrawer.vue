@@ -36,6 +36,11 @@ const handleParcelsClick = () => {
   emit('close-drawer')
 }
 
+const handleUsersClick = () => {
+  router.push('/users')
+  emit('close-drawer')
+}
+
 const handleLogout = () => {
   signout()
   router.push('/login')
@@ -70,6 +75,12 @@ const handleLogout = () => {
         prepend-icon="mdi-map"
         title="Land Parcels"
         @click="handleParcelsClick"
+      ></v-list-item>
+      <v-list-item
+        v-if="user.isAdmin"
+        prepend-icon="mdi-account-multiple"
+        title="Users"
+        @click="handleUsersClick"
       ></v-list-item>
     </v-list>
 

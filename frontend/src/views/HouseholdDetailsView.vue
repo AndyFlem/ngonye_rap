@@ -6,6 +6,8 @@ import { formatCurrency, formatArea, formatYesNo, formatDateTime } from '@/utils
 import TableCopyFooter from '@/components/TableCopyFooter.vue'
 import PersonView from '@/components/PersonView.vue'
 import HouseholdNotes from '@/components/HouseholdNotes.vue'
+import HouseholdIcas from '@/components/HouseholdIcas.vue'
+import MapLink from '@/components/MapLink.vue'
 
 
 
@@ -30,6 +32,24 @@ const villages = ref([])
 const editingVillage = ref(false)
 const draftVillageId = ref(null)
 const savingVillage = ref(false)
+const togglingFlag = ref(false)
+const householdNotes = ref(null)
+const householdIcas = ref(null)
+
+async function toggleFollowupFlag () {
+  togglingFlag.value = true
+  try {
+    const newVal = !pah.value.household_followup_flag
+    await axiosSecure.patch(`/households/${encodeURIComponent(pahno.value)}`, { household_followup_flag: newVal })
+    pah.value = { ...pah.value, household_followup_flag: newVal }
+    householdNotes.value?.loadNotes()
+  } catch (err) {
+    console.error('Failed to toggle followup flag:', err)
+    error.value = 'Failed to update followup flag.'
+  } finally {
+    togglingFlag.value = false
+  }
+}
 
 function startEditVillage () {
   draftVillageId.value = pah.value?.village_id ?? null
@@ -203,6 +223,17 @@ const isTrueValue = (value) => {
   return false
 }
 
+const parseLatLon = (obj) => {
+  if (!obj?.centroid) return { lat: null, lon: null }
+  try {
+    const geojson = typeof obj.centroid === 'string' ? JSON.parse(obj.centroid) : obj.centroid
+    const [lon, lat] = geojson.coordinates
+    return { lat, lon }
+  } catch {
+    return { lat: null, lon: null }
+  }
+}
+
 const getSafeExternalUrl = (value) => {
   if (!value) return null
   const url = String(value).trim()
@@ -249,6 +280,7 @@ const loadHousehold = async () => {
       trees.value = Array.isArray(treesResponse.data) ? treesResponse.data : []
       const cropsResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/crops`)
       crops.value = Array.isArray(cropsResponse.data) ? cropsResponse.data : []
+
     }
 
   } catch (err) {
@@ -291,18 +323,24 @@ onMounted(async () => {
             <v-chip color="red" class="mr-2" size="small" v-if="pah && pah.vulnerable">
               Vulnerable
             </v-chip>
-            <v-chip color="purple" class="mr-2" size="small" v-if="pah && pah.household_followup_flag">
-              Flagged
-            </v-chip>
-            <v-chip color="orange" class="mr-2" size="small" v-if="pah && pah.new_ica_required">
-              New ICA Required
-            </v-chip>
+
             <v-chip color="" class="mr-2" size="small" v-if="pah && pah.no_ica_required">
               ICA Not Required
             </v-chip>
             <v-chip color="" class="mr-2" size="small" v-if="pah && pah.nonaffected">
-              Non-affected
+              Disturbance only
             </v-chip>
+            <v-btn
+              v-if="pah"
+              :color="pah.household_followup_flag ? 'purple' : 'grey'"
+              :variant="pah.household_followup_flag ? 'tonal' : 'outlined'"
+              size="small"
+              class="mr-2"
+              :loading="togglingFlag"
+              @click="toggleFollowupFlag"
+            >
+              {{ pah.household_followup_flag ? 'Flagged' : 'Flag' }}
+            </v-btn>
           </v-card-title>
           <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4" />
           <v-card-text v-if="pah">
@@ -333,11 +371,11 @@ onMounted(async () => {
                   </template>
                 </div>
                 <v-divider class="my-2" />
-                <div v-if="!pah.no_ica_required" :style="{ color: pah?.date_signed ? 'inherit' : 'red' }">
+                <div v-if="!pah.no_ica_required" :style="{ color: pah.date_signed ? 'inherit' : 'red' }">
                   <strong>ICA Signature Date:</strong> <span class="table-value">{{ formatDateTime(pah.date_signed) || 'not signed' }}</span>
                   <v-btn
-                    v-if="getSafeExternalUrl(pah?.ica_link)"
-                    :href="getSafeExternalUrl(pah?.ica_link)"
+                    v-if="getSafeExternalUrl(pah.ica_link)"
+                    :href="getSafeExternalUrl(pah.ica_link)"
                     prepend-icon="mdi-open-in-new"
                     variant="text"
                     size="x-small"
@@ -358,8 +396,16 @@ onMounted(async () => {
                   <person-view :person-id="pah.cosignatory_id" title="Cosignatory:" />
                 </template>
               </v-col>
-             </v-row>
-                     <HouseholdNotes :pah="pahno" />
+            </v-row>
+            <HouseholdNotes ref="householdNotes" :pah="pahno" />
+            <HouseholdIcas
+              ref="householdIcas"
+              :pah="pahno"
+              :new-ica-required="pah?.new_ica_required ?? false"
+              @update:new-ica-required="val => { pah = { ...pah, new_ica_required: val } }"
+              @ica-added="householdNotes?.loadNotes()"
+            />
+
             <v-tabs v-model="tab" class="rounded mt-5" bg-color="blue-lighten-4" selected-class="bg-primary">
               <v-tab value="ica">ICA</v-tab>
               <v-tab :disabled="!pah.survey_complete" value="survey">Survey</v-tab>
@@ -368,26 +414,11 @@ onMounted(async () => {
               <v-window-item value="ica">
                 <v-row>
                   <v-col cols="12" md="6">
-                    <div v-if="!pah.no_ica_required" :style="{ color: pah?.date_signed ? 'inherit' : 'red' }">
-                      <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah?.date_signed || 'not signed' }}</span>
-                      <v-btn
-                        v-if="getSafeExternalUrl(pah?.ica_link)"
-                        :href="getSafeExternalUrl(pah?.ica_link)"
-                        prepend-icon="mdi-open-in-new"
-                        variant="text"
-                        size="x-small"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="ml-2"
-                        title="Open ICA link"
-                      >Open ICA Link</v-btn>
-                    </div>
-                    <div v-else ><strong>ICA:</strong> <span class="table-value">Not Required</span></div>
                     <div><strong>Physically Displaced: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.physically_displaced) }">{{ formatYesNo(pah.physically_displaced) }}</span></div>
                     <div><strong>Landholding only: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.landholding_only) }">{{ formatYesNo(pah.landholding_only) }}</span></div>
                     <div><strong>No ICA Required: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.no_ica_required) }">{{ formatYesNo(pah.no_ica_required) }}</span></div>
                     <div><strong>New ICA Required: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.new_ica_required) }">{{ formatYesNo(pah.new_ica_required) }}</span></div>
-                    <div><strong>Non-affected: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.nonaffected) }">{{ formatYesNo(pah.nonaffected) }}</span></div>
+                    <div><strong>Disturbance only: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.nonaffected) }">{{ formatYesNo(pah.nonaffected) }}</span></div>
                     <div><strong>Is Silumesii: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.silumesii) }">{{ formatYesNo(pah.silumesii) }}</span></div>
                     <div><strong>Flagged: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.household_followup_flag) }">{{ formatYesNo(pah.household_followup_flag) }}</span></div>
                   </v-col>
@@ -584,7 +615,7 @@ onMounted(async () => {
                       <tbody>
                         <template v-for="parcel in parcels" :key="parcel.land_parcel_id">
                           <tr class="parcel-row">
-                            <td>{{ parcel.land_parcel_id }}</td>
+                            <td>{{ parcel.land_parcel_id }}<MapLink :lat="parseLatLon(parcel).lat" :lon="parseLatLon(parcel).lon" /></td>
                             <td>{{ parcel.land_class || 'N/A' }}</td>
                             <td>{{ parcel.land_zone || 'N/A' }}</td>
                             <td>{{ formatYesNo(parcel.cultivated) }}</td>
@@ -650,7 +681,7 @@ onMounted(async () => {
                       </thead>
                       <tbody>
                         <tr v-for="replacement in replacements" :key="replacement.replacement_structure_id">
-                          <td class="table-value left">{{ replacement.replacement_structure_id }}</td>
+                          <td class="table-value left"><router-link :to="{ name: 'ReplacementDetails', params: { id: replacement.replacement_structure_id } }">{{ replacement.replacement_structure_id }}</router-link></td>
                           <td class="table-value left">{{ replacement.structure_id }}</td>
                           <td class="table-value left">{{ replacement.replacement_class }}</td>
                           <td class="table-value left">{{ replacement.replacement_option }}</td>
@@ -682,6 +713,7 @@ onMounted(async () => {
                               <div class="structure-panel-title">
                                 <span><span v-if="structure.protected"><b>[PROTECTED]</b>&nbsp;</span>{{ structure.structure_id }} </span>&nbsp;
                                 <span>{{ structure.structure_class }}</span> - <span><strong>{{ structure.structure_type }}</strong></span>
+                                <MapLink :lat="parseLatLon(structure).lat" :lon="parseLatLon(structure).lon" />
                               </div>
                               <v-spacer/>
                               <span class="pr-5" v-if="structure.replacement_structure_id">
@@ -832,6 +864,11 @@ onMounted(async () => {
                 </v-row>
               </v-window-item>
               <v-window-item value="survey">
+                <v-row>
+                  <v-col cols="12">
+                    Survey location: <MapLink :lat="pah_survey.lat" :lon="pah_survey.lon" />
+                  </v-col>
+                </v-row>
                 <v-table density="compact" class="mb-4" v-if="members.length">
                   <thead>
                     <tr>
@@ -893,6 +930,8 @@ onMounted(async () => {
 
       </v-container>
     </v-main>
+
+
 
     <v-dialog v-model="memberDialog" max-width="600">
       <v-card v-if="selectedMember">

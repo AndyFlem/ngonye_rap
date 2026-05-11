@@ -63,12 +63,13 @@ async function deleteNote (note) {
 }
 
 onMounted(loadNotes)
+defineExpose({ loadNotes })
 </script>
 
 <template>
   <v-card elevation="1" class="mt-4">
     <v-card-title class="d-flex align-center table-heading">
-      Notes
+      <span class="text-title-small">Notes</span>
       <v-spacer />
       <v-btn size="small" color="primary" variant="tonal" prepend-icon="mdi-plus" @click="openDialog">
         Add Note
@@ -79,8 +80,8 @@ onMounted(loadNotes)
 
     <v-alert v-if="error" type="error" variant="tonal" class="mx-4 my-2">{{ error }}</v-alert>
 
-    <v-card-text class="pa-0">
-      <v-table density="compact" v-if="notes.length > 0">
+    <v-card-text v-if="notes.length > 0" class="pa-0">
+      <v-table density="compact" >
         <thead>
           <tr>
             <th>Created By</th>
@@ -107,7 +108,6 @@ onMounted(loadNotes)
           </tr>
         </tbody>
       </v-table>
-      <div v-else-if="!loading" class="pa-4 text-medium-emphasis text-body-2">No notes yet.</div>
     </v-card-text>
   </v-card>
 

@@ -105,10 +105,14 @@ module.exports = {
     const pah = (req.params.pah || '').trim().slice(0, 120)
     if (!pah) return res.status(400).send({ error: 'pah is required' })
 
-    const allowed = ['village_id']
+    const allowed = {
+      village_id: 'village_id',
+      household_followup_flag: 'followup_flag',
+      new_ica_required: 'new_ica_required'
+    }
     const fields = {}
-    for (const key of allowed) {
-      if (key in req.body) fields[key] = req.body[key]
+    for (const [bodyKey, colName] of Object.entries(allowed)) {
+      if (bodyKey in req.body) fields[colName] = req.body[bodyKey]
     }
     if (Object.keys(fields).length === 0) {
       return res.status(400).send({ error: 'no valid fields provided' })
@@ -117,6 +121,26 @@ module.exports = {
     try {
       const count = await Knex('households').where('pah', pah).update(fields)
       if (!count) return res.status(404).send({ error: 'household not found' })
+
+      if ('household_followup_flag' in req.body) {
+        const action = req.body.household_followup_flag ? 'set' : 'cleared'
+        await Knex('notes').insert({
+          user_id: req.userId,
+          pah,
+          note: `Follow-up flag ${action}`,
+          created_at: Knex.fn.now()
+        })
+      }
+
+      if ('new_ica_required' in req.body) {
+        await Knex('notes').insert({
+          user_id: req.userId,
+          pah,
+          note: `New ICA required set to ${req.body.new_ica_required}`,
+          created_at: Knex.fn.now()
+        })
+      }
+
       return res.send({ success: true })
     } catch (err) {
       Common.error(req, 'patch', err)
@@ -211,10 +235,6 @@ module.exports = {
       const silumesiiHouseholdsResult = await Knex('v_households').where('silumesii', true).count('pah as count').first()
       summary.silumesiiHouseholds = parseInt(silumesiiHouseholdsResult.count) || 0
 
-      // Add a count of households that are landholding only
-      const landholdingOnlyResult = await Knex('v_households').where('landholding_only', true).count('pah as count').first()
-      summary.landholdingOnlyHouseholds = parseInt(landholdingOnlyResult.count) || 0
-
       // Add a count of households that have replacement households (replacement_structures_count>0)
       const replacementHouseholdsResult = await Knex('v_households').where('replacement_structures_count', '>', 0).count('pah as count').first()
       summary.replacementHouseholds = parseInt(replacementHouseholdsResult.count) || 0
@@ -242,6 +262,14 @@ module.exports = {
       // Add a sum of secondary structures compensation value
       const secondaryStructuresCompResult = await Knex('v_household_compensation').sum('secondary_structures_compensation_value as total').first()
       summary.totalSecondaryStructuresCompensation = parseFloat(secondaryStructuresCompResult.total) || 0
+
+      // Add a count of surveys
+      const surveysResult = await Knex('households_survey').count('pah as count').first()
+      summary.totalSurveys = parseInt(surveysResult.count) || 0
+
+      // Add a count of people
+      const peopleResult = await Knex('v_person').count('person_id as count').first()
+      summary.totalPeople = parseInt(peopleResult.count) || 0
 
       // Add a sum of allowances
       const allowancesResult = await Knex('v_household_compensation').sum('allowance_total as total').first()

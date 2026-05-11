@@ -370,9 +370,17 @@ onMounted(() => {
                 <div class="d-flex align-center ga-1 pr-4 bg-grey-lighten-4 rounded">
                   <v-checkbox
                     v-model="search.params.nonaffected"
-                    label="Non-affected"
+                    label="Disturbance only"
                     hide-details
+                    :indeterminate="search.params.nonaffected === null"
                     density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.nonaffected = null"
                   />
                 </div>
                 <div class="d-flex align-center ga-1 pr-4 bg-grey-lighten-4 rounded">

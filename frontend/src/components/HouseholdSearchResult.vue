@@ -78,7 +78,7 @@ watch(() => props.pahNo, async (newPah) => {
             ICA Not Required
           </v-chip>
           <v-chip color="" class="mr-2" size="small" v-if="pah && pah.nonaffected">
-            Non-affected
+            Disturbance only
           </v-chip>
         </v-col>
       </v-row>

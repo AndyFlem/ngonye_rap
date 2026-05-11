@@ -7,6 +7,8 @@ import ReplacementSearch from '@/views/ReplacementSearch.vue'
 import ReplacementDetails from '@/views/ReplacementDetails.vue'
 import ParcelSearch from '@/views/ParcelSearch.vue'
 import ParcelDetails from '@/views/ParcelDetails.vue'
+import UserList from '@/views/UserList.vue'
+import UserForm from '@/views/UserForm.vue'
 
 const routes = [
   {
@@ -63,6 +65,24 @@ const routes = [
     path: '/parcels/:id',
     name: 'ParcelDetails',
     component: ParcelDetails,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/users',
+    name: 'Users',
+    component: UserList,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/users/new',
+    name: 'UserCreate',
+    component: UserForm,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/users/:id/edit',
+    name: 'UserEdit',
+    component: UserForm,
     meta: { requiresAuth: true }
   }
 ]
