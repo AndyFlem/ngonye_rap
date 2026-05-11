@@ -5,6 +5,7 @@ const auth = require('./services/auth')
 const UsersController = require('./controllers/UsersController')
 const HouseholdsController = require('./controllers/HouseholdsController')
 const IcasController = require('./controllers/IcasController')
+const GrievancesController = require('./controllers/GrievancesController')
 const RAPController = require('./controllers/RAPController')
 const ReplacementsController = require('./controllers/ReplacementsController')
 const LandController = require('./controllers/LandController')
@@ -52,6 +53,12 @@ module.exports = (app) => {
   app.get(prefix + '/households/:pah/icas', IcasController.index)
   app.post(prefix + '/households/:pah/icas', IcasController.create)
   app.patch(prefix + '/icas/:ica_id', IcasController.update)
+
+  // GRIEVANCES
+  app.get(prefix + '/households/:pah/grievances', GrievancesController.index)
+  app.post(prefix + '/households/:pah/grievances', GrievancesController.create)
+  app.patch(prefix + '/grievances/:grievance_id', GrievancesController.update)
+  app.delete(prefix + '/grievances/:grievance_id', GrievancesController.destroy)
 
   app.get(prefix + '/households/:pah/parcels', HouseholdsController.indexParcels)
   app.get(prefix + '/households/:pah/structures', HouseholdsController.indexStructures)

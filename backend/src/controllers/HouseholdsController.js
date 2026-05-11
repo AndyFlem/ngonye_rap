@@ -88,6 +88,7 @@ function buildSearchParams (defn) {
   if (defn.has_replacement_land !== undefined && defn.has_replacement_land !== null) { params.push(`p_has_replacement_land=> ${defn.has_replacement_land}`) }
   if (defn.has_protected !== undefined && defn.has_protected !== null) { params.push(`p_has_protected=> ${defn.has_protected}`) }
   if (defn.survey_complete !== undefined && defn.survey_complete !== null) { params.push(`p_survey_complete=> ${defn.survey_complete}`) }
+  if (defn.has_current_grievance !== undefined && defn.has_current_grievance !== null) { params.push(`p_has_current_grievance=> ${defn.has_current_grievance}`) }
   return params
 }
 function csvEscape (val) {

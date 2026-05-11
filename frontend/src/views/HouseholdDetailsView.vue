@@ -7,6 +7,7 @@ import TableCopyFooter from '@/components/TableCopyFooter.vue'
 import PersonView from '@/components/PersonView.vue'
 import HouseholdNotes from '@/components/HouseholdNotes.vue'
 import HouseholdIcas from '@/components/HouseholdIcas.vue'
+import HouseholdGrievances from '@/components/HouseholdGrievances.vue'
 import MapLink from '@/components/MapLink.vue'
 
 
@@ -405,6 +406,7 @@ onMounted(async () => {
               @update:new-ica-required="val => { pah = { ...pah, new_ica_required: val } }"
               @ica-added="householdNotes?.loadNotes()"
             />
+            <HouseholdGrievances :pah="pahno" @grievance-changed="householdNotes?.loadNotes()" />
 
             <v-tabs v-model="tab" class="rounded mt-5" bg-color="blue-lighten-4" selected-class="bg-primary">
               <v-tab value="ica">ICA</v-tab>

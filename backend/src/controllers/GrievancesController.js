@@ -1,0 +1,102 @@
+const Knex = require('../services/db')
+const Common = require('./CommonDebug')('Grievances')
+
+module.exports = {
+  async index (req, res) {
+    Common.debug(req, 'index')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+    if (!pah) return res.status(400).send({ error: 'pah is required' })
+    try {
+      const grievances = await Knex('grievances')
+        .where({ pah })
+        .orderByRaw('created_at DESC, grievance_id DESC')
+      return res.send(grievances)
+    } catch (err) {
+      Common.error(req, 'index', err)
+      return res.status(500).send({ error: 'failed to fetch grievances: ' + err })
+    }
+  },
+
+  async create (req, res) {
+    Common.debug(req, 'create')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+    if (!pah) return res.status(400).send({ error: 'pah is required' })
+
+    const grievance_link = req.body.grievance_link ? String(req.body.grievance_link).trim().slice(0, 500) || null : null
+    const grievance_ref = req.body.grievance_ref ? String(req.body.grievance_ref).trim().slice(0, 50) || null : null
+
+    if (!grievance_link && !grievance_ref) return res.status(400).send({ error: 'grievance_link or grievance_ref is required' })
+
+    try {
+      const [inserted] = await Knex('grievances')
+        .insert({ pah, grievance_link, grievance_ref, is_current: true, user_id: req.userId })
+        .returning('grievance_id')
+
+      const noteText = grievance_ref
+        ? `Grievance added: ${grievance_ref}`
+        : 'Grievance added'
+      await Knex('notes').insert({
+        user_id: req.userId,
+        pah,
+        note: noteText,
+        created_at: Knex.fn.now()
+      })
+
+      const grievance = await Knex('grievances').where({ grievance_id: inserted.grievance_id }).first()
+      return res.status(201).send(grievance)
+    } catch (err) {
+      Common.error(req, 'create', err)
+      return res.status(500).send({ error: 'failed to create grievance: ' + err })
+    }
+  },
+
+  async update (req, res) {
+    Common.debug(req, 'update')
+    const grievance_id = parseInt(req.params.grievance_id, 10)
+    if (!grievance_id || isNaN(grievance_id)) return res.status(400).send({ error: 'grievance_id must be a number' })
+
+    const fields = {}
+    if ('is_current' in req.body) fields.is_current = !!req.body.is_current
+    if ('grievance_link' in req.body) fields.grievance_link = req.body.grievance_link ? String(req.body.grievance_link).trim().slice(0, 500) || null : null
+    if ('grievance_ref' in req.body) fields.grievance_ref = req.body.grievance_ref ? String(req.body.grievance_ref).trim().slice(0, 50) || null : null
+
+    if (Object.keys(fields).length === 0) return res.status(400).send({ error: 'no valid fields provided' })
+
+    try {
+      const count = await Knex('grievances').where({ grievance_id }).update(fields)
+      if (!count) return res.status(404).send({ error: 'grievance not found' })
+      return res.send({ success: true })
+    } catch (err) {
+      Common.error(req, 'update', err)
+      return res.status(500).send({ error: 'failed to update grievance: ' + err })
+    }
+  },
+
+  async destroy (req, res) {
+    Common.debug(req, 'destroy')
+    const grievance_id = parseInt(req.params.grievance_id, 10)
+    if (!grievance_id || isNaN(grievance_id)) return res.status(400).send({ error: 'grievance_id must be a number' })
+
+    try {
+      const grievance = await Knex('grievances').where({ grievance_id }).first()
+      if (!grievance) return res.status(404).send({ error: 'grievance not found' })
+
+      await Knex('grievances').where({ grievance_id }).delete()
+
+      const noteText = grievance.grievance_ref
+        ? `Grievance deleted: ${grievance.grievance_ref}`
+        : 'Grievance deleted'
+      await Knex('notes').insert({
+        user_id: req.userId,
+        pah: grievance.pah,
+        note: noteText,
+        created_at: Knex.fn.now()
+      })
+
+      return res.send({ success: true })
+    } catch (err) {
+      Common.error(req, 'destroy', err)
+      return res.status(500).send({ error: 'failed to delete grievance: ' + err })
+    }
+  }
+}

@@ -33,7 +33,8 @@ const search = ref({
     silumesii: null,
     new_ica_required: null,
     survey_complete: null,
-    landholding_only: null
+    landholding_only: null,
+    has_current_grievance: null
   }
 })
 
@@ -98,6 +99,7 @@ const autoSearchFields = [
   () => search.value.params.new_ica_required,
   () => search.value.params.survey_complete,
   () => search.value.params.landholding_only,
+  () => search.value.params.has_current_grievance,
   icarequired,
 ]
 
@@ -184,7 +186,8 @@ function clearSearch () {
     silumesii: null,
     new_ica_required: null,
     survey_complete: null,
-    landholding_only: null
+    landholding_only: null,
+    has_current_grievance: null
   }
 }
 
@@ -583,6 +586,22 @@ onMounted(() => {
                     size="x-small"
                     variant="text"
                     @click="search.params.landholding_only = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_current_grievance"
+                    label="Has Grievance"
+                    hide-details
+                    :indeterminate="search.params.has_current_grievance === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_current_grievance = null"
                   />
                 </div>
               </v-col>
