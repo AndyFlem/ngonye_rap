@@ -1,6 +1,6 @@
 const config = {
-    port: 4001,
-    cors_origin: ['http://localhost:4001', 'http://localhost:5174', 'http://localhost:5173','http://mphepo.ulendo.com','https://gis.westernpower.org'],
+    port: 4040,
+    cors_origin: ['http://localhost:5173','https://rap.westernpower.org'],
     development_mode: true,
     api_version: 'v1',
     auth_secret: 'kjsllwjksdflkjsd509kd_dks44AkfkA',
