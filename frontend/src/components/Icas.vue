@@ -2,7 +2,8 @@
 import { computed, inject, onMounted, ref } from 'vue'
 
 const props = defineProps({
-  pah: { type: String, required: true },
+  pah: { type: String, default: null },
+  nhs: { type: String, default: null },
   newIcaRequired: { type: Boolean, default: false }
 })
 
@@ -25,11 +26,20 @@ const ICA_TYPES = ['Household', 'Non-affected']
 
 const togglingFlag = ref(false)
 
+const icasUrl = computed(() =>
+  props.nhs
+    ? `/fishers/${encodeURIComponent(props.nhs)}/icas`
+    : `/households/${encodeURIComponent(props.pah)}/icas`
+)
+
 async function toggleNewIcaRequired () {
   togglingFlag.value = true
   try {
     const newVal = !props.newIcaRequired
-    await axiosSecure.patch(`/households/${encodeURIComponent(props.pah)}`, { new_ica_required: newVal })
+    const url = props.nhs
+      ? `/fishers/${encodeURIComponent(props.nhs)}`
+      : `/households/${encodeURIComponent(props.pah)}`
+    await axiosSecure.patch(url, { new_ica_required: newVal })
     emit('update:newIcaRequired', newVal)
     emit('ica-added')
   } catch (err) {
@@ -49,7 +59,7 @@ async function loadIcas () {
   loading.value = true
   error.value = ''
   try {
-    const r = await axiosSecure.get(`/households/${encodeURIComponent(props.pah)}/icas`)
+    const r = await axiosSecure.get(icasUrl.value)
     icas.value = Array.isArray(r.data) ? r.data : []
   } catch (err) {
     error.value = 'Failed to load ICAs.'
@@ -74,7 +84,7 @@ async function submitIca () {
   saving.value = true
   saveError.value = ''
   try {
-    await axiosSecure.post(`/households/${encodeURIComponent(props.pah)}/icas`, {
+    await axiosSecure.post(icasUrl.value, {
       ica_link: newIcaLink.value.trim() || null,
       date_signed: newIcaDateSigned.value || null,
       type: newIcaType.value || null
@@ -193,7 +203,7 @@ defineExpose({ loadIcas, currentIca })
       <v-card-title>Add ICA</v-card-title>
       <v-card-text>
         <v-alert v-if="saveError" type="error" variant="tonal" class="mb-3">{{ saveError }}</v-alert>
-        <v-select v-model="newIcaType" label="Type" :items="ICA_TYPES"
+        <v-select v-if="!nhs" v-model="newIcaType" label="Type" :items="ICA_TYPES"
           density="compact" variant="outlined" class="mb-3" clearable />
         <v-text-field v-model="newIcaLink" label="ICA Link" placeholder="https://..."
           density="compact" variant="outlined" class="mb-3" />

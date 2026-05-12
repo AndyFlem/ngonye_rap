@@ -9,6 +9,8 @@ import ParcelSearch from '@/views/ParcelSearch.vue'
 import ParcelDetails from '@/views/ParcelDetails.vue'
 import UserList from '@/views/UserList.vue'
 import UserForm from '@/views/UserForm.vue'
+import FishersSearch from '@/views/FishersSearch.vue'
+import FishersDetails from '@/views/FishersDetails.vue'
 
 const routes = [
   {
@@ -65,6 +67,18 @@ const routes = [
     path: '/parcels/:id',
     name: 'ParcelDetails',
     component: ParcelDetails,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/fishers',
+    name: 'Fishers',
+    component: FishersSearch,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/fishers/:nhs',
+    name: 'FishersDetails',
+    component: FishersDetails,
     meta: { requiresAuth: true }
   },
   {

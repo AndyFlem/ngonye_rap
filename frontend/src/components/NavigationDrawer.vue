@@ -36,6 +36,11 @@ const handleParcelsClick = () => {
   emit('close-drawer')
 }
 
+const handleFishersClick = () => {
+  router.push('/fishers')
+  emit('close-drawer')
+}
+
 const handleUsersClick = () => {
   router.push('/users')
   emit('close-drawer')
@@ -75,6 +80,11 @@ const handleLogout = () => {
         prepend-icon="mdi-map"
         title="Land Parcels"
         @click="handleParcelsClick"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-fish"
+        title="Fishers"
+        @click="handleFishersClick"
       ></v-list-item>
       <v-list-item
         v-if="user.isAdmin"

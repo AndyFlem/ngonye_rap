@@ -10,6 +10,8 @@ const RAPController = require('./controllers/RAPController')
 const ReplacementsController = require('./controllers/ReplacementsController')
 const LandController = require('./controllers/LandController')
 const PersonController = require('./controllers/PersonController')
+const FishersController = require('./controllers/FishersController')
+const NotesController = require('./controllers/NotesController')
 
 module.exports = (app) => {
   const prefix = '/api/' + config.api_version
@@ -44,20 +46,26 @@ module.exports = (app) => {
   app.get(prefix + '/households/:pah/survey', HouseholdsController.showSurvey)
   app.get(prefix + '/households/:pah/members', HouseholdsController.indexMembers)
 
-  // NOTES
-  app.get(prefix + '/households/:pah/notes', HouseholdsController.indexNotes)
-  app.post(prefix + '/households/:pah/notes', HouseholdsController.createNote)
-  app.delete(prefix + '/notes/:note_id', HouseholdsController.deleteNote)
+  // NOTES (households and fishers)
+  app.get(prefix + '/households/:pah/notes',  NotesController.index)
+  app.post(prefix + '/households/:pah/notes', NotesController.create)
+  app.get(prefix + '/fishers/:nhs/notes',     NotesController.index)
+  app.post(prefix + '/fishers/:nhs/notes',    NotesController.create)
+  app.delete(prefix + '/notes/:note_id',      NotesController.destroy)
 
-  // ICAS
-  app.get(prefix + '/households/:pah/icas', IcasController.index)
+  // ICAS (households and fishers)
+  app.get(prefix + '/households/:pah/icas',  IcasController.index)
   app.post(prefix + '/households/:pah/icas', IcasController.create)
-  app.patch(prefix + '/icas/:ica_id', IcasController.update)
+  app.get(prefix + '/fishers/:nhs/icas',     IcasController.index)
+  app.post(prefix + '/fishers/:nhs/icas',    IcasController.create)
+  app.patch(prefix + '/icas/:ica_id',        IcasController.update)
 
-  // GRIEVANCES
-  app.get(prefix + '/households/:pah/grievances', GrievancesController.index)
+  // GRIEVANCES (households and fishers)
+  app.get(prefix + '/households/:pah/grievances',  GrievancesController.index)
   app.post(prefix + '/households/:pah/grievances', GrievancesController.create)
-  app.patch(prefix + '/grievances/:grievance_id', GrievancesController.update)
+  app.get(prefix + '/fishers/:nhs/grievances',     GrievancesController.index)
+  app.post(prefix + '/fishers/:nhs/grievances',    GrievancesController.create)
+  app.patch(prefix + '/grievances/:grievance_id',  GrievancesController.update)
   app.delete(prefix + '/grievances/:grievance_id', GrievancesController.destroy)
 
   app.get(prefix + '/households/:pah/parcels', HouseholdsController.indexParcels)
@@ -81,6 +89,13 @@ module.exports = (app) => {
   app.post(prefix + '/parcels_export',  LandController.exportSearch)
   app.get(prefix  + '/parcels/:id/assets', LandController.indexAssets)
   app.get(prefix  + '/parcels/:id',     LandController.show)
+
+  // FISHERS
+  app.post(prefix + '/fishers_search', FishersController.search)
+  app.post(prefix + '/fishers_export', FishersController.exportSearch)
+  app.get(prefix + '/fishers/:nhs',    FishersController.show)
+  app.patch(prefix + '/fishers/:nhs',  FishersController.patch)
+  // fisher notes and icas are registered above in their respective blocks
 
   // USER MANAGEMENT
   app.post(prefix + '/user', UsersController.create)

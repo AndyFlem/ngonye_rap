@@ -3,12 +3,14 @@ const Common = require('./CommonDebug')('Grievances')
 
 module.exports = {
   async index (req, res) {
-    Common.debug(req, 'index')
-    const pah = (req.params.pah || '').trim().slice(0, 120)
-    if (!pah) return res.status(400).send({ error: 'pah is required' })
+    Common.debug(req, 'index', '')
+    const pah = (req.params.pah || '').trim().slice(0, 9)
+    const nhs = (req.params.nhs || '').trim().slice(0, 10)
+    if (!pah && !nhs) return res.status(400).send({ error: 'pah or nhs is required' })
+    const filter = pah ? { pah } : { nhs }
     try {
       const grievances = await Knex('grievances')
-        .where({ pah })
+        .where(filter)
         .orderByRaw('created_at DESC, grievance_id DESC')
       return res.send(grievances)
     } catch (err) {
@@ -18,29 +20,25 @@ module.exports = {
   },
 
   async create (req, res) {
-    Common.debug(req, 'create')
-    const pah = (req.params.pah || '').trim().slice(0, 120)
-    if (!pah) return res.status(400).send({ error: 'pah is required' })
+    Common.debug(req, 'create', '')
+    const pah = (req.params.pah || '').trim().slice(0, 9)
+    const nhs = (req.params.nhs || '').trim().slice(0, 10)
+    if (!pah && !nhs) return res.status(400).send({ error: 'pah or nhs is required' })
 
     const grievance_link = req.body.grievance_link ? String(req.body.grievance_link).trim().slice(0, 500) || null : null
     const grievance_ref = req.body.grievance_ref ? String(req.body.grievance_ref).trim().slice(0, 50) || null : null
 
     if (!grievance_link && !grievance_ref) return res.status(400).send({ error: 'grievance_link or grievance_ref is required' })
 
+    const entity = pah ? { pah } : { nhs }
+
     try {
       const [inserted] = await Knex('grievances')
-        .insert({ pah, grievance_link, grievance_ref, is_current: true, user_id: req.userId })
+        .insert({ ...entity, grievance_link, grievance_ref, is_current: true, user_id: req.userId })
         .returning('grievance_id')
 
-      const noteText = grievance_ref
-        ? `Grievance added: ${grievance_ref}`
-        : 'Grievance added'
-      await Knex('notes').insert({
-        user_id: req.userId,
-        pah,
-        note: noteText,
-        created_at: Knex.fn.now()
-      })
+      const noteText = grievance_ref ? `Grievance added: ${grievance_ref}` : 'Grievance added'
+      await Knex('notes').insert({ user_id: req.userId, ...entity, note: noteText, created_at: Knex.fn.now() })
 
       const grievance = await Knex('grievances').where({ grievance_id: inserted.grievance_id }).first()
       return res.status(201).send(grievance)
@@ -51,7 +49,7 @@ module.exports = {
   },
 
   async update (req, res) {
-    Common.debug(req, 'update')
+    Common.debug(req, 'update', '')
     const grievance_id = parseInt(req.params.grievance_id, 10)
     if (!grievance_id || isNaN(grievance_id)) return res.status(400).send({ error: 'grievance_id must be a number' })
 
@@ -73,7 +71,7 @@ module.exports = {
   },
 
   async destroy (req, res) {
-    Common.debug(req, 'destroy')
+    Common.debug(req, 'destroy', '')
     const grievance_id = parseInt(req.params.grievance_id, 10)
     if (!grievance_id || isNaN(grievance_id)) return res.status(400).send({ error: 'grievance_id must be a number' })
 
@@ -83,15 +81,9 @@ module.exports = {
 
       await Knex('grievances').where({ grievance_id }).delete()
 
-      const noteText = grievance.grievance_ref
-        ? `Grievance deleted: ${grievance.grievance_ref}`
-        : 'Grievance deleted'
-      await Knex('notes').insert({
-        user_id: req.userId,
-        pah: grievance.pah,
-        note: noteText,
-        created_at: Knex.fn.now()
-      })
+      const noteText = grievance.grievance_ref ? `Grievance deleted: ${grievance.grievance_ref}` : 'Grievance deleted'
+      const entity = grievance.pah ? { pah: grievance.pah } : { nhs: grievance.nhs }
+      await Knex('notes').insert({ user_id: req.userId, ...entity, note: noteText, created_at: Knex.fn.now() })
 
       return res.send({ success: true })
     } catch (err) {

@@ -5,9 +5,9 @@ import TopBar from '@/components/TopBar.vue'
 import { formatCurrency, formatArea, formatYesNo, formatDateTime } from '@/utils/formatters'
 import TableCopyFooter from '@/components/TableCopyFooter.vue'
 import PersonView from '@/components/PersonView.vue'
-import HouseholdNotes from '@/components/HouseholdNotes.vue'
-import HouseholdIcas from '@/components/HouseholdIcas.vue'
-import HouseholdGrievances from '@/components/HouseholdGrievances.vue'
+import Notes from '@/components/Notes.vue'
+import Icas from '@/components/Icas.vue'
+import Grievances from '@/components/Grievances.vue'
 import MapLink from '@/components/MapLink.vue'
 
 
@@ -373,7 +373,7 @@ onMounted(async () => {
                 </div>
                 <v-divider class="my-2" />
                 <div v-if="!pah.no_ica_required" :style="{ color: pah.date_signed ? 'inherit' : 'red' }">
-                  <strong>ICA Signature Date:</strong> <span class="table-value">{{ formatDateTime(pah.date_signed) || 'not signed' }}</span>
+                  <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah.date_signed ? formatDateTime(pah.date_signed) : 'not signed' }}</span>
                   <v-btn
                     v-if="getSafeExternalUrl(pah.ica_link)"
                     :href="getSafeExternalUrl(pah.ica_link)"
@@ -398,15 +398,15 @@ onMounted(async () => {
                 </template>
               </v-col>
             </v-row>
-            <HouseholdNotes ref="householdNotes" :pah="pahno" />
-            <HouseholdIcas
+            <Notes ref="householdNotes" :pah="pahno" />
+            <Icas
               ref="householdIcas"
               :pah="pahno"
               :new-ica-required="pah?.new_ica_required ?? false"
               @update:new-ica-required="val => { pah = { ...pah, new_ica_required: val } }"
               @ica-added="householdNotes?.loadNotes()"
             />
-            <HouseholdGrievances :pah="pahno" @grievance-changed="householdNotes?.loadNotes()" />
+            <Grievances :pah="pahno" @grievance-changed="householdNotes?.loadNotes()" />
 
             <v-tabs v-model="tab" class="rounded mt-5" bg-color="blue-lighten-4" selected-class="bg-primary">
               <v-tab value="ica">ICA</v-tab>

@@ -5,10 +5,12 @@ module.exports = {
   async index (req, res) {
     Common.debug(req, 'index')
     const pah = (req.params.pah || '').trim().slice(0, 120)
-    if (!pah) return res.status(400).send({ error: 'pah is required' })
+    const nhs = (req.params.nhs || '').trim().slice(0, 10)
+    if (!pah && !nhs) return res.status(400).send({ error: 'pah or nhs is required' })
+    const filter = pah ? { pah } : { nhs }
     try {
       const icas = await Knex('icas')
-        .where({ pah })
+        .where(filter)
         .orderByRaw('date_signed DESC NULLS LAST, ica_id DESC')
       return res.send(icas)
     } catch (err) {
@@ -20,25 +22,38 @@ module.exports = {
   async create (req, res) {
     Common.debug(req, 'create')
     const pah = (req.params.pah || '').trim().slice(0, 120)
-    if (!pah) return res.status(400).send({ error: 'pah is required' })
+    const nhs = (req.params.nhs || '').trim().slice(0, 10)
+    if (!pah && !nhs) return res.status(400).send({ error: 'pah or nhs is required' })
 
     const ica_link = req.body.ica_link ? String(req.body.ica_link).trim().slice(0, 500) || null : null
     const date_signed = req.body.date_signed || null
+
+    let type
+    if (nhs) {
+      type = 'Fisher'
+    } else {
+      const VALID_TYPES = ['Household', 'Non-affected']
+      type = VALID_TYPES.includes(req.body.type) ? req.body.type : null
+    }
 
     if (!ica_link && !date_signed) {
       return res.status(400).send({ error: 'ica_link or date_signed is required' })
     }
 
-    try {
-      await Knex('icas').where({ pah }).update({ is_current: false })
+    const filter = pah ? { pah } : { nhs }
 
-      const [inserted] = await Knex('icas')
-        .insert({ pah, ica_link, date_signed, is_current: true })
-        .returning('ica_id')
+    try {
+      await Knex('icas').where(filter).update({ is_current: false })
+
+      const insert = { ica_link, date_signed, is_current: true, type }
+      if (pah) insert.pah = pah
+      if (nhs) insert.nhs = nhs
+
+      const [inserted] = await Knex('icas').insert(insert).returning('ica_id')
 
       await Knex('notes').insert({
         user_id: req.userId,
-        pah,
+        ...(pah ? { pah } : { nhs }),
         note: 'New, replacement ICA added',
         created_at: Knex.fn.now()
       })
