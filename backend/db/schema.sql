@@ -45,10 +45,10 @@ COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types an
 
 
 --
--- Name: a_households_search(character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, character varying, bigint, character varying, character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: postgres
+-- Name: a_households_search(character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, character varying, bigint, character varying, character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.a_households_search(p_household_head character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_vulnerable boolean DEFAULT NULL::boolean, p_nonaffected boolean DEFAULT NULL::boolean, p_landholding_only boolean DEFAULT NULL::boolean, p_silumesii boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_no_ica_required boolean DEFAULT NULL::boolean, p_icasigned boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_physically_displaced boolean DEFAULT NULL::boolean, p_nrc character varying DEFAULT NULL::character varying, p_village_id bigint DEFAULT NULL::bigint, p_icaoption_primary_structure character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_icaoption_landholding character varying DEFAULT NULL::character varying, p_icaoption_dryland character varying DEFAULT NULL::character varying, p_icaoption_garden character varying DEFAULT NULL::character varying, p_icaoption_transport character varying DEFAULT NULL::character varying, p_has_replacement_structures boolean DEFAULT NULL::boolean, p_has_replacement_land boolean DEFAULT NULL::boolean, p_has_protected boolean DEFAULT NULL::boolean, p_survey_complete boolean DEFAULT NULL::boolean) RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
+CREATE FUNCTION public.a_households_search(p_household_head character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_vulnerable boolean DEFAULT NULL::boolean, p_nonaffected boolean DEFAULT NULL::boolean, p_landholding_only boolean DEFAULT NULL::boolean, p_silumesii boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_no_ica_required boolean DEFAULT NULL::boolean, p_icasigned boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_physically_displaced boolean DEFAULT NULL::boolean, p_nrc character varying DEFAULT NULL::character varying, p_village_id bigint DEFAULT NULL::bigint, p_icaoption_primary_structure character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_icaoption_landholding character varying DEFAULT NULL::character varying, p_icaoption_dryland character varying DEFAULT NULL::character varying, p_icaoption_garden character varying DEFAULT NULL::character varying, p_icaoption_transport character varying DEFAULT NULL::character varying, p_has_replacement_structures boolean DEFAULT NULL::boolean, p_has_replacement_land boolean DEFAULT NULL::boolean, p_has_protected boolean DEFAULT NULL::boolean, p_survey_complete boolean DEFAULT NULL::boolean, p_has_current_grievance boolean DEFAULT NULL::boolean) RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -84,6 +84,7 @@ BEGIN
       ((COALESCE(h.replacement_land_area, 0) > 0) = p_has_replacement_land OR p_has_replacement_land IS NULL) AND
       (h.has_protected = p_has_protected OR p_has_protected IS NULL) AND
       (h.survey_complete = p_survey_complete OR p_survey_complete IS NULL) AND
+      ((EXISTS (SELECT 1 FROM public.grievances g WHERE g.pah = h.pah AND g.is_current = true)) = p_has_current_grievance OR p_has_current_grievance IS NULL) AND
       (
         (SIMILARITY(p.firstname, p_household_head) > 0.4 OR p_household_head IS NULL) OR
         (SIMILARITY(p.lastname, p_household_head) > 0.4 OR p_household_head IS NULL) OR
@@ -94,7 +95,7 @@ END
 $$;
 
 
-ALTER FUNCTION public.a_households_search(p_household_head character varying, p_pah character varying, p_vulnerable boolean, p_nonaffected boolean, p_landholding_only boolean, p_silumesii boolean, p_new_ica_required boolean, p_no_ica_required boolean, p_icasigned boolean, p_followup_flag boolean, p_physically_displaced boolean, p_nrc character varying, p_village_id bigint, p_icaoption_primary_structure character varying, p_icaoption_structure_location character varying, p_icaoption_landholding character varying, p_icaoption_dryland character varying, p_icaoption_garden character varying, p_icaoption_transport character varying, p_has_replacement_structures boolean, p_has_replacement_land boolean, p_has_protected boolean, p_survey_complete boolean) OWNER TO postgres;
+ALTER FUNCTION public.a_households_search(p_household_head character varying, p_pah character varying, p_vulnerable boolean, p_nonaffected boolean, p_landholding_only boolean, p_silumesii boolean, p_new_ica_required boolean, p_no_ica_required boolean, p_icasigned boolean, p_followup_flag boolean, p_physically_displaced boolean, p_nrc character varying, p_village_id bigint, p_icaoption_primary_structure character varying, p_icaoption_structure_location character varying, p_icaoption_landholding character varying, p_icaoption_dryland character varying, p_icaoption_garden character varying, p_icaoption_transport character varying, p_has_replacement_structures boolean, p_has_replacement_land boolean, p_has_protected boolean, p_survey_complete boolean, p_has_current_grievance boolean) OWNER TO postgres;
 
 --
 -- Name: a_parcels_search(character varying, character varying, character varying, character varying, character varying, boolean, boolean); Type: FUNCTION; Schema: public; Owner: postgres
@@ -191,6 +192,37 @@ ALTER TABLE public.crops ALTER COLUMN crop_id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
+-- Name: grievances; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.grievances (
+    grievance_id bigint NOT NULL,
+    pah character varying(9) NOT NULL,
+    grievance_link character varying(500),
+    is_current boolean DEFAULT true NOT NULL,
+    user_id bigint,
+    created_at timestamp with time zone DEFAULT now(),
+    grievance_ref character varying(50)
+);
+
+
+ALTER TABLE public.grievances OWNER TO postgres;
+
+--
+-- Name: grievances_grievance_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.grievances ALTER COLUMN grievance_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.grievances_grievance_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: households; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -210,9 +242,7 @@ CREATE TABLE public.households (
     lr_reedbeds boolean,
     lr_agricultureinputs boolean,
     vulnerable boolean,
-    date_signed date,
     no_ica_required boolean,
-    ica_link character varying(500),
     nonaffected boolean,
     silumesii boolean,
     followup_flag boolean,
@@ -312,6 +342,35 @@ CREATE TABLE public.households_survey (
 
 
 ALTER TABLE public.households_survey OWNER TO postgres;
+
+--
+-- Name: icas; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.icas (
+    ica_id bigint NOT NULL,
+    pah character varying(9) NOT NULL,
+    ica_link character varying(500),
+    date_signed date,
+    is_current boolean DEFAULT true NOT NULL
+);
+
+
+ALTER TABLE public.icas OWNER TO postgres;
+
+--
+-- Name: icas_ica_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.icas ALTER COLUMN ica_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.icas_ica_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
 
 --
 -- Name: impact_zones; Type: TABLE; Schema: public; Owner: postgres
@@ -702,7 +761,8 @@ CREATE TABLE public."user" (
     last_name character varying NOT NULL,
     is_deleted boolean,
     can_login boolean DEFAULT true,
-    organisation character varying
+    organisation character varying,
+    admin boolean
 );
 
 
@@ -1048,9 +1108,9 @@ CREATE VIEW public.v_households AS
     h.lr_reedbeds,
     h.lr_agricultureinputs,
     h.vulnerable,
-    h.date_signed,
+    i.date_signed,
     h.no_ica_required,
-    h.ica_link,
+    i.ica_link,
     h.nonaffected,
     h.silumesii,
     h.followup_flag AS household_followup_flag,
@@ -1111,11 +1171,12 @@ CREATE VIEW public.v_households AS
     (EXISTS ( SELECT 1
            FROM public.households_survey hs
           WHERE (hs.pah = (h.pah)::text))) AS survey_complete
-   FROM ((((public.households h
+   FROM (((((public.households h
      LEFT JOIN public.person ph ON ((h.householdhead_id = ph.person_id)))
      LEFT JOIN public.person pc ON ((h.cosignatory_id = pc.person_id)))
      JOIN public.villages v ON ((h.village_id = v.village_id)))
-     LEFT JOIN public.v_households_land_assets hla ON (((h.pah)::text = (hla.pah)::text)));
+     LEFT JOIN public.v_households_land_assets hla ON (((h.pah)::text = (hla.pah)::text)))
+     LEFT JOIN public.icas i ON ((((h.pah)::text = (i.pah)::text) AND (i.is_current = true))));
 
 
 ALTER TABLE public.v_households OWNER TO postgres;
@@ -1303,6 +1364,7 @@ CREATE VIEW public.v_user AS
     u.email,
     u.is_deleted,
     u.can_login,
+    u.admin,
     u.organisation,
     ( SELECT count(*) AS count
            FROM public.user_pageview pv
@@ -1393,11 +1455,27 @@ ALTER TABLE ONLY public.crops
 
 
 --
+-- Name: grievances grievances_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.grievances
+    ADD CONSTRAINT grievances_pkey PRIMARY KEY (grievance_id);
+
+
+--
 -- Name: households households_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.households
     ADD CONSTRAINT households_pkey PRIMARY KEY (pah);
+
+
+--
+-- Name: icas icas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.icas
+    ADD CONSTRAINT icas_pkey PRIMARY KEY (ica_id);
 
 
 --
@@ -1628,6 +1706,30 @@ CREATE INDEX sidx_structures_geom_geom ON public.structures_geom USING gist (geo
 --
 
 CREATE INDEX sidx_zones_geom ON public.zones USING gist (geom);
+
+
+--
+-- Name: grievances grievances_pah_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.grievances
+    ADD CONSTRAINT grievances_pah_fkey FOREIGN KEY (pah) REFERENCES public.households(pah);
+
+
+--
+-- Name: grievances grievances_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.grievances
+    ADD CONSTRAINT grievances_user_id_fkey FOREIGN KEY (user_id) REFERENCES public."user"(user_id);
+
+
+--
+-- Name: icas icas_pah_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.icas
+    ADD CONSTRAINT icas_pah_fkey FOREIGN KEY (pah) REFERENCES public.households(pah);
 
 
 --
