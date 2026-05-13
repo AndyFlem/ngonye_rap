@@ -59,6 +59,8 @@ function buildSearchParams (defn) {
   if (defn.followup_flag !== undefined && defn.followup_flag !== null) { params.push(`p_followup_flag=> ${defn.followup_flag}`) }
   if (defn.ica_signed !== undefined && defn.ica_signed !== null) { params.push(`p_ica_signed=> ${defn.ica_signed}`) }
   if (defn.new_ica_required !== undefined && defn.new_ica_required !== null) { params.push(`p_new_ica_required=> ${defn.new_ica_required}`) }
+  if (defn.has_multiple_icas !== undefined && defn.has_multiple_icas !== null) { params.push(`p_has_multiple_icas=> ${defn.has_multiple_icas}`) }
+  if (defn.has_linked_household !== undefined && defn.has_linked_household !== null) { params.push(`p_has_linked_household=> ${defn.has_linked_household}`) }
   return params
 }
 

@@ -71,7 +71,7 @@ const load = async () => {
   error.value = ''
 
   try {
-    const response = await axiosSecure.get(`/households_summary`)
+    const response = await axiosSecure.get(`/summary`)
     households.value = response.data || null
 
     const replacementsResponse = await axiosSecure.get(`/replacements/summary`)
@@ -146,6 +146,30 @@ onMounted(() => {
               <TableCopyFooter :colspan="2" />
             </v-table>
           </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <h3 class="text-h3 mb-4">
+              Socio-economic Surveys
+            </h3>
+            <v-table density="compact" v-if="households">
+              <thead>
+                <tr>
+                <th class="table-heading"></th>
+                <th class="table-heading right"></th>
+                </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Surveys completed</td>
+                <td class="table-value">{{ households.totalSurveys }}</td>
+              </tr>
+              <tr>
+                <td>People registered</td>
+                <td class="table-value">{{ households.totalPeople }}</td>
+              </tr>
+              </tbody>
+              <TableCopyFooter :colspan="2" />
+            </v-table>
+          </v-col>
         </v-row>
         <v-row>
           <v-col cols="12" sm="6" md="4">
@@ -176,33 +200,36 @@ onMounted(() => {
               <TableCopyFooter :colspan="2" />
             </v-table>
           </v-col>
-        </v-row>
-        <v-row>
           <v-col cols="12" sm="6" md="4">
             <h3 class="text-h3 mb-4">
-              Socio-economic Surveys
+              Fishers Compensation Agreements
             </h3>
             <v-table density="compact" v-if="households">
               <thead>
                 <tr>
-                <th class="table-heading"></th>
-                <th class="table-heading right"></th>
+                <th class="table-heading">Fishers</th>
+                <th class="table-heading right">{{ households.fishers }}</th>
                 </tr>
               </thead>
               <tbody>
               <tr>
-                <td>Surveys completed</td>
-                <td class="table-value">{{ households.totalSurveys }}</td>
+                <td>Signed</td>
+                <td class="table-value">{{ households.signedFishers }}</td>
               </tr>
               <tr>
-                <td>People surveyed</td>
-                <td class="table-value">{{ households.totalPeople }}</td>
+                <td>Unsigned</td>
+                <td class="table-value">{{ households.unsignedFishers }}</td>
+              </tr>
+              <tr>
+                <td>Revised ICA Required</td>
+                <td class="table-value">{{ households.newICAFishers }}</td>
               </tr>
               </tbody>
               <TableCopyFooter :colspan="2" />
             </v-table>
           </v-col>
         </v-row>
+
         <v-row>
           <v-col cols="12" sm="6" md="4">
             <h3 class="text-h3 mb-4">
@@ -245,8 +272,16 @@ onMounted(() => {
                   <td class="table-value">{{ formatCurrency(households.totalAllowances/1000) }}</td>
                 </tr>
                 <tr>
+                  <td>Fishers Site Compensation</td>
+                  <td class="table-value">{{ formatCurrency(households.fisherSiteCompensation/1000) }}</td>
+                </tr>
+                <tr>
+                  <td>Fishers Transitional Allowance</td>
+                  <td class="table-value">{{ formatCurrency(households.fisherTransitionalAllowance/1000) }}</td>
+                </tr>
+                <tr>
                   <td class="table-total">Total Compensation</td>
-                  <td class="table-total table-value">{{ formatCurrency(households.totalCompensation/1000) }}</td>
+                  <td class="table-total table-value">{{ formatCurrency((households.totalCompensation + households.fisherTotalCompensation)/1000) }}</td>
                 </tr>
               </tbody>
               <TableCopyFooter :colspan="2" />

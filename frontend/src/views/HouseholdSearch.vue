@@ -34,7 +34,9 @@ const search = ref({
     new_ica_required: null,
     survey_complete: null,
     landholding_only: null,
-    has_current_grievance: null
+    has_current_grievance: null,
+    has_multiple_icas: null,
+    has_linked_fisher: null
   }
 })
 
@@ -100,6 +102,8 @@ const autoSearchFields = [
   () => search.value.params.survey_complete,
   () => search.value.params.landholding_only,
   () => search.value.params.has_current_grievance,
+  () => search.value.params.has_multiple_icas,
+  () => search.value.params.has_linked_fisher,
   icarequired,
 ]
 
@@ -187,7 +191,9 @@ function clearSearch () {
     new_ica_required: null,
     survey_complete: null,
     landholding_only: null,
-    has_current_grievance: null
+    has_current_grievance: null,
+    has_multiple_icas: null,
+    has_linked_fisher: null
   }
 }
 
@@ -602,6 +608,38 @@ onMounted(() => {
                     size="x-small"
                     variant="text"
                     @click="search.params.has_current_grievance = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_multiple_icas"
+                    label="Has Multiple ICAs"
+                    hide-details
+                    :indeterminate="search.params.has_multiple_icas === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_multiple_icas = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_linked_fisher"
+                    label="Has Linked Fisher"
+                    hide-details
+                    :indeterminate="search.params.has_linked_fisher === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_linked_fisher = null"
                   />
                 </div>
               </v-col>

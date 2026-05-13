@@ -71,7 +71,7 @@ onMounted(load)
             {{ nhs }}&nbsp;<span v-if="fisher"> - {{ fisher.fullname }}</span>
             <span>{{  }}</span>
             <v-spacer />
-            <v-chip v-if="fisher && fisher.type" color="blue" class="mr-1">{{ fisher.type }}</v-chip>
+            <v-chip class="mr-3" v-if="fisher && fisher.type" :color="fisher.type === 'Limbelo' ? 'orange' : fisher.type === 'Maungwe' ? 'green' : fisher.type === 'Both' ? 'indigo' : 'blue'" size="small">{{ fisher.type }}</v-chip>
             <v-btn
               v-if="fisher"
               :color="fisher.followup_flag ? 'purple' : 'grey'"
@@ -88,7 +88,7 @@ onMounted(load)
           <v-card-text v-if="fisher">
             <v-row>
               <v-col cols="12" md="6">
-                <PersonView v-if="fisher.person_id" :person-id="fisher.person_id" title="Person:" />
+                <PersonView v-if="fisher.person_id" :fisher="true" :person-id="fisher.person_id" title="Person:" />
                 <div v-if="fisher.person" class="mt-1">
                   <div><strong>Gender:</strong> <span class="ml-1">{{ fisher.person.gender || '—' }}</span></div>
                   <div><strong>Village:</strong> <span class="ml-1">{{ fisher.person.village || '—' }}</span></div>

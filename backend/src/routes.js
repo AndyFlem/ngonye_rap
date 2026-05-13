@@ -31,13 +31,14 @@ module.exports = (app) => {
 
   app.get(prefix + '/villages', RAPController.indexVillages)
 
+  app.get(prefix + '/summary', RAPController.summary)
+
   // PEOPLE
   app.get(prefix + '/person/:person_id', PersonController.show)
   app.patch(prefix + '/person/:person_id', PersonController.update)
   app.put(prefix + '/person/:person_id/reverse-name', PersonController.reverseName)
 
   // HOUSEHOLDS
-  app.get(prefix + '/households_summary', HouseholdsController.summary)
   app.post(prefix + '/households_search', HouseholdsController.search)
   app.post(prefix + '/households_export', HouseholdsController.exportSearch)
   app.get(prefix + '/households_ica_options', HouseholdsController.indexIcaOptions)

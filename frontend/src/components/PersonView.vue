@@ -35,6 +35,10 @@ const props = defineProps({
   readonly: {
     type: Boolean,
     default: false
+  },
+  fisher: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -194,6 +198,14 @@ async function saveNrc () {
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check" :loading="saving.nrc"
           @click="saveNrc" />
         <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close" @click="editingNrc = false" />
+      </template>
+    </v-col>
+    <v-col v-if="!slim && person.pah && person.nhs" class="pl-3">
+      <template v-if="fisher">
+        <div>Linked household:&nbsp;<router-link :to="`/households/${person.pah}`">{{ person.pah }}</router-link></div>
+      </template>
+      <template v-else>
+        <div>Linked fisher:&nbsp;<router-link :to="`/fishers/${person.nhs}`">{{ person.nhs }}</router-link></div>
       </template>
     </v-col>
   </v-row>

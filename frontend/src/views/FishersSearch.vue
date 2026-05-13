@@ -21,7 +21,9 @@ const defaultParams = () => ({
   limbelo_active: null,
   followup_flag: null,
   ica_signed: null,
-  new_ica_required: null
+  new_ica_required: null,
+  has_multiple_icas: null,
+  has_linked_household: null
 })
 
 const axiosSecure = inject('axiosSecure')
@@ -35,14 +37,12 @@ const page = ref(1)
 let autoSearchReady = false
 
 function saveSearchState () {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(search.value.params)) } catch (_) {}
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(search.value.params))
 }
 
 function restoreSearchState () {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) { search.value.params = { ...defaultParams(), ...JSON.parse(saved) } }
-  } catch (_) {}
+  const saved = localStorage.getItem(STORAGE_KEY)
+  if (saved) { search.value.params = { ...defaultParams(), ...JSON.parse(saved) } }
 }
 
 async function doSearch () {
@@ -66,7 +66,7 @@ function clearSearch () {
   search.value.params = defaultParams()
   results.value = []
   error.value = ''
-  try { localStorage.removeItem(STORAGE_KEY) } catch (_) {}
+  localStorage.removeItem(STORAGE_KEY)
 }
 
 function downloadCsv () {
@@ -96,7 +96,9 @@ const autoSearchFields = [
   () => search.value.params.limbelo_active,
   () => search.value.params.followup_flag,
   () => search.value.params.ica_signed,
-  () => search.value.params.new_ica_required
+  () => search.value.params.new_ica_required,
+  () => search.value.params.has_multiple_icas,
+  () => search.value.params.has_linked_household
 ]
 
 watch(autoSearchFields, () => {
@@ -188,7 +190,57 @@ onMounted(() => {
                 />
               </v-col>
             </v-row>
-            <v-row class="mt-2">
+            <v-row class="mt-4">
+              <v-col cols="12" class="d-flex flex-wrap align-center ga-4">
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
+                  <v-checkbox
+                    v-model="search.params.ica_signed"
+                    label="ICA Signed" hide-details
+                    :indeterminate="search.params.ica_signed === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle" color="grey" size="x-small"
+                    variant="text" @click="search.params.ica_signed = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
+                  <v-checkbox
+                    v-model="search.params.new_ica_required"
+                    label="New ICA Required" hide-details
+                    :indeterminate="search.params.new_ica_required === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle" color="grey" size="x-small"
+                    variant="text" @click="search.params.new_ica_required = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
+                  <v-checkbox
+                    v-model="search.params.has_multiple_icas"
+                    label="Has Multiple ICAs" hide-details
+                    :indeterminate="search.params.has_multiple_icas === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle" color="grey" size="x-small"
+                    variant="text" @click="search.params.has_multiple_icas = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
+                  <v-checkbox
+                    v-model="search.params.has_linked_household"
+                    label="Has Linked Household" hide-details
+                    :indeterminate="search.params.has_linked_household === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle" color="grey" size="x-small"
+                    variant="text" @click="search.params.has_linked_household = null"
+                  />
+                </div>
+              </v-col>
               <v-col cols="12" class="d-flex flex-wrap align-center ga-4">
                 <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
                   <v-checkbox
@@ -224,30 +276,6 @@ onMounted(() => {
                   <v-btn
                     icon="mdi-close-circle" color="grey" size="x-small"
                     variant="text" @click="search.params.followup_flag = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
-                  <v-checkbox
-                    v-model="search.params.ica_signed"
-                    label="ICA Signed" hide-details
-                    :indeterminate="search.params.ica_signed === null"
-                    density="comfortable"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle" color="grey" size="x-small"
-                    variant="text" @click="search.params.ica_signed = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
-                  <v-checkbox
-                    v-model="search.params.new_ica_required"
-                    label="New ICA Required" hide-details
-                    :indeterminate="search.params.new_ica_required === null"
-                    density="comfortable"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle" color="grey" size="x-small"
-                    variant="text" @click="search.params.new_ica_required = null"
                   />
                 </div>
               </v-col>

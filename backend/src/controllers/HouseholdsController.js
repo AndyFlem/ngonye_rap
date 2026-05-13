@@ -89,6 +89,8 @@ function buildSearchParams (defn) {
   if (defn.has_protected !== undefined && defn.has_protected !== null) { params.push(`p_has_protected=> ${defn.has_protected}`) }
   if (defn.survey_complete !== undefined && defn.survey_complete !== null) { params.push(`p_survey_complete=> ${defn.survey_complete}`) }
   if (defn.has_current_grievance !== undefined && defn.has_current_grievance !== null) { params.push(`p_has_current_grievance=> ${defn.has_current_grievance}`) }
+  if (defn.has_multiple_icas !== undefined && defn.has_multiple_icas !== null) { params.push(`p_has_multiple_icas=> ${defn.has_multiple_icas}`) }
+  if (defn.has_linked_fisher !== undefined && defn.has_linked_fisher !== null) { params.push(`p_has_linked_fisher=> ${defn.has_linked_fisher}`) }
   return params
 }
 function csvEscape (val) {
@@ -185,121 +187,6 @@ module.exports = {
     } catch (err) {
       Common.error(req, 'exportSearch', err)
       return res.status(500).send({ error: 'an error has occurred trying to export households: ' + err })
-    }
-  },
-  async summary (req, res) {
-    Common.debug(req, 'summary')
-
-    try {
-      const summary = {}
-
-      // Add a count of total households
-      const totalHouseholdsResult = await Knex('v_households').count('pah as count').first()
-      summary.totalHouseholds = parseInt(totalHouseholdsResult.count) || 0
-
-      // Add a count of vulnerable households
-      const vulnerableHouseholdsResult = await Knex('v_households').where('vulnerable', true).count('pah as count').first()
-      summary.vulnerableHouseholds = parseInt(vulnerableHouseholdsResult.count) || 0
-
-      // Add a count of physically displaced households
-      const displacedHouseholdsResult = await Knex('v_households').where('physically_displaced', true).count('pah as count').first()
-      summary.physicallyDisplacedHouseholds = parseInt(displacedHouseholdsResult.count) || 0
-
-      // Add a count of households with no ICA required
-      const noICAHouseholdsResult = await Knex('v_households').where('no_ica_required', true).count('pah as count').first()
-      summary.noICARequiredHouseholds = parseInt(noICAHouseholdsResult.count) || 0
-
-      // Add a count of non-affected households
-      const nonAffectedHouseholdsResult = await Knex('v_households').where('nonaffected', true).count('pah as count').first()
-      summary.nonAffectedHouseholds = parseInt(nonAffectedHouseholdsResult.count) || 0
-
-      // Add a count of signed households
-      const signedHouseholdsResult = await Knex('v_households').whereNotNull('date_signed').count('pah as count').first()
-      summary.signedHouseholds = parseInt(signedHouseholdsResult.count) || 0
-
-      summary.ICARequiredHouseholds = summary.totalHouseholds - summary.noICARequiredHouseholds
-      summary.unsignedHouseholds = summary.totalHouseholds - summary.signedHouseholds - summary.noICARequiredHouseholds
-
-      // Add a count of households with follow-up flag
-      const followUpHouseholdsResult = await Knex('v_households').where('household_followup_flag', true).count('pah as count').first()
-      summary.followUpFlagHouseholds = parseInt(followUpHouseholdsResult.count) || 0
-
-      // Add a count of households with landholding only
-      const landholdingOnlyHouseholdsResult = await Knex('v_households').where('landholding_only', true).count('pah as count').first()
-      summary.landholdingOnlyHouseholds = parseInt(landholdingOnlyHouseholdsResult.count) || 0
-
-      // Add a count of households the require a new ica
-      const newICAHouseholdsResult = await Knex('v_households').where('new_ica_required', true).count('pah as count').first()
-      summary.newICARequiredHouseholds = parseInt(newICAHouseholdsResult.count) || 0
-
-      // Add a count of households that are silumesii
-      const silumesiiHouseholdsResult = await Knex('v_households').where('silumesii', true).count('pah as count').first()
-      summary.silumesiiHouseholds = parseInt(silumesiiHouseholdsResult.count) || 0
-
-      // Add a count of households that have replacement households (replacement_structures_count>0)
-      const replacementHouseholdsResult = await Knex('v_households').where('replacement_structures_count', '>', 0).count('pah as count').first()
-      summary.replacementHouseholds = parseInt(replacementHouseholdsResult.count) || 0
-
-      // Add a count of households that have replacement land (replacement_land_area>0)
-      const replacementLandHouseholdsResult = await Knex('v_households').where('replacement_land_area', '>', 0).count('pah as count').first()
-      summary.replacementLandHouseholds = parseInt(replacementLandHouseholdsResult.count) || 0
-
-      // Add a sum of structures
-      const structuresResult = await Knex('v_households').sum('structures_count as total').first()
-      summary.totalStructures = parseFloat(structuresResult.total) || 0
-
-      // Add a sum of primary structures
-      const primaryStructuresResult = await Knex('v_households').sum('primary_structures_count as total').first()
-      summary.totalPrimaryStructures = parseFloat(primaryStructuresResult.total) || 0
-
-      // Add a sum of secondary structures
-      const secondaryStructuresResult = await Knex('v_households').sum('secondary_structures_count as total').first()
-      summary.totalSecondaryStructures = parseFloat(secondaryStructuresResult.total) || 0
-
-      // Add a sum of primary structures compensation value
-      const primaryStructuresCompResult = await Knex('v_household_compensation').sum('primary_structures_compensation_value as total').first()
-      summary.totalPrimaryStructuresCompensation = parseFloat(primaryStructuresCompResult.total) || 0
-
-      // Add a sum of secondary structures compensation value
-      const secondaryStructuresCompResult = await Knex('v_household_compensation').sum('secondary_structures_compensation_value as total').first()
-      summary.totalSecondaryStructuresCompensation = parseFloat(secondaryStructuresCompResult.total) || 0
-
-      // Add a count of surveys
-      const surveysResult = await Knex('households_survey').count('pah as count').first()
-      summary.totalSurveys = parseInt(surveysResult.count) || 0
-
-      // Add a count of people
-      const peopleResult = await Knex('v_person').count('person_id as count').first()
-      summary.totalPeople = parseInt(peopleResult.count) || 0
-
-      // Add a sum of allowances
-      const allowancesResult = await Knex('v_household_compensation').sum('allowance_total as total').first()
-      summary.totalAllowances = parseFloat(allowancesResult.total) || 0
-
-      // Add a sum of lease costs
-      const leaseCostsResult = await Knex('v_household_compensation').sum('lease_cost_total as total').first()
-      summary.totalLeaseCosts = parseFloat(leaseCostsResult.total) || 0
-
-      // Add a sum of land compensation value
-      const landCompResult = await Knex('v_household_compensation').sum('land_compensation_value as total').first()
-      summary.totalLandCompensation = parseFloat(landCompResult.total) || 0
-
-      // Add a sum of trees compensation
-      const treesCompResult = await Knex('v_household_compensation').sum('trees_compensation as total').first()
-      summary.totalTreesCompensation = parseFloat(treesCompResult.total) || 0
-
-      // Add a sum of crops value
-      const cropsValueResult = await Knex('v_household_compensation').sum('crop_value as total').first()
-      summary.totalCropCompensation = parseFloat(cropsValueResult.total) || 0
-
-      // Add a total compensation value
-      const totalCompResult = await Knex('v_household_compensation').sum('total_cash_compensation as total').first()
-      summary.totalCompensation = parseFloat(totalCompResult.total) || 0
-
-      res.send(summary)
-    } catch (err) {
-      Common.error(req, 'summary', err)
-      res.status(500).send({ error: 'an error has occurred trying to fetch households summary: ' + err })
     }
   },
   async show (req, res) {
