@@ -125,16 +125,6 @@ module.exports = {
       const count = await Knex('households').where('pah', pah).update(fields)
       if (!count) return res.status(404).send({ error: 'household not found' })
 
-      if ('household_followup_flag' in req.body) {
-        const action = req.body.household_followup_flag ? 'set' : 'cleared'
-        await Knex('notes').insert({
-          user_id: req.userId,
-          pah,
-          note: `Follow-up flag ${action}`,
-          created_at: Knex.fn.now()
-        })
-      }
-
       if ('new_ica_required' in req.body) {
         await Knex('notes').insert({
           user_id: req.userId,

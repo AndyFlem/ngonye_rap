@@ -7,6 +7,7 @@ import Grievances from '@/components/Grievances.vue'
 import Icas from '@/components/Icas.vue'
 import PersonView from '@/components/PersonView.vue'
 import { formatCurrency, formatYesNo, formatDateTime } from '@/utils/formatters'
+import FishersSearch from './FishersSearch.vue'
 
 const axiosSecure = inject('axiosSecure')
 const route = useRoute()
@@ -99,6 +100,8 @@ onMounted(load)
                 <div><strong>Social Survey:</strong> <span class="ml-1">{{ formatYesNo(fisher.social_survey) }}</span></div>
                 <div><strong>Catch Survey:</strong> <span class="ml-1">{{ formatYesNo(fisher.catch_survey) }}</span></div>
                 <div><strong>Catch Data Survey:</strong> <span class="ml-1">{{ formatYesNo(fisher.catch_data_survey) }}</span></div>
+                <div v-if="fisher.lr_fishfarming"><strong>Fish Farming:</strong> <span class="ml-1">{{ formatYesNo(fisher.lr_fishfarming) }}</span></div>
+                <div v-if="fisher.lr_goatrearing"><strong>Goat Rearing:</strong> <span class="ml-1">{{ formatYesNo(fisher.lr_goatrearing) }}</span></div>
               </v-col>
             </v-row>
             <v-row>
