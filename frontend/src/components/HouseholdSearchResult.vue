@@ -4,6 +4,7 @@ import { formatCurrency, formatArea, formatYesNo } from '@/utils/formatters'
 
 const axiosSecure = inject('axiosSecure')
 const pah = ref(null)
+const latestNote = ref(null)
 const loading = ref(false)
 const error = ref('')
 
@@ -38,9 +39,14 @@ watch(() => props.pahNo, async (newPah) => {
     loading.value = true
     error.value = ''
     pah.value = null
+    latestNote.value = null
     try {
       const response = await axiosSecure.get(`/households/${newPah}`)
       pah.value = response.data
+      if (pah.value?.household_followup_flag || pah.value?.new_ica_required) {
+        const notesResponse = await axiosSecure.get(`/households/${newPah}/notes`)
+        latestNote.value = notesResponse.data?.[0] ?? null
+      }
     } catch (err) {
       console.error('Failed to load pah:', err)
       error.value = 'An error occurred while loading the pah data. Please try again.'
@@ -119,6 +125,17 @@ watch(() => props.pahNo, async (newPah) => {
           <div><strong>Cash Compensation:</strong> <span class="table-value">K{{ formatCurrency(pah.compensation?.total_cash_compensation || 0) }}</span></div>
           <div v-if="pah.replacement_land_area>0"><strong>Replacement Land:</strong> <span class="table-value">{{ formatArea(pah.replacement_land_area) }} ({{ landOptions }})</span></div>
           <div v-if="pah.replacement_structures_count>0"><strong>Replacement Structures:</strong> <span class="table-value">{{ pah.replacement_structures_count }} <span>({{ pah.icaoption_structure_location }})</span></span></div>
+        </v-col>
+      </v-row>
+      <v-row v-if="latestNote">
+        <v-col cols="12">
+          <div class="d-flex align-start ga-2 mt-1">
+            <v-icon icon="mdi-note-text" size="small" color="purple" class="mt-1" />
+            <div>
+              <span class="text-body-2">{{ latestNote.note }}</span>
+              <span class="text-caption text-medium-emphasis ml-2">— {{ latestNote.created_by }}, {{ latestNote.created_at?.slice(0, 10) }}</span>
+            </div>
+          </div>
         </v-col>
       </v-row>
     </v-card-text>

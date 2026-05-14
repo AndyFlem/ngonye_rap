@@ -41,6 +41,11 @@ const handleFishersClick = () => {
   emit('close-drawer')
 }
 
+const handleLivelihoodRestorationClick = () => {
+  router.push('/livelihood-restoration')
+  emit('close-drawer')
+}
+
 const handleUsersClick = () => {
   router.push('/users')
   emit('close-drawer')
@@ -85,6 +90,11 @@ const handleLogout = () => {
         prepend-icon="mdi-fish"
         title="Fishers"
         @click="handleFishersClick"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-sprout"
+        title="Livelihood Restoration"
+        @click="handleLivelihoodRestorationClick"
       ></v-list-item>
       <v-list-item
         v-if="user.isAdmin"

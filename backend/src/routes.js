@@ -83,6 +83,10 @@ module.exports = (app) => {
   app.get(prefix + '/replacements', ReplacementsController.index)
   app.get(prefix + '/replacements/:id', ReplacementsController.show)
 
+  // LIVELIHOOD RESTORATION
+  app.get(prefix + '/livelihood-restoration/households', RAPController.lrHouseholds)
+  app.get(prefix + '/livelihood-restoration/fishers',    RAPController.lrFishers)
+
   // LAND
   app.get(prefix + '/land/summary', RAPController.summaryLandAquisition)
   app.get(prefix  + '/parcels/options', LandController.indexOptions)

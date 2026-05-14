@@ -9,6 +9,7 @@ const props = defineProps({
 const axiosSecure = inject('axiosSecure')
 
 const fisher = ref(null)
+const latestNote = ref(null)
 const loading = ref(false)
 const error = ref('')
 
@@ -17,9 +18,14 @@ watch(() => props.nhs, async (newNhs) => {
   loading.value = true
   error.value = ''
   fisher.value = null
+  latestNote.value = null
   try {
     const response = await axiosSecure.get(`/fishers/${newNhs}`)
     fisher.value = response.data
+    if (fisher.value?.followup_flag || fisher.value?.new_ica_required) {
+      const notesResponse = await axiosSecure.get(`/fishers/${newNhs}/notes`)
+      latestNote.value = notesResponse.data?.[0] ?? null
+    }
   } catch (err) {
     console.error('Failed to load fisher:', err)
     error.value = 'Failed to load fisher data.'
@@ -91,6 +97,17 @@ const getSafeExternalUrl = (value) => {
           <div>
             <strong>Total Compensation:</strong>
             <span class="ml-1">K{{ formatCurrency(fisher.total_compensation || 0) }}</span>
+          </div>
+        </v-col>
+      </v-row>
+      <v-row v-if="latestNote">
+        <v-col cols="12">
+          <div class="d-flex align-start ga-2 mt-1">
+            <v-icon icon="mdi-note-text" size="small" color="purple" class="mt-1" />
+            <div>
+              <span class="text-body-2">{{ latestNote.note }}</span>
+              <span class="text-caption text-medium-emphasis ml-2">— {{ latestNote.created_by }}, {{ latestNote.created_at?.slice(0, 10) }}</span>
+            </div>
           </div>
         </v-col>
       </v-row>

@@ -11,6 +11,7 @@ import UserList from '@/views/UserList.vue'
 import UserForm from '@/views/UserForm.vue'
 import FishersSearch from '@/views/FishersSearch.vue'
 import FishersDetails from '@/views/FishersDetails.vue'
+import LivelihoodRestoration from '@/views/LivelihoodRestoration.vue'
 
 const routes = [
   {
@@ -79,6 +80,12 @@ const routes = [
     path: '/fishers/:nhs',
     name: 'FishersDetails',
     component: FishersDetails,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/livelihood-restoration',
+    name: 'LivelihoodRestoration',
+    component: LivelihoodRestoration,
     meta: { requiresAuth: true }
   },
   {

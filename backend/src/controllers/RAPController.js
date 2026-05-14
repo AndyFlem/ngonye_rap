@@ -157,6 +157,50 @@ module.exports = {
       })
   },
 
+  async lrHouseholds (req, res) {
+    Common.debug(req, 'lrHouseholds')
+    const COLS = [
+      { key: 'lr_agricultural',      label: 'Agricultural' },
+      { key: 'lr_livestock',         label: 'Livestock' },
+      { key: 'lr_water',             label: 'Water' },
+      { key: 'lr_fisheries',         label: 'Fisheries' },
+      { key: 'lr_reedbeds',          label: 'Reedbeds' },
+      { key: 'lr_agricultureinputs', label: 'Agriculture Inputs' },
+    ]
+    try {
+      const rows = await Promise.all(
+        COLS.map(({ key, label }) =>
+          Knex('v_households').where(key, true).count('pah as count').first()
+            .then(r => ({ label, count: parseInt(r.count) || 0 }))
+        )
+      )
+      return res.send(rows)
+    } catch (err) {
+      Common.error(req, 'lrHouseholds', err)
+      return res.status(500).send({ error: 'error fetching households LR summary: ' + err })
+    }
+  },
+
+  async lrFishers (req, res) {
+    Common.debug(req, 'lrFishers')
+    const COLS = [
+      { key: 'lr_fishfarming', label: 'Fish Farming' },
+      { key: 'lr_goatrearing', label: 'Goat Rearing' },
+    ]
+    try {
+      const rows = await Promise.all(
+        COLS.map(({ key, label }) =>
+          Knex('v_fishers').where(key, true).count('nhs as count').first()
+            .then(r => ({ label, count: parseInt(r.count) || 0 }))
+        )
+      )
+      return res.send(rows)
+    } catch (err) {
+      Common.error(req, 'lrFishers', err)
+      return res.status(500).send({ error: 'error fetching fishers LR summary: ' + err })
+    }
+  },
+
   async summaryLandAquisition (req, res) {
     Common.debug(req, 'summaryLandAquisition')
 
