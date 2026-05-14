@@ -36,7 +36,8 @@ const search = ref({
     landholding_only: null,
     has_current_grievance: null,
     has_multiple_icas: null,
-    has_linked_fisher: null
+    has_linked_fisher: null,
+    has_notes: null
   }
 })
 
@@ -104,6 +105,7 @@ const autoSearchFields = [
   () => search.value.params.has_current_grievance,
   () => search.value.params.has_multiple_icas,
   () => search.value.params.has_linked_fisher,
+  () => search.value.params.has_notes,
   icarequired,
 ]
 
@@ -193,7 +195,8 @@ function clearSearch () {
     landholding_only: null,
     has_current_grievance: null,
     has_multiple_icas: null,
-    has_linked_fisher: null
+    has_linked_fisher: null,
+    has_notes: null
   }
 }
 
@@ -425,6 +428,22 @@ onMounted(() => {
                     @click="search.params.icasigned = null"
                   />
                 </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_multiple_icas"
+                    label="Has Multiple ICAs"
+                    hide-details
+                    :indeterminate="search.params.has_multiple_icas === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_multiple_icas = null"
+                  />
+                </div>
               </v-col>
             </v-row>
             <v-row>
@@ -612,22 +631,6 @@ onMounted(() => {
                 </div>
                 <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
                   <v-checkbox
-                    v-model="search.params.has_multiple_icas"
-                    label="Has Multiple ICAs"
-                    hide-details
-                    :indeterminate="search.params.has_multiple_icas === null"
-                    density="comfortable"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.has_multiple_icas = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
                     v-model="search.params.has_linked_fisher"
                     label="Has Linked Fisher"
                     hide-details
@@ -640,6 +643,22 @@ onMounted(() => {
                     size="x-small"
                     variant="text"
                     @click="search.params.has_linked_fisher = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_notes"
+                    label="Has Notes"
+                    hide-details
+                    :indeterminate="search.params.has_notes === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_notes = null"
                   />
                 </div>
               </v-col>

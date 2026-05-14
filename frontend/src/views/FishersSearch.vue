@@ -23,7 +23,9 @@ const defaultParams = () => ({
   ica_signed: null,
   new_ica_required: null,
   has_multiple_icas: null,
-  has_linked_household: null
+  has_linked_household: null,
+  has_notes: null,
+  has_grievances: null
 })
 
 const axiosSecure = inject('axiosSecure')
@@ -98,7 +100,9 @@ const autoSearchFields = [
   () => search.value.params.ica_signed,
   () => search.value.params.new_ica_required,
   () => search.value.params.has_multiple_icas,
-  () => search.value.params.has_linked_household
+  () => search.value.params.has_linked_household,
+  () => search.value.params.has_notes,
+  () => search.value.params.has_grievances
 ]
 
 watch(autoSearchFields, () => {
@@ -238,6 +242,30 @@ onMounted(() => {
                   <v-btn
                     icon="mdi-close-circle" color="grey" size="x-small"
                     variant="text" @click="search.params.has_linked_household = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
+                  <v-checkbox
+                    v-model="search.params.has_notes"
+                    label="Has Notes" hide-details
+                    :indeterminate="search.params.has_notes === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle" color="grey" size="x-small"
+                    variant="text" @click="search.params.has_notes = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
+                  <v-checkbox
+                    v-model="search.params.has_grievances"
+                    label="Has Grievances" hide-details
+                    :indeterminate="search.params.has_grievances === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle" color="grey" size="x-small"
+                    variant="text" @click="search.params.has_grievances = null"
                   />
                 </div>
               </v-col>

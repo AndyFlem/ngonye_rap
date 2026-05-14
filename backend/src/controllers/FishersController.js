@@ -61,6 +61,8 @@ function buildSearchParams (defn) {
   if (defn.new_ica_required !== undefined && defn.new_ica_required !== null) { params.push(`p_new_ica_required=> ${defn.new_ica_required}`) }
   if (defn.has_multiple_icas !== undefined && defn.has_multiple_icas !== null) { params.push(`p_has_multiple_icas=> ${defn.has_multiple_icas}`) }
   if (defn.has_linked_household !== undefined && defn.has_linked_household !== null) { params.push(`p_has_linked_household=> ${defn.has_linked_household}`) }
+  if (defn.has_notes !== undefined && defn.has_notes !== null) { params.push(`p_has_notes=> ${defn.has_notes}`) }
+  if (defn.has_grievances !== undefined && defn.has_grievances !== null) { params.push(`p_has_grievances=> ${defn.has_grievances}`) }
   return params
 }
 

@@ -91,6 +91,7 @@ function buildSearchParams (defn) {
   if (defn.has_current_grievance !== undefined && defn.has_current_grievance !== null) { params.push(`p_has_current_grievance=> ${defn.has_current_grievance}`) }
   if (defn.has_multiple_icas !== undefined && defn.has_multiple_icas !== null) { params.push(`p_has_multiple_icas=> ${defn.has_multiple_icas}`) }
   if (defn.has_linked_fisher !== undefined && defn.has_linked_fisher !== null) { params.push(`p_has_linked_fisher=> ${defn.has_linked_fisher}`) }
+  if (defn.has_notes !== undefined && defn.has_notes !== null) { params.push(`p_has_notes=> ${defn.has_notes}`) }
   return params
 }
 function csvEscape (val) {
