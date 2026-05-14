@@ -37,9 +37,6 @@ module.exports = {
         .insert({ ...entity, grievance_link, grievance_ref, is_current: true, user_id: req.userId })
         .returning('grievance_id')
 
-      const noteText = grievance_ref ? `Grievance added: ${grievance_ref}` : 'Grievance added'
-      await Knex('notes').insert({ user_id: req.userId, ...entity, note: noteText, created_at: Knex.fn.now() })
-
       const grievance = await Knex('grievances').where({ grievance_id: inserted.grievance_id }).first()
       return res.status(201).send(grievance)
     } catch (err) {
@@ -80,10 +77,6 @@ module.exports = {
       if (!grievance) return res.status(404).send({ error: 'grievance not found' })
 
       await Knex('grievances').where({ grievance_id }).delete()
-
-      const noteText = grievance.grievance_ref ? `Grievance deleted: ${grievance.grievance_ref}` : 'Grievance deleted'
-      const entity = grievance.pah ? { pah: grievance.pah } : { nhs: grievance.nhs }
-      await Knex('notes').insert({ user_id: req.userId, ...entity, note: noteText, created_at: Knex.fn.now() })
 
       return res.send({ success: true })
     } catch (err) {

@@ -104,7 +104,6 @@ defineExpose({ loadNotes })
             <td class="table-value left" style="white-space: pre-wrap;">{{ note.note }}</td>
             <td style="width: 40px;">
               <v-btn
-                v-if="note.user_id === user.user_id"
                 size="x-small"
                 icon="mdi-delete"
                 variant="text"
