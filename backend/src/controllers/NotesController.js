@@ -44,7 +44,7 @@ module.exports = {
     try {
       const note = await Knex('notes').where({ note_id }).first()
       if (!note) return res.status(404).send({ error: 'note not found' })
-      if (note.user_id !== req.userId) return res.status(403).send({ error: 'not authorised to delete this note' })
+      
       await Knex('notes').where({ note_id }).delete()
       return res.send({ success: true })
     } catch (err) {
