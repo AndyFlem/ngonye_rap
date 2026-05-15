@@ -1,0 +1,714 @@
+pah,name,gender,birth_year,nrc,principal_occupation,contact
+PAH001,Mulemwa Audry Kaitwala,F,1985,114572/87/1,Farmer,0770934673
+PAH002,Malumo Lifasi,M,1985,,Farmer,0777930666
+PAH003,Mbuyu Mutonga,F,1981,160093/85/1,Farmer,0966570624
+PAH004,Mushonga Mercy Maanga,F,2004,149683/87/1,Farmer,0762624925
+PAH005,Chindo Mary Namiye,F,,126008/87/1,Farmer,0776461670
+PAH006,Paul Chabala,M,1956,128990/83/1,Farmer,0697449601
+PAH007,Lubinda Lubinda,M,1957,,Farmer,0971119320
+PAH008,Liswaniso Liswaniso Emeldah,F,1968,179285/83/1,Farmer,0767673188
+PAH009,Febian Wamunyima Lubinda,M,1973,,Timber,0973222440
+PAH010,Mbangu Matthew Mukelabai,M,,,Business person,
+PAH011,Lubinda Kelven Lungungwa,M,,,Farmer,0969953403
+PAH013,Sibeso Lubinda,F,1942,,Farmer,0978055711
+PAH014,Nelly Namatama Mukinga,F,1956,,Farmer,0969774088
+PAH015,Mukinga Namatama Nelly,F,,,Farmer,0969774088
+PAH016,Muyunda Aaron Libinda,M,,,Farmer,0970853975
+PAH018,Imataa  Rachael Nakamui,F,1998,,Farmer,
+PAH021,Liswaniso Martha Munukayumbwa,F,1975,193387/83/1,Farmer,0977444178
+PAH022,Nyanga Shimbi ,F,2005,124547/87/1,Farmer,0975750636
+PAH023,Litia Sandra Sanana,F,1998,199987/85/1,Farmer,0970240961
+PAH024,Muyakwabo Nunsa,M,2000,346785/82/1,Farmer,0970105569
+PAH025,Nandila Milimo,F,1971,189825/83/1,Farmer,0775784097
+PAH026,Ostern Kasuka Musangu,M,1992,,Farmer,0973417962
+PAH027,Mukubesa Munalula,M,,,Farmer,0775059529
+PAH028,Mululu Mundile,F,1951,,Farmer,0975242888
+PAH029,Kwaisa Mirriam Namakau,F,1996,,Business person,0978090656
+PAH030,Samautu Beatrice,F,2005,145994/87/1,Farmer,0770733435
+PAH033,Chabala Loveness,F,1992,122177/87/1,Farmer,0977955955
+PAH034,Lubasi Christine,F,,,Farmer,0978052555
+PAH035,Sifaya Mubita,F,1995,126088/87/1,Farmer,0975967976
+PAH036,Mwananyambe Cecilia Inonge,F,,,Farmer,0774551763
+PAH037,Munyungi Anawana,M,,,Farmer,0963796931
+PAH038,Namakau  Mululu,F,,114444/87/1,Farmer,0977718644
+PAH039,Liswaniso Mebelo,M,1962,137577/85/1,Farmer,0777101553
+PAH040,Muyunda Pumulo,M,,,Farmer,0979229963
+PAH041,Muyendekwa Liywali Frank,M,1972,150525/83/1,Farmer,
+PAH043,Likando Hellen Mukatimui,F,,147811/87/1,Farmer,0776472301
+PAH044,Maswabi Mwabafu,F,1986,114554/87/1,Farmer,0977697389
+PAH045,Maswabi Mwabafu,F,1986,114554/87/2,Farmer,0977697389
+PAH046,Masule Nakubiana,M,1992,117906/87/1,Farmer,0777719953
+PAH048,Masiye Maimbolwa,M ,1951,119613/71/1,Farmer,0975952396
+PAH049,Liswaniso Josephine,F,1956,107969/85/1,Farmer,0969145967
+PAH050,Kafawima Mercy,F,1984,,Farmer,0969145967
+PAH051,Nandila Namatama,F,1951,103484/83/1,Farmer,0772369711
+PAH052,Konnie Namanyemo Lifunga,F,1983,,Farmer,0762316364
+PAH053,Muyumba Catherine Masiye,F,1994,126868/87/1,Farmer,0977713985
+PAH054,Maswabi Mwendabai,F,,202353/83/1,Farmer,0977587124
+PAH055,Lutuzwi Maswabi,M,,,Farmer,0974282943
+PAH056,Mwale Agness,F,,,Farmer,0776461677
+PAH057,Lubasi Sililo,M,,,Farmer,0977700658
+PAH058,Tembo Lubasi Georgina,M,,,Farmer,0772899585
+PAH059,Barikan Kelvin,M,,,Farmer,0973336712
+PAH060,Imonga Akolwa,F,,,Farmer,0770733553
+PAH061,Liywali Etambuyu,F,1992,133884/19/1,Farmer,0975889806
+PAH062,Likando  Mwauluka,M,2001,147812/87/1,Farmer,0979308604
+PAH063,Milapo Siluka,M,1952,105994/85/1,Farmer,0773251599
+PAH064,Sishekano Mubiana,M,1984,114553/87/1,Farmer,
+PAH065,Likando Manyemo,F,1988,114680/87/1,Farmer,
+PAH066,Mwinke Mbuyu Elizabeth,F,1952,138732/64/1,Farmer,
+PAH067,Kwalabana Imasiku,M,1974,195412/83/1,Farmer,0776631294
+PAH068,Mwiba Namakau,F,2000,138422/87/1,Farmer,0776460853
+PAH069,Kwalabana Dorothy,F,1964,137578/85/1,Farmer,0969741586
+PAH070,Masiye Muyuwano,F,,,Farmer,0970373148
+PAH071,Mate Mubuyaeta,M,1994,126225/87/1,Farmer,0967585380
+PAH072,Mebelo Lillian,F,,223874/71/1,Business person,0978155593
+PAH073,Maswabi Kenneth Mubita,M,,,Farmer,0573828768
+PAH074,Mululu Masiku,M,,,Farmer,0972855057
+PAH075,Mululu Nalukui,M,,,Farmer,0776460783
+PAH076,Mululu Namakau,F,,,Farmer,0977718644
+PAH077, Kalemba Kamunika,M,,254328/83/1,Farmer,0964080458
+PAH079,Mukungu Yusiku,M,2004,154912/87/1,Farmer,
+PAH080,Imataa Chuma,F,2004,149727/87/1,Farmer,0970530632
+PAH081,Muyendekwa Likando,M ,1971,153327/83/1,Farmer,0979308604
+PAH082,Lubasi Monde,M,,,Farmer,0971803913
+PAH083,Barbra Inutu Siyamana,F,1993,126206/87/1,Farmer,0973222522
+PAH084,Peter Mwambwa Likando,M,2000,138790/87/1,Farmer,0970312197
+PAH085,Likando Mwaka,F,2004,152097/87/1,Farmer,0972730498
+PAH086,Silumesi Sanyambe,M,2000,145631/83/1,Farmer,0972136649
+PAH087,Nandila Rose Namatama,F,2005,149647/83/1,Farmer,0973223068
+PAH088,Nandila Nasilele,F,1984,114609/87/1,Farmer,0762810544
+PAH089,Mwiya Joyce Mwaka,F,,,Farmer,0975856498
+PAH090,Maimbolwa Emmanuel Lifasi,M,,,Farmer,0961375432
+PAH091,Kunyanda Pilaelo,F,,,Farmer,0972432820
+PAH092,Maswabi Mary Mwangala,F,,,,0760922981
+PAH093,Mutewelya Mufaya,F,,,Farmer,0972010502
+PAH094,Imataa Liwanga,M,2002,,Fisher,0776320857
+PAH097,Mukinga Nubutu Joyce,M,,,Farmer,0960266042
+PAH098,Mutomena Chilombwa,F,,,Farmer,0963020270
+PAH099,Roberts Mount Batten Phillip,M,1952,166966/68/1,Farmer,0967350437
+PAH100,Imataa Manyando,F,2004,,Farmer,0974171939
+PAH101,Sifano Sililo,M,1973,147428/83/1,Farmer,0770733609
+PAH102,Imataa Mubuku,M,1997,,Farmer,0766289634
+PAH103,Sililo Nyambe,F,1993,117716/87/1,Farmer,0726572264
+PAH104,Sifanu Sililo ,M,,,Farmer,0770733609
+PAH105,Imataa Mwauluka,M,,,,
+PAH106,Muyendekwa Nanjala,M,,,Farmer,
+PAH107,Saloba Jameson,M,,,Farmer,
+PAH108,Mukendwa Matomola,F,,114563/87/1,Farmer,0979881626
+PAH109,Imataa Mukunyandela,F,2006,152141/87/1,Farmer,0775798254
+PAH110,Mundia Mundia,M,1973,,Farmer,0961378943
+PAH111,Silumesi Innocent Silumesi,M,1981,,Gauge reader,0979057510
+PAH112,Silumesi Mwimanenwa,M,1983,,Business person,0978105370
+PAH113,Nawa Akamandisa,M,1997,126244/87/1,Farmer,0778754387
+PAH114,Samautu Mutelo,M,2001,,Farmer,0776472397
+PAH115,Nyambe Kwalela,M,,158503/83/1,Farmer,0975363138
+PAH116,Butali Simumbi,F,,,Farmer,0774510742
+PAH117,Muyayo Anna,F,,,Farmer,0572723655
+PAH118,Lifumbelwa Kakulubelwa,M,,,Farmer,
+PAH121,Mutumba Mubiana,F,,,Farmer,
+PAH122,Sitibekiso Litaba,M,,,Farmer,
+PAH123,Namasiku Kasuka,F,,,Farmer,0774510544
+PAH124,Mabumbo Mukwambuyu,M,,,Farmer,0768363032
+PAH125,Libata Sabata,M,,,Farmer,0965903672
+PAH126,Pumulo Malumo,M,,,Farmer,
+PAH127,Pumulo Muyunda,M,,,Farmer,0979229968
+PAH128,Charles Nyambe,M,,,Farmer,0778203768
+PAH129,Gilbert W Lifuna,M,,,Farmer,
+PAH130,Sapuho Josephine Mate,F,1962,101668/83/1,Farmer,
+PAH131,Kwibisa Namakando,M,,,Farmer,
+PAH132,Richard Samautu,M,1953,,Farmer,0978559647
+PAH133,Nalumino Christopher Makandauko,M,,,Farmer,0776472429
+PAH134,Likezo Sianga,M,,,Farmer,0971882851
+PAH135,Nyambe Nyambe,M,,,Farmer,057057809
+PAH136,Likando Mayemo Sipangule,M,,,Farmer,
+PAH137,Lyamba Ilukena,M,1985,226942/83/1,Farmer,0974859944
+PAH139,Juliet Mayumbelo Mwananyambe,F,,,Farmer,
+PAH140,Patricia Muhongo Mukatimui,F,,,Farmer,0777185993
+PAH141,Pumulo Seka,M,,,Farmer,0978052555
+PAH142,Mwinke Mbuyu Elizabeth,F,,,Farmer,
+PAH143,Lungowe Samautu,F,1999,,Farmer,0974163110
+PAH144,Namiye Matomola,F,,,Farmer,0762332089
+PAH145,Cecilia Matongo,F,,,Farmer,
+PAH146,Nañalelwa Sililo,M,,,Farmer,
+PAH147,Mubita Mubita,M,,,Farmer,0970018112
+PAH148,Nang'uyi Mwauluka,F,,,Farmer,
+PAH149,Mushe Mwauluka,M,,,Farmer,
+PAH150,Felix Mabuku Muyendekwa,M,,207300/83/1,Farmer,0962110795
+PAH151,Mubita Mukwamandi,M,,,Farmer,0979826111
+PAH152,Mululu Mululu,M,,,Farmer,0972159847
+PAH153,Mpango Namakando,M,,,Farmer,0970530386
+PAH154,Namatama Matomola,M,,,Farmer,0976432051
+PAH155,Mufalo Matongo,M,,,Farmer,
+PAH156,Mubyana Matongo,M,,,Farmer,
+PAH157,Kenneth Kasimbana,M,,,Farmer,0976644129
+PAH159,Kwenisa Simasiku,M,,,Farmer,
+PAH160,Mubita Mpango,M,,,Farmer,
+PAH161,Lungowe Lukama,F,,,Farmer,077077757
+PAH162,Nalumino Namatama,F,,,Farmer,
+PAH163,Limpo Bwalya,F,,,Farmer,0974496453
+PAH164,Masheke Lubasi,M,,,Farmer,
+PAH165,Mwikisa Muyunda,M,,,Farmer,
+PAH166,Malembo Zitha,M,,,Farmer,
+PAH167,Patricia Mukatimui Muhongo,F,,,Farmer,0777185993
+PAH168,Mulalelo Mulalelo,M,,,Farmer,0775780635
+PAH169,Mutangi Justina Mutafela,F,,,Farmer,
+PAH170,Maikisa Cecilia Mwangala,F,,,Farmer,0978873072
+PAH171,Masiye Muyangwa,M,,,Farmer,0977370030
+PAH172,Mutafela Nalishebo,M,,,Farmer,
+PAH173,Mubita Muyangwa,M,,,Farmer,0776460133
+PAH174,Muhongo Mukelabai,M,,,Farmer,0975720912
+PAH175,Indala Namakando,M,,,Farmer,0776461674
+PAH176,Mukobela Imboela,M,,,Farmer,
+PAH177,Kenneth Kasimbana,M,,,Farmer,0976644129
+PAH178,Manyemo Mubuyaeta,M,,,Farmer,097664129
+PAH179,Musiyalike Silumesii,F,,,Farmer,0979223742
+PAH180,Libaka Mulemwa,F,,,Farmer,0962124192
+PAH181,Indala Kalemba,M,,,Farmer,0975939369
+PAH182,Malumo Morris Mwangala,M,,220967/83/1,Farmer,0979263372
+PAH183,Bertha Sikwati,F,,,Farmer,0971683934
+PAH184,Libaka Mulemwa ,F,,,Farmer,
+PAH186,Lyamba Mubita,M,,,Farmer,0774515979
+PAH187,Mubita Mulonda,M,,,Farmer,0761981802
+PAH188,Matongo Sifungwa,M,,,Farmer,
+PAH189,Namakau Matongo,F,,,Farmer,
+PAH190,Mutumwa Mululu,F,,,Farmer,
+PAH191,Mululu Mwaka,F,,,Farmer,
+PAH192,Neeta Muwana,F,,,Farmer,0979632534
+PAH193,Litia Bridget Kwalela,F,,,Farmer,0974761412
+PAH194,Mwala Sikombwa,M,,,Farmer,0977523799
+PAH195,Kupenga Mwala,M,,,Farmer,0976032709
+PAH196,Manga Mwauluka,,,,Farmer,
+PAH198,Mutelo Mubita,M,,,Farmer,
+PAH199,Aaron Mubita Maketo,M,,,Farmer,
+PAH200,Nandila Imataa,M,,,Farmer,
+PAH201,Imataa Lubinda,M,,,Farmer,
+PAH202,Misozi Likuwa,F,,,Farmer,
+PAH203,Inonge Munalula,F,,,Farmer,
+PAH204,Matomola Mwaba,M,,,Farmer,0970105564
+PAH205,Mukube Mukube,M,,,Farmer,0970105564
+PAH206,Makandauko Sianga,M,,,Farmer,0970018112
+PAH207,Matomola Matomola,M,,,Farmer,
+PAH208,Nakakena Mundia,F,,,Farmer,
+PAH209,Agness Sililo Likando,F,,,Farmer,
+PAH210,Malumo Mushimbei,M,,,Farmer,
+PAH211,Mundia Oscar Mwanja,M,,,Farmer,
+PAH212,Mutafela Lubasi,M,,,Farmer,0970530691
+PAH213,Anex Mutemwa Siyunda,M,,,Farmer,0776033869
+PAH215,Lukamwa Mubita(Namucana Nyambe),M,,,Farmer,0772294432
+PAH216,Nakamwelwa  Nakamwelwa,M,,,Farmer,
+PAH217,Mebelo Nalumino,F,,,Farmer,0777884815
+PAH218,Ilwendo Imbuwa,M,,,Farmer,
+PAH219,Mafenyeho Imbuwa,M,,,Farmer,077573140
+PAH220,Wamunyima Mpango,M,,,Farmer,
+PAH221,Silumesi Mubu,M,,,Farmer,0974915906
+PAH222,Muleka Kahilu,F,,,Farmer,
+PAH223,Neo Kapelwa,M,,,Farmer,0978545216
+PAH224,Sililo Kahilu,M,,,Farmer,0774510445
+PAH225,Frank Liywali Muyendekwa,M,,,Farmer,0777858679
+PAH226,Ireen Munyandi,F,,,Farmer,0975392125
+PAH227,Siyanga Matongo,M,,,Farmer,0977132381
+PAH228,Inonge Mutafela,F,,,Farmer,0773229185
+PAH229,Chinga Miwangu,M,,,Farmer,0773226889
+PAH230,Malonga Sipupe,F,,,Farmer,
+PAH231,Mbuto Mubiana,F,,,Farmer,0967961474
+PAH232,Musiwa Mululu,M,,,Farmer,0977719578
+PAH233,Malumo Nosiku,F,,,Farmer,0976717946
+PAH234,Chikuni Musiyalike,M,,,,
+PAH235,Ruth Malumo,F,,,Farmer,
+PAH236,Monde Kekelwa,F,,,Farmer,
+PAH237,Sitamulaho Mutangelwa,F,,,Farmer,
+PAH239,Mundia Mundia,,,,Farmer,
+PAH240,Chikuni Miyanda,M,,,Farmer,
+PAH241,Mwangala Mubita,M,,,Farmer,
+PAH242,Imataa Owen Silondiso,M,,,Farmer,0779134677
+PAH243,Makandauko Mwala,F,,,Farmer,
+PAH244,Sifungwa Donald Musowe,M,,,Farmer,
+PAH245,Sifungwa Malumo,M,,,Farmer,
+PAH246,Mubita Mwiya,F,,254384/83/1,Farmer,
+PAH247,Milapo Linganga,F,,,Farmer,0962767523
+PAH248,Nakweti Malumo,M,,,Farmer,0774496243
+PAH249,Ifunga Mukubesa,M,,,Farmer,0972357413
+PAH250,Silumesi Jane Mabuku,F,,,Farmer,
+PAH251,Muyana Loza,F,,570968/67/1,Farmer,0971586531
+PAH252,Munalula Makoma,M,,202310/83/1,Farmer,0973197999
+PAH253,Mubuyaeta Lungowe,F,,270528/67/1,Farmer,0977196719
+PAH254,Mukubesa Mukubesa,M,,,Farmer,
+PAH255,Barbara Mukubesa,F,,,Farmer,0770733553
+PAH256,Kapelwa Mwangala,,,,Farmer,
+PAH257,Lungowe Akakondo,F,,,Farmer,0771881152
+PAH258,Sifungwa Matomola,F,,109584/82/1,Farmer,0976729145
+PAH259,Wakumelo Katundu,M,,,Farmer,0977426034
+PAH260,Muwana Peter Muwana,M,,203790/82/1,Farmer,0976886693
+PAH261,Christine Notulu Muwana,F,,,Farmer,0776247732
+PAH262,Sibeso muliya,F,,,Farmer,0770753552
+PAH263,Muyanwa Kapokola,M,,,Farmer,0971877995
+PAH264,Lyungu Lifumbela,M,,,Farmer,0770390504
+PAH265,Masiye Florence Lungowe,F,,,Farmer,0975087557
+PAH266,Mabuku Imanga,M,,,Farmer,0972356803
+PAH267,Likando Manyemo,F,,,Farmer,
+PAH268,Muwana Mululu,M,,,Farmer,
+PAH269,Milapo Linganga,M,,,Farmer,09762767523
+PAH270,Sifaya Mubiana,,,,Farmer,
+PAH271,Mushaukwa Pauline,F,,,Farmer,
+PAH272,Maria Inambao,F,,,Farmer,
+PAH273,Namenda Muyendekwa,F,,,Farmer,
+PAH274,Mulemwa Sumbwa,F,,,Farmer,
+PAH275,Sibeso Lyambela,F,,,Farmer,
+PAH276, Kafanu Sky Muyunda,M,,155994/85/1,Farmer,
+PAH277,Matomola Matomola,M,,,Farmer,0978015888
+PAH278,Inonge Musiwa,F,,,Farmer,0978506401
+PAH279,Mukela Libinda,M,,,Farmer,097788122
+PAH280,Nawa Mufaya,M,,,Farmer,
+PAH281,Samwaka Nambula,M,,,Farmer,
+PAH282,Nosiku Kasuka,F,,,Farmer,
+PAH283,Malilo Mpango,M,,202467/83/1,Farmer,0970530346
+PAH284,Mwana Namulu,M,,135298/83/1,Farmer,
+PAH285,Masani Muliya,F,,205485/82/1,Farmer,097261097
+PAH286,Namucana Kafanu,F,,185756/85/1,Farmer,0975781085
+PAH287,Muyunda Mwikisa,M,,,Farmer,0973197933
+PAH288,Paul Mpango,M,,,Farmer,0776460144
+PAH289,Kutiya Kafanu,F,,,Farmer,
+PAH290,Patrick Masiye,M,,,Farmer,
+PAH291,Maureen Omba  Sikiliti,F,,,Farmer,
+PAH292,Misheke Lubasi,,,,,0975419853
+PAH293,Kangulubeta Shishwati,M,,,Farmer,097085539
+PAH294,Mukela Nakubiana,F,,147389/83/1,Farmer,
+PAH295,Muwana Nasilele,F,,,Farmer,
+PAH296,Muyunda Muwana,M,,,Farmer,
+PAH297,Kaundula Luhamba,M,,,Farmer,0975297780
+PAH299,Munalelo Namakando,F,,114628/87/1,Farmer,0776461678
+PAH300,Lifumbela Mutafelo,M,,,Farmer,0973223266
+PAH301,Siseo Mundia,,,,Farmer,
+PAH302,Munalula Munalula,,,,Farmer,
+PAH303,Sitali Mutukwa,F,,,Farmer,
+PAH304,Mundia Silumesi,F,,,Farmer,
+PAH305,Imelda Lubeta,F,,,Farmer,
+PAH306,Morris Malumo,M,,,Farmer,
+PAH307,Mwauluka Nakubiana,M,,204359/83/1,Farmer,
+PAH308,Mubita Mulonda,M,,,Farmer,
+PAH309,Masamu Masamu,M,,,Farmer,
+PAH310,Mundia Amos,M,,,Farmer,
+PAH311,Mwiya Simasiku ,F,,,Farmer,
+PAH312,Mabuta Kapui,F,,,Farmer,
+PAH313,Sikombwa Mabuta, M,,103050/83/1,Farmer,
+PAH314,Sitali Mutukwa,M,,,Farmer,0968342599
+PAH315,Sitali Mutoiwa,F,,,Farmer,
+PAH316,Saboi Mwendabai,F,,,Farmer,0776033875
+PAH317,Mwangala Makandauko,,,,Farmer,
+PAH318,Muzamai Limakazo,F,,,Farmer,
+PAH319,Memory Maketo,F,,,Farmer,
+PAH320,Lungowe Mubita,F,,,Farmer,0971381130
+PAH321,Pumulo Mwakamui,,,,Farmer,
+PAH322,Maketo Josephine Wamundila,F,,,Farmer,
+PAH323,Mabuta Wamundila,M,,,Farmer,0963313074
+PAH324,Namukolo Mwanja,F,,,Farmer,
+PAH325,Mabuta Sikombwa,M,,,Farmer,
+PAH326,Sibeso Mufoi,F,,,Farmer,
+PAH327,Mubita Nalishebo,M,,220738/83/1,Farmer,0960308388
+PAH328,Mabuta Lifuka,M,,,Farmer,
+PAH329,Nalukui Muzumi,F,,,Farmer,
+PAH330,Enoch Matomola,M,,,Farmer,
+PAH331,Mwangala Mwinke,F,,,Farmer,
+PAH332,Mwala Makandauko,M,,,Farmer,
+PAH333,Matomola Lubinda,M,,,Farmer,0973162632
+PAH334,Bertha Sikwati,F,,,Farmer,
+PAH335,Mweshakabo Mwiya,M,,,Farmer,
+PAH336,Nambo Mubita,F,,,Farmer,
+PAH337,Namatama Libuku,F,,,Farmer,
+PAH338,Mundia Silumesii,F,,,Farmer,
+PAH339,Beatrice Kusekwa Kuoenga,F,,,Farmer,
+PAH340,Tabo Kunyanda,F,,,Farmer,
+PAH341,Chuma Inyambo,M,,,Farmer,
+PAH342,Robert Mubita,M,,,Farmer,
+PAH343,Matomola Simataa,M,,,Farmer,0960304954
+PAH344,Loveness Kupenga,F,,,Farmer,0962692768
+PAH345,Sikombwa Kupenga,M,,,Farmer,
+PAH346,Elina Kupenga,F,,,Farmer,
+PAH347,Nobutu Mubiana,F,,,Farmer,
+PAH348,Muyambango Maketo,M,,,Farmer,
+PAH349,Mebelo Kalimono,F,,,Farmer,
+PAH350,Muyakwabo Liwilu,M,,,Farmer,
+PAH351,Sitwala Wamamole,M,,,Farmer,
+PAH352,Imasiku Namakando,M,,114558/87/1,Farmer,0770733576
+PAH353,Mubita Katunga,M,,,Farmer,
+PAH354,Sitali Situmbeko,M,,,Farmer,
+PAH355,Namatama Sakuba,M,,,Farmer,0763526307
+PAH356,Kauzana Kangelwa,M,,,Farmer,
+PAH357,Imasiku Mwauluka,M,,,Farmer,0760385230
+PAH358,Inambao Mwauluka,M,,,Farmer,
+PAH359,Lungowe Kabombo,F,,,Farmer,
+PAH360,Jenny Sishwati Kangwanda,F,,,Farmer,
+PAH361,Sepiso Wamundila,F,,,Farmer,
+PAH362,Namakau Mushe,F,,,Farmer,
+PAH363,Mwaka Lumano,F,,,Farmer,0972740851
+PAH364,Namasiku Sililo,F,,238672/83/1,Farmer,
+PAH365,Mainga Likuwa,M,,,Farmer,
+PAH366,Mushokabanji Mundia,M,,,Farmer,
+PAH367,Mwala Mubita,M,,,Farmer,
+PAH368,Nalumino Imasiku ,M,,,Farmer,
+PAH370,Mubita Mutanyambe,M,,,Farmer,
+PAH371,Mwauluka Namunji,F,,,Farmer,
+PAH372,Namatama Mundia,F,,,Farmer,0975350894
+PAH373,Maketo Muyambango,M,,,Farmer,
+PAH374,Sepiso Linganga,F,,,Farmer,
+PAH375,Muyendekwa Namenda,F,,215598/83/1,Farmer,0971596339
+PAH376,Namakau Sililo,F,,,Farmer,
+PAH377,Namatama Kanwa,F,,,Farmer,
+PAH378,Namasiku Mubita,F,,226937/83/1,Farmer,
+PAH379,Lifunga Silondiso,F,,179712/83/1,Farmer,
+PAH380,Kamutyana Mildred Ilukena,F,,,Farmer,0963844520
+PAH381,Namonda Muleta,F,,,Farmer,
+PAH382,Mwangala Imasiku,F,,,Farmer,
+PAH383,Namasiku Muyumba,F,,,Farmer,
+PAH384,Mufalo Mabuku,M,,,Farmer,
+PAH385,Namasiku Mabuku,F,,,Farmer,
+PAH386,Muleta Masiliso,,,,Farmer,
+PAH387,Mukela Lifasi,M,,,Farmer,
+PAH388,Imataa Lubasi,M,,,Farmer,
+PAH389,Lungowe Mwiya,F,,129589/87/1,Farmer,
+PAH390,Milinga Mwauluka,M,,,Farmer,
+PAH391,Masendo Mubita,M,,,Farmer,
+PAH392,Saboi Mwendabai,F,,,Farmer,
+PAH393,Nalumino Likuwa,M,,254231/83/1,Farmer,
+PAH394,Sitali Sitali,M,,,Farmer,0960475810
+PAH395,Siteleki Leckses,M,,,Farmer,
+PAH396,Mwangala Wakun'guma,F,,,Farmer,
+PAH397,Imangolwa Mwauluka,M,,,Farmer,
+PAH398,Manga Mubita,M,,,Farmer,
+PAH399,Maswabi Namalindo,M,,,Farmer,
+PAH400,Mubita Malumo,M,,,Farmer,
+PAH401,Kamunika Katunga,M,,,Farmer,
+PAH402,Nambula Muyakwabo,F,,,Farmer,
+PAH403,Patrick Mwauluka,M,,,Farmer,
+PAH404,Inyambo Mwanawina,M,,,Farmer,
+PAH406,Lyambela Kunyanda,M,,,Farmer,
+PAH407,Mwaka Kapui,M,,,Farmer,
+PAH408,Kapui Mutelo,M,,,Farmer,
+PAH409,Nandila Kuzibanyambe,M,,,Farmer,
+PAH410,Mwauluka Anold Nang'unyi,M,,,Farmer,
+PAH411,Namasiku Muyumba,F,,,Farmer,
+PAH412,Mwaka Mukendwa,F,,,,
+PAH413,Mabuku Nakamwi,F,,,,
+PAH414,Mubita Mulonda,M,,,,
+PAH415,Muyakwabo Liwilu,M,,,,
+PAH416,Sepiso Malikana,F,1986,,,0972817850
+PAH417,Lyamba Sianga,M,,,,0979706035
+PAH418,Lungowe Matakala,F,,,,0976682800
+PAH419,Linganga Monde,F,,,,
+PAH420,Monde Nawa,F,,,,
+PAH421,Sibela Simushi,M,,,,
+PAH422,Ilumbela Milupi,M,,,,
+PAH423,Namakando Mubita,F,,,,
+PAH424,Mubiana Mundia,,,,,
+PAH426,Anayawa Kunyanda,M,,183488/83/1,,
+PAH427,Lyambela Wamunyima,M,,254419/83/1,,
+PAH428,Lyambela Sitali,M,,276296/83/1,,
+PAH429,Mundia Matomola,F,,,,
+PAH430,Mulomba Mulobela Fdelis,M,,,,
+PAH431,Sitaka Pumulo,F,,,,0975964582
+PAH432,Nyambe Nosiku,F,,,,0971804163
+PAH433,Matakala Mulomba,F,,,,0978589650
+PAH434,Muleya Mwangala,F,,,,
+PAH435,Masani Maungulo,F,,,,0973179835
+PAH436,Matakala Mutinta,M,,126780/87/1,,0972107372
+PAH437,Konga Nalukui,M,,,,
+PAH438,Musiyalela Malumo,F/M,,227030/83/1,,
+PAH439,Situmbo Namakando,F,,,,0979239638
+PAH440,Mwiya Mirriam Mwashekabo,F,,,,
+PAH441,Malumo Nyambe,M,,,,0972642428
+PAH442,Muyanwa Simusi,F,,,,
+PAH443,Inonge Simenda,F,,,,
+PAH444,Margret Inonge Mutumwa,F,,,,
+PAH445,Mulauli Mufaya,M,1978,263146/82/1,,0977170329
+PAH453,Agness Konga,F,,,,
+PAH454,Polota Wamulume,M,1977,205570/83/1,,0979222361
+PAH455,Kabika Kalemba,M,,,,
+PAH456,Mulemwa Katunga,F,,,,
+PAH457,Alibandila Sishekano,M,,191991/83/1,,0977144970
+PAH458,Muganga Kennedy,M,,227415/82/1,,0977451239
+PAH459,Mbuyu Community School,,,,,0978225951
+PAH460,Njamba Wachama,M,,,,
+PAH600,Namasiku Konga,F,,,,
+PAH601,Simasiku Simasiku,M,,,,
+PAH603,Mwanamwalye Masiye,F,,,,
+PAH604,Muyanwa Kumanenwa,F,,,,
+PAH605,Mwiiba Muchaulo,M,,,,
+PAH606,Nasilele Maungulo,F,,,,0973059810
+PAH607,Community Land,,,,,
+PAH610,Mutumba Mubiana,F,,,Farmer,0975911893
+PAH611,Mululu Nalukui,F,,,,0969737517
+PAH612,Lawrence Tembo,M,,,Brick layer,
+PAH621,Mululu Namakau,F,,,,0977718644
+PAH624,Milimo Namasiku,F,,,,
+PAH625,Malembo Zita,M,,,,
+PAH627,Jane Mabuku Silumesi,F,,,,
+PAH627a,Clare Nasilele Mayumbelo,F,,,,0978650635
+PAH628,Muuka Florence Makena,F,,,,
+PAH629,Kamutumwa Yuyi,M,,,,0971190905
+PAH630,Kabika Kalemba,M,,,,0970920447
+PAH631,Mundia Silumesi,F,,,,
+PAH632,Muyanwa Nasilele,F,,,,
+PAH633,Mashaukwa Namakando,F,,,,0970105287
+PAH634,Saloba Nowanga,F,,,,
+PAH638,Nasilele Likezo,M,,,,
+PAH639,Nawa Mufaya,M,,,Farmer,0973052697
+PAH640,Namamba Namamba,M,,,,
+PAH643,Mwenda Muwana,M,,,,
+PAH644,Musiyalela Limakazo,F,,,,0770102741
+PAH681,Sinyama Nampewo,F,,,,
+PAH682,Munyungi Lubinda,F,,,,
+PAH683,Milapo Patrick Liswaniso,M,,,,0977371907
+PAH684,Liswaniso Silvia Malila,F,,,,
+PAH685,Kabika Kalemba,M,,,,0975240354
+PAH686,Musiyalela Patrick,M,,,,
+PAH687,Mutokomela Sepiso,M,,,,0975627732
+PAH688,Muchaulo Namenda,F,,,Farmer,0774936531
+PAH694,Lubasi Lyambela,M,,,,0971728552
+PAH695,Mabenga Mutonga,F,,,,0977670017
+PAH696,Taulo Peter,M,,,,0779134667
+PAH697,Konga Mwenda,M,,,,0979865712
+PAH698,Lyambela Mwauluka,M,,,,0972659527
+PAH699,Muyendekwa Mirriam,F,,,,0762821114
+PAH904,Kabele Church,,,,,
+PAH1000,Namenda Muchaulo,F,,,Farmer,
+NHS001,Chrispen Liwiakala,M,,102803/83/1,Induna,0978930950
+NHS002,Francis Kutangula,M,,101110/83/1,Farmer,0979173799
+NHS003,Halupili Edward,M,,101405/83/1,Farmer,0979124702
+NHS004,Nyambe Nyambe,M,,,Farmer,0570578096
+NHS005,Masiye Masiye,M,,188172/83/1,CLA,0971596481
+NHS006,Sikabongo Amilio,M,,114509/83/1,Farmer,0972929238
+NHS007,Mutandalo Muyanwa,M,,102038/83/1,Farmer,097772189
+NHS008,Nanalelwa Mwiya,M,,172826/83/1,Fisher,
+NHS009,Lishomwa Liywalwi,M,,171189/83/1,Fisher,0775965708
+NHS010,Ilwendo Imbuwa,M,,189082/83/1,Fisher,
+NHS011,Lucanana Lyantamani,M,,114526/87/1,Fisher,
+NHS012,Liywalii Mulilo,M,,191607/83/1,Fisher,0772256528
+NHS013,Nakamwelwa Kubaulila,M,,172773/83/1,Fisher,
+NHS014,Wamunyima Mpango,M,,193081/83/1,Fisher,
+NHS015,Alex Lyatamanyi,M,,147149/16/1,Fisher,097407077
+NHS016,Nyimbwa Muliya,F,,138015/87/1,Farmer,097237107
+NHS017,Chilindi Namasiku,F,,204104/83/1,Farmer,077200072
+NHS018,Mutumwa Nyambe,M,,179979/83/1,Fisher,
+NHS019,Lubinda Mukela,M,,171356/83/1,Farmer,097788122
+NHS020,Sitibekiso Litaba,M,,,Farmer,
+NHS021,Nawa Kuwakana,F,,145751/87/1,Fisher,
+NHS022,Mubita Sifaya,M,,126208/87/1,Brick layer,
+NHS023,Musiwa Musiyalela,M,,149167/83/1,,
+NHS024,Pelekelo Makumbi,M,,197933/83/1,Farmer,
+NHS025,Sitali Matale,M,,101244/83/1,Shop Keeper,
+NHS026,Mumonaliywa Kabuku,M,,195086/83/1,Fisher,
+NHS027,Mabuku Sanyambe,M,,177724/83/1,Shop Keeper,
+NHS028,Nasilele Kalaluka,M,,173578/83/1,Business person,
+NHS029,Sikwatiketo Matale,M,,217112/83/1,Business person,0971541356
+NHS030,Livinasi Litaba,M,,193122/83/1,Farmer,
+NHS031,Lawrence Matale,M,,254385/83/1,Business person,0977875638
+NHS032,Liywali Liywali,M,,217296/83/1,Farmer,0967448992
+NHS033,Alfred Pumulo Matale,M,,116802/83/1,Farmer,
+NHS034,Mbano Miliko,M,,104946/83/1,Second Induna,
+NHS035,Mashewani Kabuku,M,,213644/83/1,Fisher,
+NHS036,Mubita Kayombo,M,,217575/83/1,Fisher,
+NHS037,Pumulo Sitwala,M,,,Farmer,
+NHS038,Maria Mwipi,F,,226899/83/1,Farmer,
+NHS039,Mbololwa Songa,F,,147334/83/1,Induna,
+NHS040,Moola Kayuni,M,,216478/83/1,Fisher,
+NHS041,Munyamba Mundia,M,,190530/83/1,Fisher,
+NHS042,Mebelo Mundia,M,,,Fisher,
+NHS043,Mukitwa Mukitwa,M,,229428/83/1,Fisher,
+NHS044,Kabombo Kanwa,M,,173595/83/1,Fisher,
+NHS045,Mwiya Musiwa,M,,254315/83/1,Fisher,
+NHS046,Mwiya Mwiya,M,,202372/83/1,Fisher,
+NHS047,Matomola Mundia,M,,,Fisher,
+NHS048,Sibote Mwangala,M,,,Fisher,
+NHS049,Munalula Sibote,M,,,Fisher,
+NHS050,Joseph Mwiya,M,,202399/83/1,Fisher,0966255591
+NHS051,Nandila Mwiya,M,,215896/84/1,Farmer,0960221370
+NHS052,Matomola Matomola,M,,276319/83/1,Fisher,
+NHS053,Emmanuel Kangumu,M,,226792/83/1,Fisher,0966207063
+NHS054,Zikinyeho Pelekelo,M,,179726/83/1,Fisher,
+NHS055,Kwekeza Silindi,M,,193093/83/1,Fisher,
+NHS056,Muchaulo Muyunda,M,,114862/87/1,Fisher,
+NHS057,Samanga Mafa,M,,190773/83/1,Fisher,
+NHS058,Sakuba Sakuba,M,,226923/83/1,Fisher,
+NHS059,Mubita Katobela,M,,116798/83/1,Fisher,
+NHS060,Mafaya Mafaya,M,,138190/97/1,Fisher,
+NHS061,Manyando Muwanie,M,,212698/83/1,Fisher,
+NHS062,Inambao Matomola,M,,235097/83/1,Fisher,
+NHS063,Sitali Siyanga,M,,254243/83/1,Fisher,
+NHS064,Chingumbe Chingumbe,M,,215907/83/1,Fisher,
+NHS065,Pelekelo Muwanei,M,,,Fisher,0973011178
+NHS066,Sikombwa Mwala,M,,190318/83/1,Farmer,
+NHS067,Imataa Nwauluka,M,,191346/83/1,Farmer,
+NHS068,Sikombwa Mwala,M,,102582/83/1,Farmer,
+NHS069,Sikombwa Mabuta,M,,,Farmer,
+NHS070,Moses Mwauluka,M,,193277/83/1,Security guard,
+NHS071,Malumo Sifungwa,M,,103134/83/1,Farmer,
+NHS072,Mwanangombe Matongo,M,,166401/83/1,Farmer,
+NHS073,Mulonda Mubita,F,,194511/83/1,Farmer,0771574684
+NHS074,Sitali Sitali,M,,226917/83/1,Game scout,0973913502
+NHS075,Robert Mubita,M,,410166/83/1,Farmer,
+NHS076,Mukwamandi Mubita,M,,202244/83/1,Farmer,
+NHS077,Mwanja Mundia,M,,198537/83/1,Farmer,
+NHS078,Lyambela Kunyanda,M,,568315/83/1,Farmer,
+NHS079,Patrick Mwauluka,M,,101765/83/1,Farmer,
+NHS080,Mwaluka Kupenga,M,,309619/74/1,Farmer,
+NHS081,Nanunyi Mwauluka,M,,175764/83/1,Farmer,
+NHS082,Nalishebo Mubita,M,,220738/83/1,Farmer,
+NHS083,Imasiku Mwauluka,M,,241972/83/1,Fisher,
+NHS084,Lubinda Imataa,M,,173572/83/1,Fisher,
+NHS085,Mwaba Matomola,M,,,Second Induna,
+NHS086,Sikwati Bertha,M,,138262/87/1,Farmer,
+NHS087,Makandauko Imasiku,M,,189613/83/1 ,Fisher,
+NHS088,Maketo Ilukena,M,,244460/71/1,Fisher,
+NHS089,Matongo Matongo,M,,226794/83/1,Fisher,
+NHS090,Sitali Lyambela,M,,,Fisher,
+NHS091,Siteleki Leckses,M,,215317/11/1,Acting Induna,
+NHS092,Makandauko Mwala,M,,200902/83/1,Farmer,0975107400
+NHS093,Sikombwa Mabuta,M,,226778/83/1,Farmer,
+NHS094,Mulomba Matakala,M,,150263/83/1,Fisher,
+NHS095,Imasiku Muchaulo,M,,,Fisher,0965728444
+NHS096,Lubinda Lyambela,M,,254253/83/1,Fisher,
+NHS097,Mutafela Malumo,M,,114579/87/1,Farmer,0972640870
+NHS098,Mulomba Mulobela,M,,,Farmer,
+NHS099,Frank Liywalii,M,,150525/83/1,Farmer,
+NHS100,Muchaulo Nyambe,F,,,Induna,
+NHS101,Wamuwi Kwalombota,F,,254341/83/1,Farmer,
+NHS102,Namakando Likezo,F,,138543/83/1,Farmer,
+NHS103,Sepiso Mutokomela,M,,168407/85/1,Driver,
+NHS104,Malunga Muka,M,,227187/83/1,Fisher,
+NHS105,Lubinda Mate,M,,,Escavator operator,
+NHS106,Taulo Peter,M,,142277/87/1,Casual worker,
+NHS107,Saloba Milapo,M,,101858/83/1,Farmer,
+NHS108,Collins Mululu Muwana,M,,167566/83/1,Second Induna,
+NHS109,Lifumbela Mahupulo,M,,129623/87/1,Fisher,
+NHS110,Mwauluka Lyambela,M,,380556/74/1,Fisher,
+NHS111,Sikota Mulomba,M,,,Driver,0979953252
+NHS112,Minyoi Mabumbo,M,,252296/82/1,Fisher,
+NHS113,Musiyalela Patrick,M,,101650/83/1,Fisher,
+NHS114,Mulomba Simalumba,M,,138283/87/1,Casual worker,
+NHS115,Katunga Mubano,M,,,Fisher,
+NHS116,Lubango Kase,M,,166741/83/1,Fisher,
+NHS117,Mukendwa Matakala,M,,226943/83/1,Fisher,
+NHS118,Mululu Mundile,F,,101294/83/1,Farmer,
+NHS119,Muchaulo Mwiiba,M,,254244/83/1,Farmer,
+NHS120,Mwananyambe Martin,M,,232764/11/1,Farmer,
+NHS121,Mubuyana Mbuto,F,,269230/74/1,Farmer,
+NHS122,Milapo Victor Ilukena,M,,138896/87/1,Farmer,0979881631
+NHS123,Likezo Nasilele,M,,,Farmer,
+NHS124,Namenda Mucaulo,F,,182146/83/1,Farmer,
+NHS125,Maxwel Mukendwa,M,,119448/71/1,Farmer,
+NHS126,Gift Lubango,M,,142400/87/1,Casual worker,
+NHS127,Nalinanga Mwiya,F,,227135/83/1,Farmer,
+NHS128,Kase Mululu,M,,190748/83/1,Fisher,
+NHS129,Namenda Muyendekwa,F,,215598/83/1,Farmer,
+NHS130,Mululu Mululu,M,,138261/87/1,Fisher,0971730194
+NHS131,Namakando Kwibisa,M,,,Fisher,
+NHS132,Matakala Mulomba,M,,269749/83/1,Fisher,
+NHS133,Mabenga Muyumba,M,,,Farmer,
+NHS134,Sitali Rosemary,M,,129601/87/1,Fisher,
+NHS135,Nyambe Saloba,F,,114754/87/1,Fisher,
+NHS136,Kamunika Kalemba,M,,254328/83/1,Fisher,
+NHS137,Matakala Pelekelo,M,,,Fisher,
+NHS138,Simasiku Imakando,M,,254259/83/1,Fisher,
+NHS139,Namamba Namamba,M,,,Brick layer,
+NHS140,Mwiya Mubita,M,,254384/83/1,,
+NHS141,Kufakwandi Mahupulo,M,,176100/83/1,Stone breaker,0970970447
+NHS142,Sishekano Mukendwa,M,,172438/83/1,Fisher,0971861574
+NHS143,Mebelo Mawiso,M,,,Fisher,
+NHS144,Clare Nasilele,F,,206931/84/1,CLA,
+NHS145,Lubasi Lyambela,M,,131587/87/1,Fisher,0971728552
+NHS146,Liswaniso Mwiba,M,,138367/87/1,Fisher,
+NHS147,Liswaniso Milapo,M,,150561/85/1,Farmer,
+NHS148,Linganga Mubita,M,,221330/83/1,Fisher,
+NHS149,Sinyama Nampewo,F,,,Farmer,
+NHS150,Sumbwa Mulemwa,F,,132894/83/1,Farmer,
+NHS151,Wamunyima Maketo,F,,,Farmer,
+NHS152,Matomola Matomola,M,,,Driver,0978015888
+NHS153,Kaonde Malumbano,M,,254383/83/1,Fisher,
+NHS154,Bornface Lulenga,M,,,Fisher,
+NHS155,Muyambango Maketo,M,,187589/83/1,Fisher,0775798320
+NHS156,Likezo Mukendwa,M,,129586/87/1,Fisher,0975963375
+NHS157,Gorbar Chanda,M,,254246/83/1,Fisher,
+NHS158,Kamunica Katunga,M,,,Fisher,0772506554
+NHS159,Konga Kalaluka,M,,,Farmer,
+NHS160,Muyumbana Morris Sikwatiketo,F,,269804/83/1,Fisher,
+NHS161,Kasamu Mabenga,M,,268323/83/1,Farmer,
+NHS162,Namasiku Konga,F,,227140/84/1,Farmer,0975106917
+NHS163,Nandila Milimo,F,,189825/83/1,Farmer,
+NHS164,Anawana Munyungi,M,,129116/85/1,Farmer,
+NHS165,Dorothy Kwalabana,F,,137578/85/1,Farmer,
+NHS166,Paul Chabala,M,,138990/83/1,Second Induna,
+NHS167,Lifumbela Baggrey Buchete,M,,140129/83/1,Farmer,
+NHS168,Flex Simasiku,M,,194822/83/1,Fisher,
+NHS169,Lifumbelo Mutafela,M,,,Induna,
+NHS170,Mafenyeho Masiye,M,,133337/85/1,Fisher,
+NHS171,Liswaniso Josephine,F,,107969/85/1,Farmer,
+NHS172,Mubita Sitali,M,,101634/83/1,Fisher,
+NHS173,Simasiku Milunga,M,,176603/83/1,Fisher,
+NHS174,Sitali Mubita,M,,114766/87/1,Fisher,
+NHS175,Kayombo Simasiku,M,,186984/83/1,Farmer,
+NHS176,Sepiso Munyangwe,M,,187000/83/1,Fisher,
+NHS177,Joseph Muyunda,M,,155020/85/1,Fisher,
+NHS178,Elizabeth Mwinke,F,,138732/64/1,Farmer,
+NHS179,Harriet Sambano Mbano,F,,202390/83/1,Farmer,
+NHS180,Mubita Mubano,M,,202769/83/1,Fisher,
+NHS181,Laele Masiye,F,,101414/83/1,Farmer,
+NHS182,Petuho Mululu,M,,163610/85/1,Fisher,
+NHS183,Chibeya Grace,F,,127033/85/1,Farmer,
+NHS184,Musungo Musiyalike,M,,114808/87/1,Fisher,
+NHS185,Simasiku Pelekelo,M,,114637/87/1,Farmer,
+NHS186,Malwalo Chrispen,F,,202464/83/1,Fisher,
+NHS187,Sitali Sitali,M,,147724/87/1,Game scout,
+NHS188,Musiyalela Maimbowa,M,,138786/87/1,Herbalist,
+NHS189,Mwendabai Maswabi,F,,202353/83/1,Clinic volunteer,
+NHS190,Mwabafu Maswabi,F,,114554/87/1,Gauge reader ,
+NHS191,Nangalelwa Likando,M,,,,
+NHS192,Mukubesa Munalula,M,,114641/87/1,Farmer,
+NHS193,Sianga Mutendwa,F,,205592/83/1,,
+NHS194,Nakubyana Masule,M,,117906/87/1,Farmer,
+NHS195,Muyunda Mwiba,M,,927223/83/1,Fisher,
+NHS196,Imasiku Kwalabana,M,,195313/83/1,Fisher,
+NHS197,Kabati Kabati,M,,114677/87/1,Fisher,
+NHS198,Mukwamandi Malindi,M,,103607/83/1,Fisher,
+NHS199,Muyakwabo Liwilu,M,,,Fisher,
+NHS200,Mwangala Malumo,M,,220967/83/1,Fisher,0976610337
+NHS201,Pelekelo Mwananyambe,F,,176349/83/1,Farmer,
+NHS202,Mutoiwa Likezo,M,,,Fisher,
+NHS203,Situmbeko Kusukuluka,M,,181926/83/1,Driver,097978796
+NHS204,Mubita Liswani,M,,166253/83/1,,
+NHS U100,Kabika Kalemba,M,,156340/85/1,Farmer,
+NHS U101,Katambo Lutangu,M,,227172/83/1,Fisher,
+NHS U103,Sikuka Limpo,,,,,
+NHS U104,Liswaniso Mebelo,M,,,Farmer,
+NHS U105,Linanga Liywali,,,145631/87/1 ,,
+NHS U106,Luyanga Naini,M,,346785/82/1,Brick layer,
+NHS U107,Mulobela Lipilaelo,M,,154368/85/1,Fisher,
+NHS U108,Maswabi Lutuzwi,M,,,Fisher,
+NHS U110,Sitali Sitali,M,,,Fisher,
+NHS U111,Sitali Rosemary,F,,,Fisher,
+NHS U112,Sitali Mubita,M,,,Fisher,
+NHS U114,Mwiya Sitali,M,,,Fisher,
+NHS U116,Muyendekwa Felix Mabuku,M,,,Business person,
+NHS U117,Muyendekwa Liyalii,M,,,Farmer,
+NHS U118,Mulomba Sikota,M,,,Driver,
+NHS U119,Mululu Petuho,M,,,Fisher,
+NHS U121,Imakando Kasuka,M,,,Fisher,
+NHS U122,Akufuna Nalumango,M,,165338/85/1,Game scout,
+NHS U123,Kakulubelwa Simumbi,M,,,Farmer,
+NHS U124,Lubasi Imata,M,,,Farmer,
+NHS U125,Lyambela Lubinda,M,,,Fisher,
+NHS U126,Lyambela Mwiba,M,,,Fisher,
+NHS U127,Lyambela Mwauluka,M,,,Fisher,
+NHS U128,Mabumbo Minyoi,M,,,Fisher,
+NHS U130,Makandauko Mwala,M,,,Farmer,
+NHS U131,Mate Sitali,M,,212190/83/1,Fisher,
+NHS U132,Mubita Mpango,M,,187013/83/1,Farmer,
+NHS U137,Mukendwa Sishekano,M,,,Fisher,
+NHS U139,Mwiba Muchaulo,M,,,Fisher,
+NHS U140,Liswaniso Mebelo,M,,137577/85/1,Fisher,
+NHS U141,Mwala Mwala,M,,,Farmer,
+NHS U142,Mwauluka Imangolwa,M,,,Fisher,
+NHS U143,Mwiba Muchaulo,M,,,Fisher,
+NHS U144,Saloba Milapo,M,,,Farmer,
+NHS U145,Imasiku Muchaulo,M,,,Fisher,
+NHS U146,Muchaulo Muyunda,M,,,Fisher,

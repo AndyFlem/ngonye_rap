@@ -24,7 +24,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
@@ -38,17 +38,17 @@ CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: -
+-- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types and functions';
 
 
 --
--- Name: a_fishers_search(character varying, character varying, character varying, character varying, integer, boolean, boolean, character varying, character varying, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
+-- Name: a_fishers_search(character varying, character varying, character varying, character varying, integer, boolean, boolean, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.a_fishers_search(p_name character varying DEFAULT NULL::character varying, p_nhs character varying DEFAULT NULL::character varying, p_nrc character varying DEFAULT NULL::character varying, p_type character varying DEFAULT NULL::character varying, p_survey_phase integer DEFAULT NULL::integer, p_social_survey boolean DEFAULT NULL::boolean, p_catch_survey boolean DEFAULT NULL::boolean, p_maungwe_active character varying DEFAULT NULL::character varying, p_limbelo_active character varying DEFAULT NULL::character varying, p_followup_flag boolean DEFAULT NULL::boolean, p_ica_signed boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_household boolean DEFAULT NULL::boolean) RETURNS TABLE(nhs character varying)
+CREATE FUNCTION public.a_fishers_search(p_name character varying DEFAULT NULL::character varying, p_nhs character varying DEFAULT NULL::character varying, p_nrc character varying DEFAULT NULL::character varying, p_type character varying DEFAULT NULL::character varying, p_survey_phase integer DEFAULT NULL::integer, p_social_survey boolean DEFAULT NULL::boolean, p_catch_survey boolean DEFAULT NULL::boolean, p_maungwe_active character varying DEFAULT NULL::character varying, p_limbelo_active character varying DEFAULT NULL::character varying, p_followup_flag boolean DEFAULT NULL::boolean, p_ica_signed boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_household boolean DEFAULT NULL::boolean, p_has_notes boolean DEFAULT NULL::boolean, p_has_grievances boolean DEFAULT NULL::boolean) RETURNS TABLE(nhs character varying)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -71,6 +71,8 @@ BEGIN
     (p_new_ica_required IS NULL OR f.new_ica_required = p_new_ica_required) AND
     (p_has_multiple_icas IS NULL OR ((SELECT COUNT(*) FROM public.icas WHERE icas.nhs = f.nhs) > 1) = p_has_multiple_icas) AND
     (p_has_linked_household IS NULL OR (p.pah IS NOT NULL) = p_has_linked_household) AND
+    (p_has_notes IS NULL OR (EXISTS (SELECT 1 FROM public.notes n WHERE n.nhs = f.nhs)) = p_has_notes) AND
+    (p_has_grievances IS NULL OR (EXISTS (SELECT 1 FROM public.grievances g WHERE g.nhs = f.nhs)) = p_has_grievances) AND
     (
       p_name IS NULL OR
       SIMILARITY(p.firstname, p_name) > 0.4 OR
@@ -81,11 +83,13 @@ END
 $$;
 
 
+ALTER FUNCTION public.a_fishers_search(p_name character varying, p_nhs character varying, p_nrc character varying, p_type character varying, p_survey_phase integer, p_social_survey boolean, p_catch_survey boolean, p_maungwe_active character varying, p_limbelo_active character varying, p_followup_flag boolean, p_ica_signed boolean, p_new_ica_required boolean, p_has_multiple_icas boolean, p_has_linked_household boolean, p_has_notes boolean, p_has_grievances boolean) OWNER TO postgres;
+
 --
--- Name: a_households_search(character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, character varying, bigint, character varying, character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
+-- Name: a_households_search(character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, character varying, bigint, character varying, character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
-CREATE FUNCTION public.a_households_search(p_household_head character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_vulnerable boolean DEFAULT NULL::boolean, p_nonaffected boolean DEFAULT NULL::boolean, p_landholding_only boolean DEFAULT NULL::boolean, p_silumesii boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_no_ica_required boolean DEFAULT NULL::boolean, p_icasigned boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_physically_displaced boolean DEFAULT NULL::boolean, p_nrc character varying DEFAULT NULL::character varying, p_village_id bigint DEFAULT NULL::bigint, p_icaoption_primary_structure character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_icaoption_landholding character varying DEFAULT NULL::character varying, p_icaoption_dryland character varying DEFAULT NULL::character varying, p_icaoption_garden character varying DEFAULT NULL::character varying, p_icaoption_transport character varying DEFAULT NULL::character varying, p_has_replacement_structures boolean DEFAULT NULL::boolean, p_has_replacement_land boolean DEFAULT NULL::boolean, p_has_protected boolean DEFAULT NULL::boolean, p_survey_complete boolean DEFAULT NULL::boolean, p_has_current_grievance boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_fisher boolean DEFAULT NULL::boolean) RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
+CREATE FUNCTION public.a_households_search(p_household_head character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_vulnerable boolean DEFAULT NULL::boolean, p_nonaffected boolean DEFAULT NULL::boolean, p_landholding_only boolean DEFAULT NULL::boolean, p_silumesii boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_no_ica_required boolean DEFAULT NULL::boolean, p_icasigned boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_physically_displaced boolean DEFAULT NULL::boolean, p_nrc character varying DEFAULT NULL::character varying, p_village_id bigint DEFAULT NULL::bigint, p_icaoption_primary_structure character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_icaoption_landholding character varying DEFAULT NULL::character varying, p_icaoption_dryland character varying DEFAULT NULL::character varying, p_icaoption_garden character varying DEFAULT NULL::character varying, p_icaoption_transport character varying DEFAULT NULL::character varying, p_has_replacement_structures boolean DEFAULT NULL::boolean, p_has_replacement_land boolean DEFAULT NULL::boolean, p_has_protected boolean DEFAULT NULL::boolean, p_survey_complete boolean DEFAULT NULL::boolean, p_has_current_grievance boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_fisher boolean DEFAULT NULL::boolean, p_has_notes boolean DEFAULT NULL::boolean) RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -124,6 +128,7 @@ BEGIN
       ((EXISTS (SELECT 1 FROM public.grievances g WHERE g.pah = h.pah AND g.is_current = true)) = p_has_current_grievance OR p_has_current_grievance IS NULL) AND
       (((SELECT COUNT(*) FROM public.icas WHERE icas.pah = h.pah) > 1) = p_has_multiple_icas OR p_has_multiple_icas IS NULL) AND
       ((EXISTS (SELECT 1 FROM public.person pm WHERE pm.pah = h.pah AND pm.nhs IS NOT NULL)) = p_has_linked_fisher OR p_has_linked_fisher IS NULL) AND
+      ((EXISTS (SELECT 1 FROM public.notes n WHERE n.pah = h.pah)) = p_has_notes OR p_has_notes IS NULL) AND
       (
         (SIMILARITY(p.firstname, p_household_head) > 0.4 OR p_household_head IS NULL) OR
         (SIMILARITY(p.lastname, p_household_head) > 0.4 OR p_household_head IS NULL) OR
@@ -134,8 +139,10 @@ END
 $$;
 
 
+ALTER FUNCTION public.a_households_search(p_household_head character varying, p_pah character varying, p_vulnerable boolean, p_nonaffected boolean, p_landholding_only boolean, p_silumesii boolean, p_new_ica_required boolean, p_no_ica_required boolean, p_icasigned boolean, p_followup_flag boolean, p_physically_displaced boolean, p_nrc character varying, p_village_id bigint, p_icaoption_primary_structure character varying, p_icaoption_structure_location character varying, p_icaoption_landholding character varying, p_icaoption_dryland character varying, p_icaoption_garden character varying, p_icaoption_transport character varying, p_has_replacement_structures boolean, p_has_replacement_land boolean, p_has_protected boolean, p_survey_complete boolean, p_has_current_grievance boolean, p_has_multiple_icas boolean, p_has_linked_fisher boolean, p_has_notes boolean) OWNER TO postgres;
+
 --
--- Name: a_parcels_search(character varying, character varying, character varying, character varying, character varying, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
+-- Name: a_parcels_search(character varying, character varying, character varying, character varying, character varying, boolean, boolean); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
 CREATE FUNCTION public.a_parcels_search(p_pah character varying DEFAULT NULL::character varying, p_land_parcel_id character varying DEFAULT NULL::character varying, p_land_class character varying DEFAULT NULL::character varying, p_land_zone character varying DEFAULT NULL::character varying, p_village character varying DEFAULT NULL::character varying, p_cultivated boolean DEFAULT NULL::boolean, p_remaining_viable boolean DEFAULT NULL::boolean) RETURNS TABLE(land_parcel_id character varying, pah character varying)
@@ -156,8 +163,10 @@ END;
 $$;
 
 
+ALTER FUNCTION public.a_parcels_search(p_pah character varying, p_land_parcel_id character varying, p_land_class character varying, p_land_zone character varying, p_village character varying, p_cultivated boolean, p_remaining_viable boolean) OWNER TO postgres;
+
 --
--- Name: a_replacements_search(character varying, character varying, character varying, character varying, character varying, boolean, boolean, character varying); Type: FUNCTION; Schema: public; Owner: -
+-- Name: a_replacements_search(character varying, character varying, character varying, character varying, character varying, boolean, boolean, character varying); Type: FUNCTION; Schema: public; Owner: postgres
 --
 
 CREATE FUNCTION public.a_replacements_search(p_pah character varying DEFAULT NULL::character varying, p_replacement_structure_id character varying DEFAULT NULL::character varying, p_replacement_option character varying DEFAULT NULL::character varying, p_replacement_class character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_protected boolean DEFAULT NULL::boolean, p_flag_followup boolean DEFAULT NULL::boolean, p_phase character varying DEFAULT NULL::character varying) RETURNS TABLE(replacement_structure_id character varying, pah character varying)
@@ -179,12 +188,14 @@ END;
 $$;
 
 
+ALTER FUNCTION public.a_replacements_search(p_pah character varying, p_replacement_structure_id character varying, p_replacement_option character varying, p_replacement_class character varying, p_icaoption_structure_location character varying, p_protected boolean, p_flag_followup boolean, p_phase character varying) OWNER TO postgres;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: crop_types; Type: TABLE; Schema: public; Owner: -
+-- Name: crop_types; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.crop_types (
@@ -193,8 +204,10 @@ CREATE TABLE public.crop_types (
 );
 
 
+ALTER TABLE public.crop_types OWNER TO postgres;
+
 --
--- Name: crops; Type: TABLE; Schema: public; Owner: -
+-- Name: crops; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.crops (
@@ -206,8 +219,10 @@ CREATE TABLE public.crops (
 );
 
 
+ALTER TABLE public.crops OWNER TO postgres;
+
 --
--- Name: crops_crop_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: crops_crop_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public.crops ALTER COLUMN crop_id ADD GENERATED ALWAYS AS IDENTITY (
@@ -221,7 +236,7 @@ ALTER TABLE public.crops ALTER COLUMN crop_id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- Name: fishers; Type: TABLE; Schema: public; Owner: -
+-- Name: fishers; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.fishers (
@@ -241,12 +256,16 @@ CREATE TABLE public.fishers (
     limbelo_annual_buckets numeric(10,3),
     limbelo_days_fished numeric(8,2),
     new_ica_required boolean DEFAULT false NOT NULL,
-    followup_flag boolean DEFAULT false NOT NULL
+    followup_flag boolean DEFAULT false NOT NULL,
+    lr_fishfarming boolean,
+    lr_goatrearing boolean
 );
 
 
+ALTER TABLE public.fishers OWNER TO postgres;
+
 --
--- Name: grievances; Type: TABLE; Schema: public; Owner: -
+-- Name: grievances; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.grievances (
@@ -262,8 +281,10 @@ CREATE TABLE public.grievances (
 );
 
 
+ALTER TABLE public.grievances OWNER TO postgres;
+
 --
--- Name: grievances_grievance_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: grievances_grievance_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public.grievances ALTER COLUMN grievance_id ADD GENERATED ALWAYS AS IDENTITY (
@@ -277,7 +298,7 @@ ALTER TABLE public.grievances ALTER COLUMN grievance_id ADD GENERATED ALWAYS AS 
 
 
 --
--- Name: households; Type: TABLE; Schema: public; Owner: -
+-- Name: households; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.households (
@@ -314,8 +335,10 @@ CREATE TABLE public.households (
 );
 
 
+ALTER TABLE public.households OWNER TO postgres;
+
 --
--- Name: households_survey; Type: TABLE; Schema: public; Owner: -
+-- Name: households_survey; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.households_survey (
@@ -393,8 +416,10 @@ CREATE TABLE public.households_survey (
 );
 
 
+ALTER TABLE public.households_survey OWNER TO postgres;
+
 --
--- Name: icas; Type: TABLE; Schema: public; Owner: -
+-- Name: icas; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.icas (
@@ -409,8 +434,10 @@ CREATE TABLE public.icas (
 );
 
 
+ALTER TABLE public.icas OWNER TO postgres;
+
 --
--- Name: icas_ica_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: icas_ica_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public.icas ALTER COLUMN ica_id ADD GENERATED ALWAYS AS IDENTITY (
@@ -424,7 +451,7 @@ ALTER TABLE public.icas ALTER COLUMN ica_id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- Name: impact_zones; Type: TABLE; Schema: public; Owner: -
+-- Name: impact_zones; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.impact_zones (
@@ -435,8 +462,10 @@ CREATE TABLE public.impact_zones (
 );
 
 
+ALTER TABLE public.impact_zones OWNER TO postgres;
+
 --
--- Name: impact_zones_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: impact_zones_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.impact_zones_id_seq
@@ -448,15 +477,17 @@ CREATE SEQUENCE public.impact_zones_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.impact_zones_id_seq OWNER TO postgres;
+
 --
--- Name: impact_zones_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: impact_zones_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.impact_zones_id_seq OWNED BY public.impact_zones.id;
 
 
 --
--- Name: land_assets; Type: TABLE; Schema: public; Owner: -
+-- Name: land_assets; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.land_assets (
@@ -477,8 +508,10 @@ CREATE TABLE public.land_assets (
 );
 
 
+ALTER TABLE public.land_assets OWNER TO postgres;
+
 --
--- Name: land_assets_geom; Type: TABLE; Schema: public; Owner: -
+-- Name: land_assets_geom; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.land_assets_geom (
@@ -489,8 +522,10 @@ CREATE TABLE public.land_assets_geom (
 );
 
 
+ALTER TABLE public.land_assets_geom OWNER TO postgres;
+
 --
--- Name: land_parcels; Type: TABLE; Schema: public; Owner: -
+-- Name: land_parcels; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.land_parcels (
@@ -506,8 +541,10 @@ CREATE TABLE public.land_parcels (
 );
 
 
+ALTER TABLE public.land_parcels OWNER TO postgres;
+
 --
--- Name: land_parcels_geom; Type: TABLE; Schema: public; Owner: -
+-- Name: land_parcels_geom; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.land_parcels_geom (
@@ -518,8 +555,10 @@ CREATE TABLE public.land_parcels_geom (
 );
 
 
+ALTER TABLE public.land_parcels_geom OWNER TO postgres;
+
 --
--- Name: land_parcels_geom_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: land_parcels_geom_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.land_parcels_geom_id_seq
@@ -531,15 +570,17 @@ CREATE SEQUENCE public.land_parcels_geom_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.land_parcels_geom_id_seq OWNER TO postgres;
+
 --
--- Name: land_parcels_geom_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: land_parcels_geom_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.land_parcels_geom_id_seq OWNED BY public.land_parcels_geom.id;
 
 
 --
--- Name: notes; Type: TABLE; Schema: public; Owner: -
+-- Name: notes; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.notes (
@@ -553,8 +594,10 @@ CREATE TABLE public.notes (
 );
 
 
+ALTER TABLE public.notes OWNER TO postgres;
+
 --
--- Name: notes_note_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: notes_note_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public.notes ALTER COLUMN note_id ADD GENERATED ALWAYS AS IDENTITY (
@@ -568,7 +611,7 @@ ALTER TABLE public.notes ALTER COLUMN note_id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- Name: person; Type: TABLE; Schema: public; Owner: -
+-- Name: person; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.person (
@@ -604,8 +647,10 @@ CREATE TABLE public.person (
 );
 
 
+ALTER TABLE public.person OWNER TO postgres;
+
 --
--- Name: person_person_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: person_person_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public.person ALTER COLUMN person_id ADD GENERATED ALWAYS AS IDENTITY (
@@ -619,7 +664,7 @@ ALTER TABLE public.person ALTER COLUMN person_id ADD GENERATED ALWAYS AS IDENTIT
 
 
 --
--- Name: replacement_structure_types; Type: TABLE; Schema: public; Owner: -
+-- Name: replacement_structure_types; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.replacement_structure_types (
@@ -630,8 +675,10 @@ CREATE TABLE public.replacement_structure_types (
 );
 
 
+ALTER TABLE public.replacement_structure_types OWNER TO postgres;
+
 --
--- Name: replacement_structures; Type: TABLE; Schema: public; Owner: -
+-- Name: replacement_structures; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.replacement_structures (
@@ -645,8 +692,10 @@ CREATE TABLE public.replacement_structures (
 );
 
 
+ALTER TABLE public.replacement_structures OWNER TO postgres;
+
 --
--- Name: structures; Type: TABLE; Schema: public; Owner: -
+-- Name: structures; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.structures (
@@ -688,8 +737,10 @@ CREATE TABLE public.structures (
 );
 
 
+ALTER TABLE public.structures OWNER TO postgres;
+
 --
--- Name: structures_geom; Type: TABLE; Schema: public; Owner: -
+-- Name: structures_geom; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.structures_geom (
@@ -699,8 +750,10 @@ CREATE TABLE public.structures_geom (
 );
 
 
+ALTER TABLE public.structures_geom OWNER TO postgres;
+
 --
--- Name: structures_geom_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: structures_geom_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.structures_geom_id_seq
@@ -712,15 +765,17 @@ CREATE SEQUENCE public.structures_geom_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.structures_geom_id_seq OWNER TO postgres;
+
 --
--- Name: structures_geom_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: structures_geom_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.structures_geom_id_seq OWNED BY public.structures_geom.id;
 
 
 --
--- Name: tree_types; Type: TABLE; Schema: public; Owner: -
+-- Name: tree_types; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.tree_types (
@@ -731,8 +786,10 @@ CREATE TABLE public.tree_types (
 );
 
 
+ALTER TABLE public.tree_types OWNER TO postgres;
+
 --
--- Name: tree_types_tree_type_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: tree_types_tree_type_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public.tree_types ALTER COLUMN tree_type_id ADD GENERATED ALWAYS AS IDENTITY (
@@ -746,7 +803,7 @@ ALTER TABLE public.tree_types ALTER COLUMN tree_type_id ADD GENERATED ALWAYS AS 
 
 
 --
--- Name: trees; Type: TABLE; Schema: public; Owner: -
+-- Name: trees; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.trees (
@@ -760,8 +817,10 @@ CREATE TABLE public.trees (
 );
 
 
+ALTER TABLE public.trees OWNER TO postgres;
+
 --
--- Name: trees_tree_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: trees_tree_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public.trees ALTER COLUMN tree_id ADD GENERATED ALWAYS AS IDENTITY (
@@ -775,7 +834,7 @@ ALTER TABLE public.trees ALTER COLUMN tree_id ADD GENERATED ALWAYS AS IDENTITY (
 
 
 --
--- Name: user; Type: TABLE; Schema: public; Owner: -
+-- Name: user; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public."user" (
@@ -791,8 +850,10 @@ CREATE TABLE public."user" (
 );
 
 
+ALTER TABLE public."user" OWNER TO postgres;
+
 --
--- Name: user_login; Type: TABLE; Schema: public; Owner: -
+-- Name: user_login; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.user_login (
@@ -801,8 +862,10 @@ CREATE TABLE public.user_login (
 );
 
 
+ALTER TABLE public.user_login OWNER TO postgres;
+
 --
--- Name: user_pageview; Type: TABLE; Schema: public; Owner: -
+-- Name: user_pageview; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.user_pageview (
@@ -812,8 +875,10 @@ CREATE TABLE public.user_pageview (
 );
 
 
+ALTER TABLE public.user_pageview OWNER TO postgres;
+
 --
--- Name: user_user_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: user_user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public."user" ALTER COLUMN user_id ADD GENERATED ALWAYS AS IDENTITY (
@@ -827,7 +892,7 @@ ALTER TABLE public."user" ALTER COLUMN user_id ADD GENERATED ALWAYS AS IDENTITY 
 
 
 --
--- Name: usergroup; Type: TABLE; Schema: public; Owner: -
+-- Name: usergroup; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.usergroup (
@@ -837,8 +902,10 @@ CREATE TABLE public.usergroup (
 );
 
 
+ALTER TABLE public.usergroup OWNER TO postgres;
+
 --
--- Name: usergroup_user; Type: TABLE; Schema: public; Owner: -
+-- Name: usergroup_user; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.usergroup_user (
@@ -847,8 +914,10 @@ CREATE TABLE public.usergroup_user (
 );
 
 
+ALTER TABLE public.usergroup_user OWNER TO postgres;
+
 --
--- Name: usergroup_usergroup_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: usergroup_usergroup_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public.usergroup ALTER COLUMN usergroup_id ADD GENERATED ALWAYS AS IDENTITY (
@@ -862,7 +931,7 @@ ALTER TABLE public.usergroup ALTER COLUMN usergroup_id ADD GENERATED ALWAYS AS I
 
 
 --
--- Name: v_crops; Type: VIEW; Schema: public; Owner: -
+-- Name: v_crops; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_crops AS
@@ -877,8 +946,10 @@ CREATE VIEW public.v_crops AS
      JOIN public.crop_types ct ON (((c.crop_type)::text = (ct.crop_type)::text)));
 
 
+ALTER TABLE public.v_crops OWNER TO postgres;
+
 --
--- Name: v_fishers; Type: VIEW; Schema: public; Owner: -
+-- Name: v_fishers; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_fishers AS
@@ -919,14 +990,18 @@ CREATE VIEW public.v_fishers AS
     i.ica_link,
     f.new_ica_required,
     f.followup_flag,
-    ph.pah AS linked_pah
+    ph.pah AS linked_pah,
+    f.lr_fishfarming,
+    f.lr_goatrearing
    FROM ((public.fishers f
      JOIN public.person ph ON ((f.person_id = ph.person_id)))
      LEFT JOIN public.icas i ON ((((f.nhs)::text = (i.nhs)::text) AND (i.is_current = true))));
 
 
+ALTER TABLE public.v_fishers OWNER TO postgres;
+
 --
--- Name: v_land_assets; Type: VIEW; Schema: public; Owner: -
+-- Name: v_land_assets; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_land_assets AS
@@ -963,8 +1038,10 @@ CREATE VIEW public.v_land_assets AS
      JOIN public.land_parcels lp ON (((la.land_parcel_id)::text = (lp.land_parcel_id)::text)));
 
 
+ALTER TABLE public.v_land_assets OWNER TO postgres;
+
 --
--- Name: v_households_land_assets; Type: VIEW; Schema: public; Owner: -
+-- Name: v_households_land_assets; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_households_land_assets AS
@@ -987,8 +1064,10 @@ CREATE VIEW public.v_households_land_assets AS
   GROUP BY lp.pah;
 
 
+ALTER TABLE public.v_households_land_assets OWNER TO postgres;
+
 --
--- Name: v_replacement_structures; Type: VIEW; Schema: public; Owner: -
+-- Name: v_replacement_structures; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_replacement_structures AS
@@ -1012,8 +1091,10 @@ CREATE VIEW public.v_replacement_structures AS
      LEFT JOIN public.structures s ON (((rs.structure_id)::text = (s.structure_id)::text)));
 
 
+ALTER TABLE public.v_replacement_structures OWNER TO postgres;
+
 --
--- Name: v_structures; Type: VIEW; Schema: public; Owner: -
+-- Name: v_structures; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_structures AS
@@ -1069,8 +1150,10 @@ CREATE VIEW public.v_structures AS
      LEFT JOIN public.v_replacement_structures rs ON (((s.replacement_structure_id)::text = (rs.replacement_structure_id)::text)));
 
 
+ALTER TABLE public.v_structures OWNER TO postgres;
+
 --
--- Name: v_trees; Type: VIEW; Schema: public; Owner: -
+-- Name: v_trees; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_trees AS
@@ -1096,8 +1179,10 @@ CREATE VIEW public.v_trees AS
      JOIN public.tree_types tt ON (((t.tree_type)::text = (tt.tree_type)::text)));
 
 
+ALTER TABLE public.v_trees OWNER TO postgres;
+
 --
--- Name: v_trees_summary; Type: VIEW; Schema: public; Owner: -
+-- Name: v_trees_summary; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_trees_summary AS
@@ -1111,8 +1196,10 @@ CREATE VIEW public.v_trees_summary AS
   GROUP BY t.pah, t.tree_type;
 
 
+ALTER TABLE public.v_trees_summary OWNER TO postgres;
+
 --
--- Name: villages; Type: TABLE; Schema: public; Owner: -
+-- Name: villages; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.villages (
@@ -1121,8 +1208,10 @@ CREATE TABLE public.villages (
 );
 
 
+ALTER TABLE public.villages OWNER TO postgres;
+
 --
--- Name: v_households; Type: VIEW; Schema: public; Owner: -
+-- Name: v_households; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_households AS
@@ -1226,8 +1315,10 @@ CREATE VIEW public.v_households AS
      LEFT JOIN public.icas i ON ((((h.pah)::text = (i.pah)::text) AND (i.is_current = true))));
 
 
+ALTER TABLE public.v_households OWNER TO postgres;
+
 --
--- Name: v_household_compensation; Type: VIEW; Schema: public; Owner: -
+-- Name: v_household_compensation; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_household_compensation AS
@@ -1243,8 +1334,10 @@ CREATE VIEW public.v_household_compensation AS
    FROM public.v_households;
 
 
+ALTER TABLE public.v_household_compensation OWNER TO postgres;
+
 --
--- Name: v_land_assets_gis; Type: VIEW; Schema: public; Owner: -
+-- Name: v_land_assets_gis; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_land_assets_gis AS
@@ -1266,8 +1359,10 @@ CREATE VIEW public.v_land_assets_gis AS
      JOIN public.land_parcels lp ON (((la.land_parcel_id)::text = (lp.land_parcel_id)::text)));
 
 
+ALTER TABLE public.v_land_assets_gis OWNER TO postgres;
+
 --
--- Name: v_land_parcels; Type: VIEW; Schema: public; Owner: -
+-- Name: v_land_parcels; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_land_parcels AS
@@ -1298,8 +1393,10 @@ CREATE VIEW public.v_land_parcels AS
      JOIN public.villages v ON ((h.village_id = v.village_id)));
 
 
+ALTER TABLE public.v_land_parcels OWNER TO postgres;
+
 --
--- Name: v_land_parcels_gis; Type: VIEW; Schema: public; Owner: -
+-- Name: v_land_parcels_gis; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_land_parcels_gis AS
@@ -1314,8 +1411,10 @@ CREATE VIEW public.v_land_parcels_gis AS
      JOIN public.land_parcels_geom lpg ON (((lp.land_parcel_id)::text = (lpg.land_parcel_id)::text)));
 
 
+ALTER TABLE public.v_land_parcels_gis OWNER TO postgres;
+
 --
--- Name: v_notes; Type: VIEW; Schema: public; Owner: -
+-- Name: v_notes; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_notes AS
@@ -1330,8 +1429,10 @@ CREATE VIEW public.v_notes AS
      LEFT JOIN public."user" u ON ((u.user_id = n.user_id)));
 
 
+ALTER TABLE public.v_notes OWNER TO postgres;
+
 --
--- Name: v_person; Type: VIEW; Schema: public; Owner: -
+-- Name: v_person; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_person AS
@@ -1369,8 +1470,10 @@ CREATE VIEW public.v_person AS
      LEFT JOIN public.villages v ON ((p.village_id = v.village_id)));
 
 
+ALTER TABLE public.v_person OWNER TO postgres;
+
 --
--- Name: v_structures_gis; Type: VIEW; Schema: public; Owner: -
+-- Name: v_structures_gis; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_structures_gis AS
@@ -1389,8 +1492,10 @@ CREATE VIEW public.v_structures_gis AS
      JOIN public.structures_geom sg ON (((s.structure_id)::text = (sg.structure_id)::text)));
 
 
+ALTER TABLE public.v_structures_gis OWNER TO postgres;
+
 --
--- Name: v_user; Type: VIEW; Schema: public; Owner: -
+-- Name: v_user; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_user AS
@@ -1409,8 +1514,10 @@ CREATE VIEW public.v_user AS
    FROM public."user" u;
 
 
+ALTER TABLE public.v_user OWNER TO postgres;
+
 --
--- Name: v_usergroup_user; Type: VIEW; Schema: public; Owner: -
+-- Name: v_usergroup_user; Type: VIEW; Schema: public; Owner: postgres
 --
 
 CREATE VIEW public.v_usergroup_user AS
@@ -1421,8 +1528,10 @@ CREATE VIEW public.v_usergroup_user AS
      JOIN public.usergroup ug ON ((ugu.usergroup_id = ug.usergroup_id)));
 
 
+ALTER TABLE public.v_usergroup_user OWNER TO postgres;
+
 --
--- Name: villages_village_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: villages_village_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 ALTER TABLE public.villages ALTER COLUMN village_id ADD GENERATED ALWAYS AS IDENTITY (
@@ -1436,7 +1545,7 @@ ALTER TABLE public.villages ALTER COLUMN village_id ADD GENERATED ALWAYS AS IDEN
 
 
 --
--- Name: zones; Type: TABLE; Schema: public; Owner: -
+-- Name: zones; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.zones (
@@ -1448,29 +1557,31 @@ CREATE TABLE public.zones (
 );
 
 
+ALTER TABLE public.zones OWNER TO postgres;
+
 --
--- Name: impact_zones id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: impact_zones id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.impact_zones ALTER COLUMN id SET DEFAULT nextval('public.impact_zones_id_seq'::regclass);
 
 
 --
--- Name: land_parcels_geom id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: land_parcels_geom id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.land_parcels_geom ALTER COLUMN id SET DEFAULT nextval('public.land_parcels_geom_id_seq'::regclass);
 
 
 --
--- Name: structures_geom id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: structures_geom id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.structures_geom ALTER COLUMN id SET DEFAULT nextval('public.structures_geom_id_seq'::regclass);
 
 
 --
--- Name: crop_types crop_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: crop_types crop_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.crop_types
@@ -1478,7 +1589,7 @@ ALTER TABLE ONLY public.crop_types
 
 
 --
--- Name: crops crops_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: crops crops_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.crops
@@ -1486,7 +1597,7 @@ ALTER TABLE ONLY public.crops
 
 
 --
--- Name: fishers fishers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: fishers fishers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.fishers
@@ -1494,7 +1605,7 @@ ALTER TABLE ONLY public.fishers
 
 
 --
--- Name: grievances grievances_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: grievances grievances_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.grievances
@@ -1502,7 +1613,7 @@ ALTER TABLE ONLY public.grievances
 
 
 --
--- Name: households households_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: households households_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.households
@@ -1510,7 +1621,7 @@ ALTER TABLE ONLY public.households
 
 
 --
--- Name: icas icas_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: icas icas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.icas
@@ -1518,7 +1629,7 @@ ALTER TABLE ONLY public.icas
 
 
 --
--- Name: impact_zones impact_zones_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: impact_zones impact_zones_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.impact_zones
@@ -1526,7 +1637,7 @@ ALTER TABLE ONLY public.impact_zones
 
 
 --
--- Name: land_assets_geom land_assets_geom_pkey1; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: land_assets_geom land_assets_geom_pkey1; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.land_assets_geom
@@ -1534,7 +1645,7 @@ ALTER TABLE ONLY public.land_assets_geom
 
 
 --
--- Name: land_assets land_assets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: land_assets land_assets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.land_assets
@@ -1542,7 +1653,7 @@ ALTER TABLE ONLY public.land_assets
 
 
 --
--- Name: land_parcels_geom land_parcels_geom_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: land_parcels_geom land_parcels_geom_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.land_parcels_geom
@@ -1550,7 +1661,7 @@ ALTER TABLE ONLY public.land_parcels_geom
 
 
 --
--- Name: land_parcels land_parcels_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: land_parcels land_parcels_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.land_parcels
@@ -1558,7 +1669,7 @@ ALTER TABLE ONLY public.land_parcels
 
 
 --
--- Name: notes notes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: notes notes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.notes
@@ -1566,7 +1677,7 @@ ALTER TABLE ONLY public.notes
 
 
 --
--- Name: person person_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: person person_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.person
@@ -1574,7 +1685,7 @@ ALTER TABLE ONLY public.person
 
 
 --
--- Name: replacement_structure_types replacement_structure_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: replacement_structure_types replacement_structure_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.replacement_structure_types
@@ -1582,7 +1693,7 @@ ALTER TABLE ONLY public.replacement_structure_types
 
 
 --
--- Name: replacement_structures replacement_structures_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: replacement_structures replacement_structures_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.replacement_structures
@@ -1590,7 +1701,7 @@ ALTER TABLE ONLY public.replacement_structures
 
 
 --
--- Name: structures_geom structures_geom_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: structures_geom structures_geom_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.structures_geom
@@ -1598,7 +1709,7 @@ ALTER TABLE ONLY public.structures_geom
 
 
 --
--- Name: structures structures_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: structures structures_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.structures
@@ -1606,7 +1717,7 @@ ALTER TABLE ONLY public.structures
 
 
 --
--- Name: tree_types tree_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: tree_types tree_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.tree_types
@@ -1614,7 +1725,7 @@ ALTER TABLE ONLY public.tree_types
 
 
 --
--- Name: trees trees_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: trees trees_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.trees
@@ -1622,7 +1733,7 @@ ALTER TABLE ONLY public.trees
 
 
 --
--- Name: user_login user_login_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_login user_login_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.user_login
@@ -1630,7 +1741,7 @@ ALTER TABLE ONLY public.user_login
 
 
 --
--- Name: user_pageview user_pageview_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user_pageview user_pageview_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.user_pageview
@@ -1638,7 +1749,7 @@ ALTER TABLE ONLY public.user_pageview
 
 
 --
--- Name: user user_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: user user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public."user"
@@ -1646,7 +1757,7 @@ ALTER TABLE ONLY public."user"
 
 
 --
--- Name: usergroup usergroup_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: usergroup usergroup_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.usergroup
@@ -1654,7 +1765,7 @@ ALTER TABLE ONLY public.usergroup
 
 
 --
--- Name: usergroup_user usergroup_user_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: usergroup_user usergroup_user_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.usergroup_user
@@ -1662,7 +1773,7 @@ ALTER TABLE ONLY public.usergroup_user
 
 
 --
--- Name: villages villages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: villages villages_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.villages
@@ -1670,7 +1781,7 @@ ALTER TABLE ONLY public.villages
 
 
 --
--- Name: zones zones_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: zones zones_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.zones
@@ -1678,77 +1789,77 @@ ALTER TABLE ONLY public.zones
 
 
 --
--- Name: indx_ crops_pah; Type: INDEX; Schema: public; Owner: -
+-- Name: indx_ crops_pah; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX "indx_ crops_pah" ON public.crops USING btree (pah) WITH (deduplicate_items='true');
 
 
 --
--- Name: indx_land_assets_parcel; Type: INDEX; Schema: public; Owner: -
+-- Name: indx_land_assets_parcel; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX indx_land_assets_parcel ON public.land_assets USING btree (land_parcel_id) WITH (deduplicate_items='true');
 
 
 --
--- Name: indx_land_parcels_pah; Type: INDEX; Schema: public; Owner: -
+-- Name: indx_land_parcels_pah; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX indx_land_parcels_pah ON public.land_parcels USING btree (pah) WITH (deduplicate_items='true');
 
 
 --
--- Name: indx_structs_pah; Type: INDEX; Schema: public; Owner: -
+-- Name: indx_structs_pah; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX indx_structs_pah ON public.structures USING btree (pah) WITH (deduplicate_items='true');
 
 
 --
--- Name: indx_trees; Type: INDEX; Schema: public; Owner: -
+-- Name: indx_trees; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX indx_trees ON public.trees USING btree (pah) WITH (deduplicate_items='true');
 
 
 --
--- Name: sidx_impact_zones_geom; Type: INDEX; Schema: public; Owner: -
+-- Name: sidx_impact_zones_geom; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX sidx_impact_zones_geom ON public.impact_zones USING gist (geom);
 
 
 --
--- Name: sidx_land_assets_geom_geom; Type: INDEX; Schema: public; Owner: -
+-- Name: sidx_land_assets_geom_geom; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX sidx_land_assets_geom_geom ON public.land_assets_geom USING gist (geom);
 
 
 --
--- Name: sidx_land_parcels_geom_geom; Type: INDEX; Schema: public; Owner: -
+-- Name: sidx_land_parcels_geom_geom; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX sidx_land_parcels_geom_geom ON public.land_parcels_geom USING gist (geom);
 
 
 --
--- Name: sidx_structures_geom_geom; Type: INDEX; Schema: public; Owner: -
+-- Name: sidx_structures_geom_geom; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX sidx_structures_geom_geom ON public.structures_geom USING gist (geom);
 
 
 --
--- Name: sidx_zones_geom; Type: INDEX; Schema: public; Owner: -
+-- Name: sidx_zones_geom; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX sidx_zones_geom ON public.zones USING gist (geom);
 
 
 --
--- Name: fishers fishers_person_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fishers fishers_person_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.fishers
@@ -1756,7 +1867,7 @@ ALTER TABLE ONLY public.fishers
 
 
 --
--- Name: grievances grievances_nhs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: grievances grievances_nhs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.grievances
@@ -1764,7 +1875,7 @@ ALTER TABLE ONLY public.grievances
 
 
 --
--- Name: grievances grievances_pah_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: grievances grievances_pah_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.grievances
@@ -1772,7 +1883,7 @@ ALTER TABLE ONLY public.grievances
 
 
 --
--- Name: grievances grievances_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: grievances grievances_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.grievances
@@ -1780,7 +1891,7 @@ ALTER TABLE ONLY public.grievances
 
 
 --
--- Name: icas icas_nhs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: icas icas_nhs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.icas
@@ -1788,7 +1899,7 @@ ALTER TABLE ONLY public.icas
 
 
 --
--- Name: icas icas_pah_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: icas icas_pah_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.icas
@@ -1796,7 +1907,7 @@ ALTER TABLE ONLY public.icas
 
 
 --
--- Name: notes notes_nhs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: notes notes_nhs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.notes

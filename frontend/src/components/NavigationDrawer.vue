@@ -41,6 +41,11 @@ const handleFishersClick = () => {
   emit('close-drawer')
 }
 
+const handlePeopleClick = () => {
+  router.push('/people')
+  emit('close-drawer')
+}
+
 const handleLivelihoodRestorationClick = () => {
   router.push('/livelihood-restoration')
   emit('close-drawer')
@@ -90,6 +95,11 @@ const handleLogout = () => {
         prepend-icon="mdi-fish"
         title="Fishers"
         @click="handleFishersClick"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-account"
+        title="People"
+        @click="handlePeopleClick"
       ></v-list-item>
       <v-list-item
         prepend-icon="mdi-sprout"

@@ -1,16 +1,16 @@
 <script setup>
 import { computed, inject, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import TopBar from '@/components/TopBar.vue'
 import Notes from '@/components/Notes.vue'
 import Grievances from '@/components/Grievances.vue'
 import Icas from '@/components/Icas.vue'
 import PersonView from '@/components/PersonView.vue'
 import { formatCurrency, formatYesNo, formatDateTime } from '@/utils/formatters'
-import FishersSearch from './FishersSearch.vue'
 
 const axiosSecure = inject('axiosSecure')
 const route = useRoute()
+const router = useRouter()
 
 const fisher = ref(null)
 const loading = ref(false)
@@ -49,7 +49,9 @@ const load = async () => {
   }
 }
 
-
+const goBack = () => {
+  router.back()
+}
 
 const getSafeExternalUrl = (value) => {
   if (!value) return null

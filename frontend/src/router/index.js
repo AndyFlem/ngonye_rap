@@ -11,6 +11,9 @@ import UserList from '@/views/UserList.vue'
 import UserForm from '@/views/UserForm.vue'
 import FishersSearch from '@/views/FishersSearch.vue'
 import FishersDetails from '@/views/FishersDetails.vue'
+import PeopleSearch from '@/views/PeopleSearch.vue'
+import PersonDetails from '@/views/PersonDetails.vue'
+import PersonForm from '@/views/PersonForm.vue'
 import LivelihoodRestoration from '@/views/LivelihoodRestoration.vue'
 
 const routes = [
@@ -80,6 +83,24 @@ const routes = [
     path: '/fishers/:nhs',
     name: 'FishersDetails',
     component: FishersDetails,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/people',
+    name: 'People',
+    component: PeopleSearch,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/people/:person_id',
+    name: 'PersonDetails',
+    component: PersonDetails,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/people/:person_id/edit',
+    name: 'PersonEdit',
+    component: PersonForm,
     meta: { requiresAuth: true }
   },
   {

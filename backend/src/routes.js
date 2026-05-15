@@ -34,6 +34,9 @@ module.exports = (app) => {
   app.get(prefix + '/summary', RAPController.summary)
 
   // PEOPLE
+  app.post(prefix + '/people_search', PersonController.search)
+  app.post(prefix + '/people_export', PersonController.exportSearch)
+  app.get(prefix + '/people/field-values', PersonController.fieldValues)
   app.get(prefix + '/person/:person_id', PersonController.show)
   app.patch(prefix + '/person/:person_id', PersonController.update)
   app.put(prefix + '/person/:person_id/reverse-name', PersonController.reverseName)

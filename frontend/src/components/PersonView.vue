@@ -132,7 +132,7 @@ async function saveNrc () {
 
     <!-- Fullname -->
     <v-col cols="12">
-      <b>{{ title }}</b>&nbsp;({{ person.person_id }})&nbsp;{{ person.fullname }}
+      <b>{{ title }}</b><router-link :to="`/people/${person.person_id}`">{{ person.fullname }}</router-link>
       <v-btn v-if="!readonly" size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-swap-horizontal" :loading="reversing" @click="reverseName"
         style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
       <v-btn v-if="!readonly" size="x-small" class="ml-1 text-grey" variant="text" :icon="editingName ? 'mdi-pencil-off' : 'mdi-pencil'"

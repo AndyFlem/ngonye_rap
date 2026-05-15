@@ -379,7 +379,7 @@ onMounted(async () => {
                     :href="getSafeExternalUrl(pah.ica_link)"
                     prepend-icon="mdi-open-in-new"
                     variant="text"
-                    size="x-small"
+                    size="small"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="ml-2"
@@ -868,7 +868,21 @@ onMounted(async () => {
               <v-window-item value="survey">
                 <v-row>
                   <v-col cols="12">
+                    <div>
+                      <v-btn
+                        v-if="getSafeExternalUrl(pah_survey.survey_link)"
+                        :href="getSafeExternalUrl(pah_survey.survey_link)"
+                        prepend-icon="mdi-file-document-outline"
+                        variant="text"
+                        size="small"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class=""
+                      >Open Survey Form</v-btn>
+                    </div>
+                    <div>
                     Survey location: <MapLink :lat="pah_survey.lat" :lon="pah_survey.lon" />
+                    </div>
                   </v-col>
                 </v-row>
                 <v-table density="compact" class="mb-4" v-if="members.length">
