@@ -6,6 +6,7 @@ export default {
     const securedInstance = securedAxiosInstance(options)
 
     app.provide('axiosSecure', securedInstance)
+    app.provide('baseUrlStatic', options.config.baseUrlStatic)
     app.axios = {}
     app.axios.http = securedInstance
 

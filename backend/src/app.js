@@ -49,6 +49,7 @@ app.use(bodyParser.json())
 app.use(fileUpload())
 
 app.use(express.static('public'))
+app.use('/static', express.static(path.join(__dirname, '../static')))
 
 app.use((req, res, next) => {
   let dString = req.method + ' ' + req.baseUrl + req.path

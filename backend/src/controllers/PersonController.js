@@ -48,6 +48,7 @@ function buildSearchParams (defn) {
   if (defn.is_head        !== undefined && defn.is_head        !== null) params.push(`p_is_head=> ${defn.is_head}`)
   if (defn.is_cosignatory !== undefined && defn.is_cosignatory !== null) params.push(`p_is_cosignatory=> ${defn.is_cosignatory}`)
   if (defn.is_disabled    !== undefined && defn.is_disabled    !== null) params.push(`p_is_disabled=> ${defn.is_disabled}`)
+  if (defn.has_photo      !== undefined && defn.has_photo      !== null) params.push(`p_has_photo=> ${defn.has_photo}`)
   return params
 }
 

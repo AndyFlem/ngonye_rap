@@ -15,7 +15,8 @@ const defaultParams = () => ({
   is_fisher: null,
   is_head: null,
   is_cosignatory: null,
-  is_disabled: null
+  is_disabled: null,
+  has_photo: null
 })
 
 const axiosSecure = inject('axiosSecure')
@@ -84,7 +85,8 @@ const autoSearchFields = [
   () => search.value.params.is_fisher,
   () => search.value.params.is_head,
   () => search.value.params.is_cosignatory,
-  () => search.value.params.is_disabled
+  () => search.value.params.is_disabled,
+  () => search.value.params.has_photo
 ]
 
 watch(autoSearchFields, () => {
@@ -205,6 +207,18 @@ onMounted(() => {
                   <v-btn
                     icon="mdi-close-circle" color="grey" size="x-small"
                     variant="text" @click="search.params.is_disabled = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
+                  <v-checkbox
+                    v-model="search.params.has_photo"
+                    label="Has photo" hide-details
+                    :indeterminate="search.params.has_photo === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle" color="grey" size="x-small"
+                    variant="text" @click="search.params.has_photo = null"
                   />
                 </div>
               </v-col>

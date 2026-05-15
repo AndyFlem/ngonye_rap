@@ -4,7 +4,9 @@ import { useRoute, useRouter } from 'vue-router'
 import TopBar from '@/components/TopBar.vue'
 
 
+
 const axiosSecure = inject('axiosSecure')
+const baseUrlStatic = inject('baseUrlStatic')
 const route = useRoute()
 const router = useRouter()
 
@@ -27,6 +29,10 @@ const load = async () => {
     loading.value = false
   }
 }
+
+const photoUrl = computed(() =>
+  person.value?.photo_file ? `${baseUrlStatic}static/hhh_photos/${person.value.photo_file}` : null
+)
 
 const personRef = computed(() => {
   const id = route.params.person_id
@@ -59,7 +65,7 @@ onMounted(load)
 
           <v-card-text v-if="person">
             <v-row>
-              <v-col cols="12" md="6" class="mt-2">
+              <v-col cols="12" md="4" class="mt-2">
                 <div><b>Id: </b>{{ personRef }}</div>
                 <div><b>Name: </b>{{ person.fullname }}</div>
                 <div><strong>Gender:</strong> <span class="ml-1">{{ person.gender || '—' }}</span></div>
@@ -68,7 +74,8 @@ onMounted(load)
                 <div><strong>NRC:</strong> <span class="ml-1">{{ person.nrc || '—' }}</span></div>
               </v-col>
 
-              <v-col cols="12" md="6" class="mt-2">
+              <v-col cols="12" md="4" class="mt-2">
+                
 
                 <div><strong>Year of Birth:</strong> <span class="ml-1">{{ person.year_of_birth || '—' }}</span></div>
                 <div><strong>Village:</strong> <span class="ml-1">{{ person.village || '—' }}</span></div>
@@ -77,7 +84,11 @@ onMounted(load)
                 <div><strong>District:</strong> <span class="ml-1">{{ person.district || '—' }}</span></div>
                 <div><strong>Origin:</strong> <span class="ml-1">{{ person.origin || '—' }}</span></div>
               </v-col>
-
+              <v-col cols="12" md="4">
+                <v-img v-if="photoUrl" :src="photoUrl" max-height="220" max-width="180" cover class="rounded mb-3" />
+              </v-col>
+            </v-row>
+            <v-row>
               <v-col cols="12" md="6">
                 <v-table density="compact" class="mb-3">
                   <thead>
