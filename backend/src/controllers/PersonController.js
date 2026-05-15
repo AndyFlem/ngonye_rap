@@ -103,6 +103,10 @@ module.exports = {
     for (const key of allowed) {
       if (key in req.body) fields[key] = req.body[key]
     }
+    console.log(fields.year_of_birth, parseInt(fields.year_of_birth), isNaN(parseInt(fields.year_of_birth)))
+    if (fields.year_of_birth !== undefined && isNaN(parseInt(fields.year_of_birth))) {
+      fields.year_of_birth=null
+    }
 
     if (Object.keys(fields).length === 0) {
       return res.status(400).send({ error: 'no valid fields provided' })
