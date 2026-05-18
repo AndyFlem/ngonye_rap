@@ -23,6 +23,11 @@ const saveError = ref('')
 const togglingId = ref(null)
 const deletingId = ref(null)
 
+const editingGrievanceId = ref(null)
+const draftEditRef = ref('')
+const draftEditLink = ref('')
+const savingEdit = ref(false)
+
 const grievancesUrl = computed(() =>
   props.nhs
     ? `/fishers/${encodeURIComponent(props.nhs)}/grievances`
@@ -96,6 +101,28 @@ async function deleteGrievance (grievance) {
   }
 }
 
+function startEditGrievance (g) {
+  editingGrievanceId.value = g.grievance_id
+  draftEditRef.value = g.grievance_ref ?? ''
+  draftEditLink.value = g.grievance_link ?? ''
+}
+
+async function saveEditGrievance (g) {
+  savingEdit.value = true
+  try {
+    await axiosSecure.patch(`/grievances/${g.grievance_id}`, {
+      grievance_ref: draftEditRef.value.trim() || null,
+      grievance_link: draftEditLink.value.trim() || null
+    })
+    editingGrievanceId.value = null
+    await loadGrievances()
+  } catch (err) {
+    console.error('Failed to update grievance:', err)
+  } finally {
+    savingEdit.value = false
+  }
+}
+
 const getSafeUrl = (value) => {
   if (!value) return null
   const url = String(value).trim()
@@ -132,14 +159,38 @@ defineExpose({ loadGrievances })
         </thead>
         <tbody>
           <tr v-for="g in grievances" :key="g.grievance_id">
-            <td class="table-value left" style="white-space: nowrap;">{{ g.grievance_ref || '—' }}</td>
+            <td class="table-value left" style="white-space: nowrap;">
+              <template v-if="editingGrievanceId !== g.grievance_id">
+                <span>{{ g.grievance_ref || '—' }}</span>
+                <v-btn size="x-small" variant="text" icon="mdi-pencil" class="ml-1 text-grey"
+                  style="height:1em;width:1em;min-height:unset;min-width:unset"
+                  @click="startEditGrievance(g)" />
+              </template>
+              <template v-else>
+                <v-text-field v-model="draftEditRef" density="compact" hide-details
+                  variant="underlined" style="max-width:140px" placeholder="e.g. GRV-001" />
+              </template>
+            </td>
             <td class="table-value left">
-              <span v-if="g.grievance_link">{{ decodeURIComponent(g.grievance_link.split('/').pop().split('?')[0]) }}</span>
-              <span v-else>—</span>
-              <v-btn v-if="getSafeUrl(g.grievance_link)"
-                :href="getSafeUrl(g.grievance_link)"
-                size="x-small" variant="text" icon="mdi-open-in-new"
-                target="_blank" rel="noopener noreferrer" class="ml-1" />
+              <template v-if="editingGrievanceId !== g.grievance_id">
+                <span v-if="g.grievance_link">{{ decodeURIComponent(g.grievance_link.split('/').pop().split('?')[0]) }}</span>
+                <span v-else>—</span>
+                <v-btn size="x-small" variant="text" icon="mdi-pencil" class="ml-1 text-grey"
+                  style="height:1em;width:1em;min-height:unset;min-width:unset"
+                  @click="startEditGrievance(g)" />
+                <v-btn v-if="getSafeUrl(g.grievance_link)"
+                  :href="getSafeUrl(g.grievance_link)"
+                  size="x-small" variant="text" icon="mdi-open-in-new"
+                  target="_blank" rel="noopener noreferrer" class="ml-1" />
+              </template>
+              <template v-else>
+                <v-text-field v-model="draftEditLink" density="compact" hide-details
+                  variant="underlined" style="max-width:320px" placeholder="https://..." />
+                <v-btn size="x-small" variant="text" icon="mdi-check" class="ml-1 text-grey"
+                  :loading="savingEdit" @click="saveEditGrievance(g)" />
+                <v-btn size="x-small" variant="text" icon="mdi-close" class="ml-1 text-grey"
+                  @click="editingGrievanceId = null" />
+              </template>
             </td>
             <td style="white-space: nowrap;">
               <v-chip v-if="g.is_current" size="x-small" color="green">Current</v-chip>
