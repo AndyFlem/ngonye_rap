@@ -13,6 +13,10 @@ const router = useRouter()
 const person = ref(null)
 const loading = ref(false)
 const error = ref('')
+const mergePersonId = ref('')
+const merging = ref(false)
+const mergeDialog = ref(false)
+const mergeError = ref('')
 
 const personId = computed(() => String(route.params.person_id || '').trim())
 
@@ -39,6 +43,24 @@ const personRef = computed(() => {
   return id ? `PER${String(id).padStart(4, '0')}` : 'PER0000'
 })
 
+async function mergePerson () {
+  merging.value = true
+  mergeError.value = ''
+  try {
+    await axiosSecure.post('/people/merge', {
+      person1_id: Number(personId.value),
+      person2_id: Number(mergePersonId.value)
+    })
+    mergeDialog.value = false
+    router.go(0) // Refresh the page to show updated details
+  } catch (err) {
+    console.error('Failed to merge person:', err)
+    mergeError.value = err.response?.data?.error || 'An error occurred while merging.'
+  } finally {
+    merging.value = false
+  }
+}
+
 onMounted(load)
 </script>
 
@@ -50,7 +72,9 @@ onMounted(load)
         <v-alert v-if="error" type="error" variant="tonal" class="mb-4">{{ error }}</v-alert>
         <v-card elevation="1">
           <v-card-title class="d-flex">
-            <span v-if="person">{{ person.fullname }}</span>
+            <template v-if="person">
+              {{ person.fullname }}<span v-if="person && person.deceased_date">&nbsp;(deceased: {{ person.deceased_date }})</span>
+            </template>
             <span v-else>Person {{ personRef }}</span>
             <v-spacer />
             <template v-if="person">
@@ -75,9 +99,8 @@ onMounted(load)
               </v-col>
 
               <v-col cols="12" md="4" class="mt-2">
-                
-
-                <div><strong>Year of Birth:</strong> <span class="ml-1">{{ person.year_of_birth || '—' }}</span></div>
+                <div><strong>Year of Birth:</strong> <span class="ml-1">{{ person.year_of_birth || '—' }} <span v-if="person.year_of_birth">({{ new Date().getFullYear() - person.year_of_birth }})</span></span></div>
+                <div v-if="person.deceased_date"><strong>Date of death:</strong> <span class="ml-1">{{ person.deceased_date }}</span></div>
                 <div><strong>Village:</strong> <span class="ml-1">{{ person.village || '—' }}</span></div>
                 <div><strong>Relationship:</strong> <span class="ml-1">{{ person.relationship || '—' }}</span></div>
                 <div><strong>Marital Status:</strong> <span class="ml-1">{{ person.marital_status || '—' }}</span></div>
@@ -163,12 +186,48 @@ onMounted(load)
           </v-card-text>
 
           <v-card-actions>
-            <v-btn @click="router.push('/people')">Back to People</v-btn>
-            <v-spacer />
-            <v-btn color="primary" variant="tonal" :disabled="!person" @click="router.push(`/people/${personId}/edit`)">Edit</v-btn>
+            <v-container>
+            <v-row>
+              <v-col cols="12" class="d-flex">
+                <v-text-field
+                  v-model="mergePersonId"
+                  label="Merge with Person ID"
+                  density="compact"
+                  hide-details
+                  variant="outlined"
+                  type="number"
+                  style="max-width: 380px"
+                  class="mr-2 text-red"
+                />
+                <v-btn color="error" variant="tonal" :disabled="!mergePersonId || !person" @click="mergeDialog = true">Merge</v-btn>
+              </v-col>
+            </v-row>
+            <v-row >
+              <v-col cols="12" class="d-flex">  
+                <v-btn @click="router.push('/people')">Back to People</v-btn>
+                <v-spacer />
+                <v-btn color="primary" variant="tonal" :disabled="!person" @click="router.push(`/people/${personId}/edit`)">Edit</v-btn>
+              </v-col>
+            </v-row>
+            </v-container>
           </v-card-actions>
         </v-card>
       </v-container>
     </v-main>
   </div>
+
+  <v-dialog v-model="mergeDialog" max-width="420">
+    <v-card>
+      <v-card-title>Confirm Merge</v-card-title>
+      <v-card-text>
+        Person {{ mergePersonId }} will be merged into {{ personRef }} and then deleted. This cannot be undone.
+        <v-alert v-if="mergeError" type="error" variant="tonal" class="mt-3">{{ mergeError }}</v-alert>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="mergeDialog = false; mergeError = ''">Cancel</v-btn>
+        <v-spacer />
+        <v-btn color="error" :loading="merging" @click="mergePerson">Confirm Merge</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>

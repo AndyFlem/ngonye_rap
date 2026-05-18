@@ -36,6 +36,7 @@ module.exports = (app) => {
   // PEOPLE
   app.post(prefix + '/people_search', PersonController.search)
   app.post(prefix + '/people_export', PersonController.exportSearch)
+  app.post(prefix + '/people/merge', PersonController.mergePeople)
   app.get(prefix + '/people/field-values', PersonController.fieldValues)
   app.get(prefix + '/person/:person_id', PersonController.show)
   app.patch(prefix + '/person/:person_id', PersonController.update)

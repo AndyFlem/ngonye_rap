@@ -49,6 +49,7 @@ function buildSearchParams (defn) {
   if (defn.is_cosignatory !== undefined && defn.is_cosignatory !== null) params.push(`p_is_cosignatory=> ${defn.is_cosignatory}`)
   if (defn.is_disabled    !== undefined && defn.is_disabled    !== null) params.push(`p_is_disabled=> ${defn.is_disabled}`)
   if (defn.has_photo      !== undefined && defn.has_photo      !== null) params.push(`p_has_photo=> ${defn.has_photo}`)
+  if (defn.is_deceased    !== undefined && defn.is_deceased    !== null) params.push(`p_is_deceased=> ${defn.is_deceased}`)
   return params
 }
 
@@ -97,15 +98,18 @@ module.exports = {
       'gender', 'contact', 'contact2', 'nrc',
       'year_of_birth', 'village_id', 'relationship', 'marital_status', 'district', 'origin',
       'primary_occupation', 'secondary_occupation', 'primary_skill', 'secondary_skill',
-      'residential_status', 'education', 'disabilities', 'disabled'
+      'residential_status', 'education', 'disabilities', 'disabled', 'deceased_date'
     ]
     const fields = {}
     for (const key of allowed) {
       if (key in req.body) fields[key] = req.body[key]
     }
-    console.log(fields.year_of_birth, parseInt(fields.year_of_birth), isNaN(parseInt(fields.year_of_birth)))
+
     if (fields.year_of_birth !== undefined && isNaN(parseInt(fields.year_of_birth))) {
-      fields.year_of_birth=null
+      fields.year_of_birth = null
+    }
+    if (fields.deceased_date !== undefined && fields.deceased_date === '') {
+      fields.deceased_date = null
     }
 
     if (Object.keys(fields).length === 0) {
@@ -187,6 +191,70 @@ module.exports = {
     } catch (err) {
       Common.error(req, 'show', err)
       return res.status(500).send({ error: 'an error has occurred trying to fetch person: ' + err })
+    }
+  },
+
+  async mergePeople (req, res) {
+    Common.debug(req, 'mergePeople')
+    const { person1_id, person2_id } = req.body
+
+    if (!person1_id || !person2_id) {
+      return res.status(400).send({ error: 'person1_id and person2_id are required' })
+    }
+    if (Number(person1_id) === Number(person2_id)) {
+      return res.status(400).send({ error: 'person1_id and person2_id must be different' })
+    }
+
+    try {
+      const [p1, p2] = await Promise.all([
+        Knex('person').where({ person_id: person1_id }).first(),
+        Knex('person').where({ person_id: person2_id }).first()
+      ])
+
+      if (!p1) return res.status(404).send({ error: 'person 1 not found' })
+      if (!p2) return res.status(404).send({ error: 'person 2 not found' })
+
+      await Knex.transaction(async (trx) => {
+        if (p2.pah) {
+          if (p2.household_head) {
+            await trx('households').where({ pah: p2.pah }).update({ householdhead_id: person1_id })
+            await trx('person').where({ person_id: person1_id }).update({ household_head: true })
+          }
+          if (p2.cosignatory) {
+            await trx('households').where({ pah: p2.pah }).update({ cosignatory_id: person1_id })
+            await trx('person').where({ person_id: person1_id }).update({ cosignatory: true })
+          }
+          await trx('person').where({ person_id: person1_id }).update({ pah: p2.pah })
+        }
+
+        if (p2.nhs) {
+          if (p2.fisher) {
+            await trx('fishers').where({ nhs: p2.nhs }).update({ person_id: person1_id })
+          }
+          await trx('person').where({ person_id: person1_id }).update({ nhs: p2.nhs })
+        }
+
+        const copyFields = [
+          'relationship', 'firstname', 'middlename', 'lastname', 'contact', 'contact2', 'nrc',
+          'village_id', 'district', 'origin', 'primary_occupation', 'secondary_occupation',
+          'primary_skill', 'secondary_skill', 'year_of_birth', 'gender', 'marital_status',
+          'fisher_village_id'
+        ]
+        const updateData = {}
+        for (const field of copyFields) {
+          if (!p1[field] && p2[field]) updateData[field] = p2[field]
+        }
+        if (Object.keys(updateData).length > 0) {
+          await trx('person').where({ person_id: person1_id }).update(updateData)
+        }
+
+        await trx('person').where({ person_id: person2_id }).delete()
+      })
+
+      return res.send({ success: true })
+    } catch (err) {
+      Common.error(req, 'mergePeople', err)
+      return res.status(500).send({ error: 'error merging people: ' + err })
     }
   }
 }

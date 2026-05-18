@@ -30,7 +30,8 @@ const form = ref({
   secondary_skill: '',
   education: '',
   disabilities: '',
-  disabled: false
+  disabled: false,
+  deceased_date: ''
 })
 
 const validationErrors = ref({})
@@ -105,6 +106,7 @@ const load = async () => {
     form.value.education = p.education ?? ''
     form.value.disabilities = p.disabilities ?? ''
     form.value.disabled = p.disabled ?? false
+    form.value.deceased_date = p.deceased_date ?? ''
   } catch (err) {
     error.value = 'Failed to load person.'
   } finally {
@@ -195,6 +197,7 @@ onMounted(load)
                   <v-combobox v-model="form.education" label="Education" :items="educationOptions" density="compact" variant="outlined" class="mb-2" />
                   <v-checkbox v-model="form.disabled" label="Disabled" density="compact" hide-details />
                   <v-text-field v-model="form.disabilities" label="Disabilities" density="compact" variant="outlined" class="mb-2" :disabled="!form.disabled" />
+                  <v-text-field v-model="form.deceased_date" label="Deceased Date" type="date" density="compact" variant="outlined" class="mb-2" clearable />
                 </v-col>
               </v-row>
             </template>

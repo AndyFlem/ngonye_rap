@@ -43,6 +43,7 @@ watch(() => props.personId, async (id) => {
           <router-link :to="`/people/${props.personId}`">
             {{ person ? person.fullname : props.personId }}
           </router-link>
+          <span v-if="person && person.deceased_date">&nbsp;(deceased: {{ person.deceased_date }})</span>
         </v-col>
         <v-col cols="4" class="d-flex justify-end flex-wrap ga-1">
           <v-chip v-if="person && person.fisher" color="teal" size="small">Fisher</v-chip>

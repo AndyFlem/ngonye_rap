@@ -16,7 +16,8 @@ const defaultParams = () => ({
   is_head: null,
   is_cosignatory: null,
   is_disabled: null,
-  has_photo: null
+  has_photo: null,
+  is_deceased: null
 })
 
 const axiosSecure = inject('axiosSecure')
@@ -86,7 +87,8 @@ const autoSearchFields = [
   () => search.value.params.is_head,
   () => search.value.params.is_cosignatory,
   () => search.value.params.is_disabled,
-  () => search.value.params.has_photo
+  () => search.value.params.has_photo,
+  () => search.value.params.is_deceased
 ]
 
 watch(autoSearchFields, () => {
@@ -219,6 +221,18 @@ onMounted(() => {
                   <v-btn
                     icon="mdi-close-circle" color="grey" size="x-small"
                     variant="text" @click="search.params.has_photo = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
+                  <v-checkbox
+                    v-model="search.params.is_deceased"
+                    label="Deceased" hide-details
+                    :indeterminate="search.params.is_deceased === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle" color="grey" size="x-small"
+                    variant="text" @click="search.params.is_deceased = null"
                   />
                 </div>
               </v-col>

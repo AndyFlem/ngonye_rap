@@ -27,8 +27,7 @@ const crops = ref([])
 const loading = ref(false)
 const error = ref('')
 const tab = ref('ica')
-const memberDialog = ref(false)
-const selectedMember = ref(null)
+
 const villages = ref([])
 const editingVillage = ref(false)
 const draftVillageId = ref(null)
@@ -72,34 +71,7 @@ async function saveVillage () {
   }
 }
 
-const memberFields = [
-  ['person_id', 'Person ID'],
-  ['pah', 'PAH No'],
-  ['household_head', 'Household Head'],
-  ['cosignatory', 'Cosignatory'],
-  ['firstname', 'First Name'],
-  ['middlename', 'Middle Name'],
-  ['lastname', 'Last Name'],
-  ['fullname', 'Full Name'],
-  ['nrc', 'NRC'],
-  ['contact', 'Contact 1'],
-  ['contact2', 'Contact 2'],
-  ['gender', 'Gender'],
-  ['age', 'Age'],
-  ['relationship', 'Relationship'],
-  ['marital_status', 'Marital Status'],
-  ['pregnant_this_year', 'Pregnant This Year'],
-  ['residential_status', 'Residential Status'],
-  ['education', 'Education'],
-  ['primary_occupation', 'Primary Occupation'],
-  ['secondary_occupation', 'Secondary Occupation'],
-  ['primary_skill', 'Primary Skill'],
-  ['secondary_skill', 'Secondary Skill'],
-  ['disabled', 'Disabled'],
-  ['disabilities', 'Disabilities'],
-  ['district', 'District'],
-  ['origin', 'Origin'],
-]
+
 const surveyFields = [
   ['pah', 'PAH No'],
   ['survey_date', 'Date and Time of Survey'],
@@ -170,18 +142,7 @@ const surveyFields = [
   ['members_confirmed', 'Members Confirmed'],
   ['members_list', 'Members List']
 ]
-const booleanMemberFields = new Set(['household_head', 'cosignatory', 'pregnant_this_year', 'disabled'])
 
-const formatMemberValue = (key, value) => {
-  if (value === null || value === undefined) return '—'
-  if (booleanMemberFields.has(key)) return formatYesNo(value)
-  return String(value)
-}
-
-const openMemberModal = (member) => {
-  selectedMember.value = member
-  memberDialog.value = true
-}
 
 const pahno = computed(() => String(route.params.pah || '').trim())
 
@@ -408,6 +369,43 @@ onMounted(async () => {
             />
             <Grievances :pah="pahno" @grievance-changed="householdNotes?.loadNotes()" />
 
+            <v-table density="compact" class="mt-5" v-if="members.length">
+              <thead>
+                <tr>
+                  <th colspan="8" class="table-heading">Household Members ({{ members.length }})</th>
+                </tr>
+                <tr>
+                  <th class="left">Role</th>
+                  <th>Name</th>
+                  <th class="left">Gender</th>
+                  <th class="left">Birth Year</th>
+                  <th>Relationship</th>
+                  <th>Marital Status</th>
+                  <th>Education</th>
+                  <th>Primary Occupation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="m in sortedMembers" :key="m.person_id" :class="{ 'member-disabled': m.disabled }">
+                  <td class="table-value left">
+                    <span v-if="m.household_head" class="member-badge hh-badge">HH</span>
+                    <span v-if="m.cosignatory" class="member-badge co-badge">CO</span>
+                    <span v-if="m.disabled" class="member-badge disabled-badge">Disabled</span>
+                  </td>
+                  <td class="table-value left">
+                    <router-link :to="{ name: 'PersonDetails', params: { person_id: m.person_id } }">{{ m.fullname }}</router-link>
+                    <span v-if="m.deceased_date">&nbsp;(deceased: {{ m.deceased_date }})</span>
+                  </td>
+                  <td class="table-value left">{{ m.gender }}</td>
+                  <td class="table-value left"><span v-if="m.year_of_birth">{{ m.year_of_birth }} ({{ new Date().getFullYear() - m.year_of_birth }})</span></td>
+                  <td class="table-value left">{{ m.relationship }}</td>
+                  <td class="table-value left">{{ m.marital_status }}</td>
+                  <td class="table-value left">{{ m.education }}</td>
+                  <td class="table-value left">{{ m.primary_occupation || '—' }}</td>
+                </tr>
+              </tbody>
+              <TableCopyFooter :colspan="8" />
+            </v-table>
             <v-tabs v-model="tab" class="rounded mt-5" bg-color="blue-lighten-4" selected-class="bg-primary">
               <v-tab value="ica">ICA</v-tab>
               <v-tab :disabled="!pah.survey_complete" value="survey">Survey</v-tab>
@@ -885,43 +883,6 @@ onMounted(async () => {
                     </div>
                   </v-col>
                 </v-row>
-                <v-table density="compact" class="mb-4" v-if="members.length">
-                  <thead>
-                    <tr>
-                      <th colspan="8" class="table-heading">Household Members ({{ members.length }})</th>
-                    </tr>
-                    <tr>
-                      <th class="left">Role</th>
-                      <th>Name</th>
-                      <th class="left">Gender</th>
-                      <th class="left">Age</th>
-                      <th>Relationship</th>
-                      <th>Marital Status</th>
-                      <th>Education</th>
-                      <th>Primary Occupation</th>
-
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="m in sortedMembers" :key="m.person_id" :class="{ 'member-disabled': m.disabled }">
-                      <td class="table-value left">
-                        <span v-if="m.household_head" class="member-badge hh-badge">HH</span>
-                        <span v-if="m.cosignatory" class="member-badge co-badge">CO</span>
-                        <span v-if="m.disabled" class="member-badge disabled-badge">Disabled</span>
-                      </td>
-                      <td class="table-value left">
-                        <v-btn variant="text" size="small" class="pa-0 text-none" @click="openMemberModal(m)">{{ m.fullname }}</v-btn>
-                      </td>
-                      <td class="table-value left">{{ m.gender }}</td>
-                      <td class="table-value left">{{ m.age }}</td>
-                      <td class="table-value left">{{ m.relationship }}</td>
-                      <td class="table-value left">{{ m.marital_status }}</td>
-                      <td class="table-value left">{{ m.education }}</td>
-                      <td class="table-value left">{{ m.primary_occupation || '—' }}</td>
-                    </tr>
-                  </tbody>
-                  <TableCopyFooter :colspan="8" />
-                </v-table>
                 <v-table density="compact" class="survey-table pt-5" v-if="pah_survey">
                   <thead>
                     <tr>
@@ -947,27 +908,6 @@ onMounted(async () => {
       </v-container>
     </v-main>
 
-
-
-    <v-dialog v-model="memberDialog" max-width="600">
-      <v-card v-if="selectedMember">
-        <v-card-title class="table-heading">{{ selectedMember.fullname }}</v-card-title>
-        <v-card-text class="pa-0">
-          <v-table density="compact">
-            <tbody>
-              <tr v-for="([key, label]) in memberFields" :key="key">
-                <td class="survey-label">{{ label }}</td>
-                <td class="table-value left">{{ formatMemberValue(key, selectedMember[key]) }}</td>
-              </tr>
-            </tbody>
-          </v-table>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn color="primary" variant="text" @click="memberDialog = false">Close</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </div>
 </template>
 
