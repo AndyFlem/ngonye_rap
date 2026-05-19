@@ -9,6 +9,7 @@ import Notes from '@/components/Notes.vue'
 import Icas from '@/components/Icas.vue'
 import Grievances from '@/components/Grievances.vue'
 import MapLink from '@/components/MapLink.vue'
+import Members from '@/components/Members.vue'
 
 
 
@@ -18,7 +19,6 @@ const router = useRouter()
 
 const pah = ref(null)
 const pah_survey = ref(null)
-const members = ref([])
 const parcels = ref([])
 const structures = ref([])
 const replacements = ref([])
@@ -148,11 +148,6 @@ const pahno = computed(() => String(route.params.pah || '').trim())
 
 
 
-const sortedMembers = computed(() => {
-  const rank = (m) => m.household_head ? 0 : m.cosignatory ? 1 : 2
-  return [...members.value].sort((a, b) => rank(a) - rank(b))
-})
-
 const landOptions = computed(() => {
   if (!pah.value) return ''
   const options = [
@@ -216,10 +211,6 @@ const loadHousehold = async () => {
       // load any survey data for this PAH
       const surveyResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/survey`)
       pah_survey.value = surveyResponse.data || null
-
-      // load the household members for this PAH
-      const membersResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/members`)
-      members.value = Array.isArray(membersResponse.data) ? membersResponse.data : []
 
       // load the land parcels for this PAH
       const parcelsResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/parcels`)
@@ -369,43 +360,7 @@ onMounted(async () => {
             />
             <Grievances :pah="pahno" @grievance-changed="householdNotes?.loadNotes()" />
 
-            <v-table density="compact" class="mt-5" v-if="members.length">
-              <thead>
-                <tr>
-                  <th colspan="8" class="table-heading">Household Members ({{ members.length }})</th>
-                </tr>
-                <tr>
-                  <th class="left">Role</th>
-                  <th>Name</th>
-                  <th class="left">Gender</th>
-                  <th class="left">Birth Year</th>
-                  <th>Relationship</th>
-                  <th>Marital Status</th>
-                  <th>Education</th>
-                  <th>Primary Occupation</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="m in sortedMembers" :key="m.person_id" :class="{ 'member-disabled': m.disabled }">
-                  <td class="table-value left">
-                    <span v-if="m.household_head" class="member-badge hh-badge">HH</span>
-                    <span v-if="m.cosignatory" class="member-badge co-badge">CO</span>
-                    <span v-if="m.disabled" class="member-badge disabled-badge">Disabled</span>
-                  </td>
-                  <td class="table-value left">
-                    <router-link :to="{ name: 'PersonDetails', params: { person_id: m.person_id } }">{{ m.fullname }}</router-link>
-                    <span v-if="m.deceased_date">&nbsp;(deceased: {{ m.deceased_date }})</span>
-                  </td>
-                  <td class="table-value left">{{ m.gender }}</td>
-                  <td class="table-value left"><span v-if="m.year_of_birth">{{ m.year_of_birth }} ({{ new Date().getFullYear() - m.year_of_birth }})</span></td>
-                  <td class="table-value left">{{ m.relationship }}</td>
-                  <td class="table-value left">{{ m.marital_status }}</td>
-                  <td class="table-value left">{{ m.education }}</td>
-                  <td class="table-value left">{{ m.primary_occupation || '—' }}</td>
-                </tr>
-              </tbody>
-              <TableCopyFooter :colspan="8" />
-            </v-table>
+            <Members :pah="pahno" class="mt-5" />
             <v-tabs v-model="tab" class="rounded mt-5" bg-color="blue-lighten-4" selected-class="bg-primary">
               <v-tab value="ica">ICA</v-tab>
               <v-tab :disabled="!pah.survey_complete" value="survey">Survey</v-tab>
@@ -949,36 +904,6 @@ onMounted(async () => {
   background-color: rgba(224, 140, 140, 0.527);
   border-radius: 8px;
   padding: 0 6px;
-}
-
-.members-table th {
-  font-size: 0.78rem;
-  white-space: nowrap;
-}
-
-.member-badge {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 700;
-  border-radius: 3px;
-  padding: 1px 5px;
-  margin: 0 2px;
-}
-.member-disabled {
-  background-color: rgba(255, 193, 7, 0.18);
-}
-
-.hh-badge {
-  background-color: rgba(25, 118, 210, 0.15);
-  color: #1565c0;
-}
-.co-badge {
-  background-color: rgba(25, 210, 133, 0.2);
-  color: #1b7a4e;
-}
-.disabled-badge {
-  background-color: rgba(226, 139, 98, 0.2);
-  color: #442008;
 }
 
 .survey-table .survey-label {

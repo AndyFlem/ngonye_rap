@@ -301,27 +301,6 @@ module.exports = {
       return res.status(500).send({ error: 'an error has occurred trying to fetch the crops for the household: ' + err })
     }
   },
-  async indexMembers (req, res) {
-    Common.debug(req, 'indexMembers')
-    const pah = (req.params.pah || '').trim().slice(0, 120)
-
-    if (!pah) {
-      return res.status(400).send({ error: 'pah is required' })
-    }
-
-    try {
-      const members = await Knex('v_person')
-        .where({ pah })
-        .orderBy('household_head', 'desc')
-        .orderBy('cosignatory', 'desc')
-        .orderBy('fullname')
-
-      return res.send(members)
-    } catch (err) {
-      Common.error(req, 'indexMembers', err)
-      return res.status(500).send({ error: 'an error has occurred trying to fetch the members for the household: ' + err })
-    }
-  },
   async showSurvey (req, res) {
     Common.debug(req, 'showSurvey')
     const pah = (req.params.pah || '').trim().slice(0, 120)

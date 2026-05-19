@@ -38,6 +38,7 @@ module.exports = (app) => {
   app.post(prefix + '/people_export', PersonController.exportSearch)
   app.post(prefix + '/people/merge', PersonController.mergePeople)
   app.get(prefix + '/people/field-values', PersonController.fieldValues)
+  app.post(prefix + '/person', PersonController.create)
   app.get(prefix + '/person/:person_id', PersonController.show)
   app.patch(prefix + '/person/:person_id', PersonController.update)
   app.put(prefix + '/person/:person_id/reverse-name', PersonController.reverseName)
@@ -49,7 +50,8 @@ module.exports = (app) => {
   app.get(prefix + '/households/:pah', HouseholdsController.show)
   app.patch(prefix + '/households/:pah', HouseholdsController.patch)
   app.get(prefix + '/households/:pah/survey', HouseholdsController.showSurvey)
-  app.get(prefix + '/households/:pah/members', HouseholdsController.indexMembers)
+  app.get(prefix + '/households/:pah/members', PersonController.indexMembers)
+  app.get(prefix + '/fishers/:nhs/members',    PersonController.indexMembers)
 
   // NOTES (households and fishers)
   app.get(prefix + '/households/:pah/notes',  NotesController.index)

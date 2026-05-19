@@ -54,6 +54,49 @@ function buildSearchParams (defn) {
 }
 
 module.exports = {
+  async create (req, res) {
+    Common.debug(req, 'create')
+
+    const allowed = [
+      'firstname', 'middlename', 'lastname', 'gender', 'contact', 'contact2', 'nrc',
+      'year_of_birth', 'village_id', 'relationship', 'marital_status', 'district', 'origin',
+      'primary_occupation', 'secondary_occupation', 'primary_skill', 'secondary_skill',
+      'residential_status', 'education', 'disabilities', 'disabled', 'deceased_date',
+      'pah', 'nhs'
+    ]
+    const fields = {}
+    for (const key of allowed) {
+      if (key in req.body && req.body[key] !== '' && req.body[key] !== undefined) {
+        fields[key] = req.body[key] ?? null
+      }
+    }
+    if (fields.year_of_birth !== undefined && isNaN(parseInt(fields.year_of_birth))) fields.year_of_birth = null
+    if (fields.deceased_date === '') fields.deceased_date = null
+
+    fields.created_at = Knex.fn.now()
+    fields.created_user_id = req.userId
+
+    try {
+      // If being added to a household, inherit the nhs of the household head (if they have one)
+      if (fields.pah && !fields.nhs) {
+        const head = await Knex('person').where({ pah: fields.pah, household_head: true }).first('nhs')
+        if (head && head.nhs) fields.nhs = head.nhs
+      }
+
+      // If being added to a fisher, inherit the pah of the fisher person (if they have one)
+      if (fields.nhs && !fields.pah) {
+        const fisher = await Knex('person').where({ nhs: fields.nhs, fisher: true }).first('pah')
+        if (fisher && fisher.pah) fields.pah = fisher.pah
+      }
+
+      const [{ person_id }] = await Knex('person').insert(fields).returning('person_id')
+      return res.status(201).send({ person_id })
+    } catch (err) {
+      Common.error(req, 'create', err)
+      return res.status(500).send({ error: 'an error has occurred trying to create person: ' + err })
+    }
+  },
+
   async search (req, res) {
     Common.debug(req, 'search')
     try {
@@ -191,6 +234,25 @@ module.exports = {
     } catch (err) {
       Common.error(req, 'show', err)
       return res.status(500).send({ error: 'an error has occurred trying to fetch person: ' + err })
+    }
+  },
+
+  async indexMembers (req, res) {
+    Common.debug(req, 'indexMembers')
+    const pah = (req.params.pah || '').trim().slice(0, 9)
+    const nhs = (req.params.nhs || '').trim().slice(0, 10)
+    if (!pah && !nhs) return res.status(400).send({ error: 'pah or nhs is required' })
+    const filter = pah ? { pah } : { nhs }
+    try {
+      const members = await Knex('v_person')
+        .where(filter)
+        .orderBy('household_head', 'desc')
+        .orderBy('cosignatory', 'desc')
+        .orderBy('fullname')
+      return res.send(members)
+    } catch (err) {
+      Common.error(req, 'indexMembers', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch members: ' + err })
     }
   },
 
