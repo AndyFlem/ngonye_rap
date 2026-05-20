@@ -123,11 +123,11 @@ onMounted(load)
                       <td>Household (PAH)</td>
                       <td><router-link :to="`/households/${person.pah}`">{{ person.pah }}</router-link></td>
                     </tr>
-                    <tr v-if="person.nhs && person.fisher">
+                    <tr v-if="person.nhs">
                       <td>Fisher Record</td>
                       <td><router-link :to="`/fishers/${person.nhs}`">{{ person.nhs }}</router-link></td>
                     </tr>
-                    <tr v-if="!person.pah && !(person.nhs && person.fisher)">
+                    <tr v-if="!person.pah && !person.nhs">
                       <td colspan="2" class="text-medium-emphasis">No linked records</td>
                     </tr>
                   </tbody>

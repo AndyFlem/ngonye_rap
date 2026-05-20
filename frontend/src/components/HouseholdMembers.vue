@@ -4,8 +4,7 @@ import TableCopyFooter from '@/components/TableCopyFooter.vue'
 import PersonFormFields from '@/components/PersonFormFields.vue'
 
 const props = defineProps({
-  pah: { type: String, default: null },
-  nhs: { type: String, default: null },
+  pah: { type: String, default: null }
 })
 
 const axiosSecure = inject('axiosSecure')
@@ -18,12 +17,10 @@ const sortedMembers = computed(() => {
 })
 
 const loadMembers = async () => {
-  if (!props.pah && !props.nhs) return
+  if (!props.pah) return
   loading.value = true
   try {
-    const url = props.pah
-      ? `/households/${encodeURIComponent(props.pah)}/members`
-      : `/fishers/${encodeURIComponent(props.nhs)}/members`
+    const url = `/households/${encodeURIComponent(props.pah)}/members`
     const response = await axiosSecure.get(url)
     members.value = Array.isArray(response.data) ? response.data : []
   } finally {
@@ -73,7 +70,7 @@ const submitAdd = async () => {
   addSaving.value = true
   addError.value = ''
   try {
-    const payload = { ...addForm.value, ...(props.pah ? { pah: props.pah } : { nhs: props.nhs }) }
+    const payload = { ...addForm.value, ...({ pah: props.pah }) }
     await axiosSecure.post('/person', payload)
     showAddDialog.value = false
     await loadMembers()
@@ -86,7 +83,7 @@ const submitAdd = async () => {
 </script>
 
 <template>
-  <div v-if="pah || nhs">
+  <div v-if="pah">
     <div class="d-flex justify-end mb-1">
       <v-btn size="small" variant="outlined" prepend-icon="mdi-plus" @click="openAdd">Add Member</v-btn>
     </div>
@@ -99,6 +96,7 @@ const submitAdd = async () => {
         <tr>
           <th class="left">Role</th>
           <th>Name</th>
+          <th>NHS</th>
           <th class="left">Gender</th>
           <th class="left">Birth Year</th>
           <th>Relationship</th>
@@ -118,6 +116,7 @@ const submitAdd = async () => {
             <router-link :to="{ name: 'PersonDetails', params: { person_id: m.person_id } }">{{ m.fullname }}</router-link>
             <span v-if="m.deceased_date">&nbsp;(deceased: {{ m.deceased_date }})</span>
           </td>
+          <td class="table-value left"><router-link v-if="m.nhs" :to="{ name: 'FishersDetails', params: { nhs: m.nhs } }">{{ m.nhs }}</router-link></td>
           <td class="table-value left">{{ m.gender }}</td>
           <td class="table-value left"><span v-if="m.year_of_birth">{{ m.year_of_birth }} ({{ new Date().getFullYear() - m.year_of_birth }})</span></td>
           <td class="table-value left">{{ m.relationship }}</td>

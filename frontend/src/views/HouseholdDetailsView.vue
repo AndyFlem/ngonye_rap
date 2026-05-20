@@ -9,7 +9,7 @@ import Notes from '@/components/Notes.vue'
 import Icas from '@/components/Icas.vue'
 import Grievances from '@/components/Grievances.vue'
 import MapLink from '@/components/MapLink.vue'
-import Members from '@/components/Members.vue'
+import Members from '@/components/HouseholdMembers.vue'
 
 const axiosSecure = inject('axiosSecure')
 const route = useRoute()
@@ -32,7 +32,6 @@ const draftVillageId = ref(null)
 const savingVillage = ref(false)
 const togglingFlag = ref(false)
 const householdNotes = ref(null)
-const householdIcas = ref(null)
 
 async function toggleFollowupFlag () {
   togglingFlag.value = true

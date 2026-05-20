@@ -62,7 +62,7 @@ module.exports = {
       'year_of_birth', 'village_id', 'relationship', 'marital_status', 'district', 'origin',
       'primary_occupation', 'secondary_occupation', 'primary_skill', 'secondary_skill',
       'residential_status', 'education', 'disabilities', 'disabled', 'deceased_date',
-      'pah', 'nhs'
+      'pah'
     ]
     const fields = {}
     for (const key of allowed) {
@@ -77,18 +77,6 @@ module.exports = {
     fields.created_user_id = req.userId
 
     try {
-      // If being added to a household, inherit the nhs of the household head (if they have one)
-      if (fields.pah && !fields.nhs) {
-        const head = await Knex('person').where({ pah: fields.pah, household_head: true }).first('nhs')
-        if (head && head.nhs) fields.nhs = head.nhs
-      }
-
-      // If being added to a fisher, inherit the pah of the fisher person (if they have one)
-      if (fields.nhs && !fields.pah) {
-        const fisher = await Knex('person').where({ nhs: fields.nhs, fisher: true }).first('pah')
-        if (fisher && fisher.pah) fields.pah = fisher.pah
-      }
-
       const [{ person_id }] = await Knex('person').insert(fields).returning('person_id')
       return res.status(201).send({ person_id })
     } catch (err) {
@@ -240,9 +228,8 @@ module.exports = {
   async indexMembers (req, res) {
     Common.debug(req, 'indexMembers')
     const pah = (req.params.pah || '').trim().slice(0, 9)
-    const nhs = (req.params.nhs || '').trim().slice(0, 10)
-    if (!pah && !nhs) return res.status(400).send({ error: 'pah or nhs is required' })
-    const filter = pah ? { pah } : { nhs }
+    if (!pah) return res.status(400).send({ error: 'pah is required' })
+    const filter = { pah }
     try {
       const members = await Knex('v_person')
         .where(filter)
@@ -269,8 +256,8 @@ module.exports = {
 
     try {
       const [p1, p2] = await Promise.all([
-        Knex('person').where({ person_id: person1_id }).first(),
-        Knex('person').where({ person_id: person2_id }).first()
+        Knex('v_person').where({ person_id: person1_id }).first(),
+        Knex('v_person').where({ person_id: person2_id }).first()
       ])
 
       if (!p1) return res.status(404).send({ error: 'person 1 not found' })
@@ -291,7 +278,6 @@ module.exports = {
 
         if (p2.nhs) {
           await trx('fishers').where({ nhs: p2.nhs }).update({ person_id: person1_id })
-          await trx('person').where({ person_id: person1_id }).update({ nhs: p2.nhs, fisher: true })
         }
 
         const copyFields = [

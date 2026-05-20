@@ -7,7 +7,7 @@ import Grievances from '@/components/Grievances.vue'
 import Icas from '@/components/Icas.vue'
 import PersonView from '@/components/PersonView.vue'
 import { formatCurrency, formatYesNo, formatDateTime } from '@/utils/formatters'
-import Members from '@/components/Members.vue'
+
 
 const axiosSecure = inject('axiosSecure')
 const route = useRoute()
@@ -92,7 +92,7 @@ onMounted(load)
           <v-card-text v-if="fisher">
             <v-row>
               <v-col cols="12" md="6">
-                <PersonView v-if="fisher.person_id" :fisher="true" :person-id="fisher.person_id" title="Person:" />
+                <PersonView v-if="fisher.person_id" :fisher="true" :person-id="fisher.person_id" title="Fisher:" />
                 <div v-if="fisher.person" class="mt-1">
                   <div><strong>Gender:</strong> <span class="ml-1">{{ fisher.person.gender || '—' }}</span></div>
                   <div><strong>Village:</strong> <span class="ml-1">{{ fisher.person.village || '—' }}</span></div>
@@ -132,7 +132,7 @@ onMounted(load)
               @ica-added="fisherNotes?.loadNotes()"
               class="mb-4"
             />
-            <Members :nhs="nhs" class="mt-4" />
+
             <v-row class="pt-4">
               <v-col cols="12" md="6">
                 <v-table density="compact">

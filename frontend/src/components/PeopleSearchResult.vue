@@ -46,7 +46,7 @@ watch(() => props.personId, async (id) => {
           <span v-if="person && person.deceased_date">&nbsp;(deceased: {{ person.deceased_date }})</span>
         </v-col>
         <v-col cols="4" class="d-flex justify-end flex-wrap ga-1">
-          <v-chip v-if="person && person.fisher" color="teal" size="small">Fisher</v-chip>
+          <v-chip v-if="person && person.nhs" color="teal" size="small">Fisher</v-chip>
           <v-chip v-if="person && person.household_head" color="blue" size="small">Head</v-chip>
           <v-chip v-if="person && person.cosignatory" color="orange" size="small">Cosignatory</v-chip>
           <v-chip v-if="person && person.disabled" color="red" size="small">Disabled</v-chip>
@@ -62,7 +62,7 @@ watch(() => props.personId, async (id) => {
               <div v-if="person.nrc"><strong>NRC:</strong> <span class="ml-1">{{ person.nrc }}</span></div>
               <div v-if="person.nhs">
                 <strong>NHS:</strong>
-                <router-link v-if="person.fisher" :to="`/fishers/${person.nhs}`" class="ml-1">{{ person.nhs }}</router-link>
+                <router-link v-if="person.nhs" :to="`/fishers/${person.nhs}`" class="ml-1">{{ person.nhs }}</router-link>
                 <span v-else class="ml-1">{{ person.nhs }}</span>
               </div>
               <div v-if="person.pah">
