@@ -67,7 +67,8 @@ module.exports = (app) => {
   app.post(prefix + '/fishers/:nhs/icas',    IcasController.create)
   app.patch(prefix + '/icas/:ica_id',        IcasController.update)
 
-  // GRIEVANCES (households and fishers)
+  // GRIEVANCES (all + households and fishers)
+  app.get(prefix + '/grievances',                  GrievancesController.indexAll)
   app.get(prefix + '/households/:pah/grievances',  GrievancesController.index)
   app.post(prefix + '/households/:pah/grievances', GrievancesController.create)
   app.get(prefix + '/fishers/:nhs/grievances',     GrievancesController.index)

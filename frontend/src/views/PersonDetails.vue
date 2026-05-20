@@ -97,7 +97,6 @@ onMounted(load)
                 <div><strong>Alternate Contact:</strong> <span class="ml-1">{{ person.contact2 || '—' }}</span></div>
                 <div><strong>NRC:</strong> <span class="ml-1">{{ person.nrc || '—' }}</span></div>
               </v-col>
-
               <v-col cols="12" md="4" class="mt-2">
                 <div><strong>Year of Birth:</strong> <span class="ml-1">{{ person.year_of_birth || '—' }} <span v-if="person.year_of_birth">({{ new Date().getFullYear() - person.year_of_birth }})</span></span></div>
                 <div v-if="person.deceased_date"><strong>Date of death:</strong> <span class="ml-1">{{ person.deceased_date }}</span></div>

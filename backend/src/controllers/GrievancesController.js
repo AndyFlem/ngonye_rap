@@ -83,5 +83,29 @@ module.exports = {
       Common.error(req, 'destroy', err)
       return res.status(500).send({ error: 'failed to delete grievance: ' + err })
     }
+  },
+
+  async indexAll (req, res) {
+    Common.debug(req, 'indexAll', '')
+    try {
+      const result = await Knex('grievances as g')
+        .select(
+          'g.grievance_id',
+          'g.pah',
+          'g.nhs',
+          'g.grievance_ref',
+          'g.grievance_link',
+          'g.is_current',
+          'g.created_at',
+          Knex.raw("COALESCE(vh.fullname, vf.fullname) AS person_name")
+        )
+        .leftJoin('v_households as vh', 'g.pah', 'vh.pah')
+        .leftJoin('v_fishers as vf', 'g.nhs', 'vf.nhs')
+        .orderByRaw('g.created_at DESC, g.grievance_id DESC')
+      return res.send(result)
+    } catch (err) {
+      Common.error(req, 'indexAll', err)
+      return res.status(500).send({ error: 'failed to fetch all grievances: ' + err })
+    }
   }
 }

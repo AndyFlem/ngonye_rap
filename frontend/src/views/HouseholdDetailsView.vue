@@ -11,8 +11,6 @@ import Grievances from '@/components/Grievances.vue'
 import MapLink from '@/components/MapLink.vue'
 import Members from '@/components/Members.vue'
 
-
-
 const axiosSecure = inject('axiosSecure')
 const route = useRoute()
 const router = useRouter()
@@ -143,10 +141,7 @@ const surveyFields = [
   ['members_list', 'Members List']
 ]
 
-
 const pahno = computed(() => String(route.params.pah || '').trim())
-
-
 
 const landOptions = computed(() => {
   if (!pah.value) return ''

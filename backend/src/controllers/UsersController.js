@@ -236,6 +236,8 @@ module.exports = {
     Common.debug(req, 'signin')
 
     let user = null
+    // Convert email to lower case
+    req.body.email = req.body.email.toLowerCase()
     Knex.transaction(function (trx) {
       Knex('user')
         .where({email: req.body.email})

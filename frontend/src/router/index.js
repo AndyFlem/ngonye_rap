@@ -15,6 +15,7 @@ import PeopleSearch from '@/views/PeopleSearch.vue'
 import PersonDetails from '@/views/PersonDetails.vue'
 import PersonForm from '@/views/PersonForm.vue'
 import LivelihoodRestoration from '@/views/LivelihoodRestoration.vue'
+import GrievancesList from '@/views/GrievancesList.vue'
 
 const routes = [
   {
@@ -107,6 +108,12 @@ const routes = [
     path: '/livelihood-restoration',
     name: 'LivelihoodRestoration',
     component: LivelihoodRestoration,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/grievances',
+    name: 'GrievancesList',
+    component: GrievancesList,
     meta: { requiresAuth: true }
   },
   {
