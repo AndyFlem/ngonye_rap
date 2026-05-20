@@ -290,10 +290,8 @@ module.exports = {
         }
 
         if (p2.nhs) {
-          if (p2.fisher) {
-            await trx('fishers').where({ nhs: p2.nhs }).update({ person_id: person1_id })
-          }
-          await trx('person').where({ person_id: person1_id }).update({ nhs: p2.nhs })
+          await trx('fishers').where({ nhs: p2.nhs }).update({ person_id: person1_id })
+          await trx('person').where({ person_id: person1_id }).update({ nhs: p2.nhs, fisher: true })
         }
 
         const copyFields = [
