@@ -27,6 +27,7 @@ module.exports = {
 
     const grievance_link = req.body.grievance_link ? String(req.body.grievance_link).trim().slice(0, 500) || null : null
     const grievance_ref = req.body.grievance_ref ? String(req.body.grievance_ref).trim().slice(0, 50) || null : null
+    const date_received = req.body.date_received ? String(req.body.date_received).trim() || null : null
 
     if (!grievance_link && !grievance_ref) return res.status(400).send({ error: 'grievance_link or grievance_ref is required' })
 
@@ -34,7 +35,7 @@ module.exports = {
 
     try {
       const [inserted] = await Knex('grievances')
-        .insert({ ...entity, grievance_link, grievance_ref, is_current: true, user_id: req.userId })
+        .insert({ ...entity, grievance_link, grievance_ref, date_received, is_current: true, user_id: req.userId })
         .returning('grievance_id')
 
       const grievance = await Knex('grievances').where({ grievance_id: inserted.grievance_id }).first()
@@ -54,6 +55,7 @@ module.exports = {
     if ('is_current' in req.body) fields.is_current = !!req.body.is_current
     if ('grievance_link' in req.body) fields.grievance_link = req.body.grievance_link ? String(req.body.grievance_link).trim().slice(0, 500) || null : null
     if ('grievance_ref' in req.body) fields.grievance_ref = req.body.grievance_ref ? String(req.body.grievance_ref).trim().slice(0, 50) || null : null
+    if ('date_received' in req.body) fields.date_received = req.body.date_received ? String(req.body.date_received).trim() || null : null
 
     if (Object.keys(fields).length === 0) return res.status(400).send({ error: 'no valid fields provided' })
 
@@ -96,6 +98,7 @@ module.exports = {
           'g.grievance_ref',
           'g.grievance_link',
           'g.is_current',
+          'g.date_received',
           'g.created_at',
           Knex.raw("COALESCE(vh.fullname, vf.fullname) AS person_name")
         )

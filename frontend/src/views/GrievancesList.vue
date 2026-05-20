@@ -10,7 +10,7 @@ const grievances = ref([])
 const loading = ref(false)
 const error = ref('')
 const showCurrentOnly = ref(false)
-const sortKey = ref(null)   // 'ref' | 'entity'
+const sortKey = ref(null)   // 'ref' | 'entity' | 'date'
 const sortDir = ref(1)      // 1 = asc, -1 = desc
 
 const toggleSort = (key) => {
@@ -35,12 +35,17 @@ const displayed = computed(() => {
   if (!sortKey.value) return rows
 
   return [...rows].sort((a, b) => {
-    const va = sortKey.value === 'ref'
-      ? (a.grievance_ref ?? '')
-      : (a.pah ?? a.nhs ?? '')
-    const vb = sortKey.value === 'ref'
-      ? (b.grievance_ref ?? '')
-      : (b.pah ?? b.nhs ?? '')
+    let va, vb
+    if (sortKey.value === 'ref') {
+      va = a.grievance_ref ?? ''
+      vb = b.grievance_ref ?? ''
+    } else if (sortKey.value === 'date') {
+      va = a.date_received ?? ''
+      vb = b.date_received ?? ''
+    } else {
+      va = a.pah ?? a.nhs ?? ''
+      vb = b.pah ?? b.nhs ?? ''
+    }
     return va.localeCompare(vb, undefined, { numeric: true }) * sortDir.value
   })
 })
@@ -56,6 +61,31 @@ const entityId = (g) => g.pah ?? g.nhs
 const entityPath = (g) => g.pah
   ? `/households/${encodeURIComponent(g.pah)}`
   : `/fishers/${encodeURIComponent(g.nhs)}`
+
+const editingDateId = ref(null)
+const draftEditDate = ref('')
+const savingEditDate = ref(false)
+
+function startEditDate (g) {
+  editingDateId.value = g.grievance_id
+  draftEditDate.value = g.date_received ?? ''
+}
+
+async function saveEditDate (g) {
+  savingEditDate.value = true
+  try {
+    await axiosSecure.patch(`/grievances/${g.grievance_id}`, {
+      date_received: draftEditDate.value || null
+    })
+    editingDateId.value = null
+    const idx = grievances.value.findIndex(x => x.grievance_id === g.grievance_id)
+    if (idx !== -1) grievances.value[idx].date_received = draftEditDate.value || null
+  } catch (err) {
+    console.error('Failed to update date received:', err)
+  } finally {
+    savingEditDate.value = false
+  }
+}
 
 const load = async () => {
   loading.value = true
@@ -106,6 +136,9 @@ onMounted(load)
                   PAH / NHS <v-icon size="x-small" :icon="sortIcon('entity')" />
                 </th>
                 <th class="table-heading">Name</th>
+                <th class="table-heading" style="cursor:pointer; white-space:nowrap" @click="toggleSort('date')">
+                  Date Received <v-icon size="x-small" :icon="sortIcon('date')" />
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -141,9 +174,25 @@ onMounted(load)
                   >{{ entityId(g) }}</span>
                 </td>
                 <td class="table-value left">{{ g.person_name || '—' }}</td>
+                <td style="white-space:nowrap" @click.stop>
+                  <template v-if="editingDateId !== g.grievance_id">
+                    <span>{{ g.date_received || '—' }}</span>
+                    <v-btn size="x-small" variant="text" icon="mdi-pencil" class="ml-1 text-grey"
+                      style="height:1em;width:1em;min-height:unset;min-width:unset"
+                      @click="startEditDate(g)" />
+                  </template>
+                  <template v-else>
+                    <v-text-field v-model="draftEditDate" type="date" density="compact" hide-details
+                      variant="underlined" style="max-width:160px" />
+                    <v-btn size="x-small" variant="text" icon="mdi-check" class="ml-1 text-grey"
+                      :loading="savingEditDate" @click="saveEditDate(g)" />
+                    <v-btn size="x-small" variant="text" icon="mdi-close" class="ml-1 text-grey"
+                      @click="editingDateId = null" />
+                  </template>
+                </td>
               </tr>
               <tr v-if="displayed.length === 0 && !loading">
-                <td colspan="5" class="text-center text-disabled pa-4">No grievances found.</td>
+                <td colspan="6" class="text-center text-disabled pa-4">No grievances found.</td>
               </tr>
             </tbody>
           </v-table>

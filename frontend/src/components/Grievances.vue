@@ -17,6 +17,7 @@ const error = ref('')
 const dialog = ref(false)
 const newGrievanceLink = ref('')
 const newGrievanceRef = ref('')
+const newDateReceived = ref('')
 const saving = ref(false)
 const saveError = ref('')
 
@@ -27,6 +28,10 @@ const editingGrievanceId = ref(null)
 const draftEditRef = ref('')
 const draftEditLink = ref('')
 const savingEdit = ref(false)
+
+const editingDateId = ref(null)
+const draftEditDate = ref('')
+const savingEditDate = ref(false)
 
 const grievancesUrl = computed(() =>
   props.nhs
@@ -50,6 +55,7 @@ async function loadGrievances () {
 function openDialog () {
   newGrievanceLink.value = ''
   newGrievanceRef.value = ''
+  newDateReceived.value = ''
   saveError.value = ''
   dialog.value = true
 }
@@ -64,7 +70,8 @@ async function submitGrievance () {
   try {
     await axiosSecure.post(grievancesUrl.value, {
       grievance_link: newGrievanceLink.value.trim() || null,
-      grievance_ref: newGrievanceRef.value.trim() || null
+      grievance_ref: newGrievanceRef.value.trim() || null,
+      date_received: newDateReceived.value || null
     })
     dialog.value = false
     await loadGrievances()
@@ -123,6 +130,26 @@ async function saveEditGrievance (g) {
   }
 }
 
+function startEditDate (g) {
+  editingDateId.value = g.grievance_id
+  draftEditDate.value = g.date_received ?? ''
+}
+
+async function saveEditDate (g) {
+  savingEditDate.value = true
+  try {
+    await axiosSecure.patch(`/grievances/${g.grievance_id}`, {
+      date_received: draftEditDate.value || null
+    })
+    editingDateId.value = null
+    await loadGrievances()
+  } catch (err) {
+    console.error('Failed to update date received:', err)
+  } finally {
+    savingEditDate.value = false
+  }
+}
+
 const getSafeUrl = (value) => {
   if (!value) return null
   const url = String(value).trim()
@@ -153,6 +180,7 @@ defineExpose({ loadGrievances })
           <tr>
             <th>Ref</th>
             <th>Link</th>
+            <th style="white-space:nowrap">Date Received</th>
             <th>Status</th>
             <th></th>
           </tr>
@@ -193,6 +221,22 @@ defineExpose({ loadGrievances })
               </template>
             </td>
             <td style="white-space: nowrap;">
+              <template v-if="editingDateId !== g.grievance_id">
+                <span>{{ g.date_received || '—' }}</span>
+                <v-btn size="x-small" variant="text" icon="mdi-pencil" class="ml-1 text-grey"
+                  style="height:1em;width:1em;min-height:unset;min-width:unset"
+                  @click="startEditDate(g)" />
+              </template>
+              <template v-else>
+                <v-text-field v-model="draftEditDate" type="date" density="compact" hide-details
+                  variant="underlined" style="max-width:160px" />
+                <v-btn size="x-small" variant="text" icon="mdi-check" class="ml-1 text-grey"
+                  :loading="savingEditDate" @click="saveEditDate(g)" />
+                <v-btn size="x-small" variant="text" icon="mdi-close" class="ml-1 text-grey"
+                  @click="editingDateId = null" />
+              </template>
+            </td>
+            <td style="white-space: nowrap;">
               <v-chip v-if="g.is_current" size="x-small" color="green">Current</v-chip>
             </td>
             <td style="white-space: nowrap; width: 80px;">
@@ -227,6 +271,8 @@ defineExpose({ loadGrievances })
         <v-text-field v-model="newGrievanceRef" label="Grievance Ref" placeholder="e.g. GRV-001"
           density="compact" variant="outlined" class="mb-3" />
         <v-text-field v-model="newGrievanceLink" label="SharePoint Link" placeholder="https://..."
+          density="compact" variant="outlined" class="mb-3" />
+        <v-text-field v-model="newDateReceived" label="Date Received" type="date"
           density="compact" variant="outlined" />
       </v-card-text>
       <v-card-actions>
