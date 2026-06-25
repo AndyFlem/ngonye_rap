@@ -50,6 +50,7 @@ function buildSearchParams (defn) {
   if (defn.is_disabled    !== undefined && defn.is_disabled    !== null) params.push(`p_is_disabled=> ${defn.is_disabled}`)
   if (defn.has_photo      !== undefined && defn.has_photo      !== null) params.push(`p_has_photo=> ${defn.has_photo}`)
   if (defn.is_deceased    !== undefined && defn.is_deceased    !== null) params.push(`p_is_deceased=> ${defn.is_deceased}`)
+  if (defn.has_grievances !== undefined && defn.has_grievances !== null) params.push(`p_has_grievances=> ${defn.has_grievances}`)
   return params
 }
 

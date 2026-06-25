@@ -69,10 +69,8 @@ module.exports = (app) => {
 
   // GRIEVANCES (all + households and fishers)
   app.get(prefix + '/grievances',                  GrievancesController.indexAll)
-  app.get(prefix + '/households/:pah/grievances',  GrievancesController.index)
-  app.post(prefix + '/households/:pah/grievances', GrievancesController.create)
-  app.get(prefix + '/fishers/:nhs/grievances',     GrievancesController.index)
-  app.post(prefix + '/fishers/:nhs/grievances',    GrievancesController.create)
+  app.get(prefix + '/people/:person_id/grievances',  GrievancesController.index)
+  app.post(prefix + '/people/:person_id/grievances', GrievancesController.create)
   app.patch(prefix + '/grievances/:grievance_id',  GrievancesController.update)
   app.delete(prefix + '/grievances/:grievance_id', GrievancesController.destroy)
 

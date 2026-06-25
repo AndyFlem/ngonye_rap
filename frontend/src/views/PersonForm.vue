@@ -8,6 +8,7 @@ const axiosSecure = inject('axiosSecure')
 const route = useRoute()
 const router = useRouter()
 
+const isEdit = computed(() => Boolean(route.params.person_id))
 const personId = computed(() => route.params.person_id)
 
 const form = ref({
@@ -56,6 +57,7 @@ const saving = ref(false)
 const error = ref('')
 
 const load = async () => {
+  if (!isEdit.value) return
   loading.value = true
   error.value = ''
   try {
@@ -95,10 +97,15 @@ const save = async () => {
   saving.value = true
   error.value = ''
   try {
-    await axiosSecure.patch(`/person/${personId.value}`, form.value)
-    router.push(`/people/${personId.value}`)
+    if (isEdit.value) {
+      await axiosSecure.patch(`/person/${personId.value}`, form.value)
+      router.push(`/people/${personId.value}`)
+    } else {
+      const response = await axiosSecure.post('/person', { ...form.value, pah: null })
+      router.push(`/people/${response.data.person_id}`)
+    }
   } catch (err) {
-    error.value = 'Failed to save person.'
+    error.value = isEdit.value ? 'Failed to save person.' : 'Failed to create person.'
   } finally {
     saving.value = false
   }
@@ -113,7 +120,7 @@ onMounted(load)
     <v-main>
       <v-container class="pa-6">
         <v-card elevation="1">
-          <v-card-title class="table-heading">Edit Person</v-card-title>
+          <v-card-title class="table-heading">{{ isEdit ? 'Edit Person' : 'Add Person' }}</v-card-title>
 
           <v-card-text>
             <div v-if="loading" class="d-flex justify-center pa-6">
@@ -128,8 +135,8 @@ onMounted(load)
 
           <v-card-actions>
             <v-spacer />
-            <v-btn variant="text" :disabled="saving" @click="router.push(`/people/${personId}`)">Cancel</v-btn>
-            <v-btn color="primary" variant="tonal" :loading="saving" @click="save">Save</v-btn>
+            <v-btn variant="text" :disabled="saving" @click="isEdit ? router.push(`/people/${personId}`) : router.push('/people')">Cancel</v-btn>
+            <v-btn color="primary" variant="tonal" :loading="saving" @click="save">{{ isEdit ? 'Save' : 'Create' }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-container>

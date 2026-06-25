@@ -124,7 +124,7 @@ onMounted(load)
               </div>
             </v-row>
             <Notes ref="fisherNotes" :nhs="nhs" class="mb-4" />
-            <Grievances :nhs="nhs" class="mb-4" @grievance-changed="fisherNotes?.loadNotes()" />
+            <Grievances :person-id="fisher.person_id" class="mb-4" @grievance-changed="fisherNotes?.loadNotes()" />
             <Icas
               :nhs="nhs"
               :new-ica-required="fisher?.new_ica_required ?? false"

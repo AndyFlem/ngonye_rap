@@ -4,13 +4,12 @@ const Common = require('./CommonDebug')('Grievances')
 module.exports = {
   async index (req, res) {
     Common.debug(req, 'index', '')
-    const pah = (req.params.pah || '').trim().slice(0, 9)
-    const nhs = (req.params.nhs || '').trim().slice(0, 10)
-    if (!pah && !nhs) return res.status(400).send({ error: 'pah or nhs is required' })
-    const filter = pah ? { pah } : { nhs }
+    
+    const person_id = parseInt(req.params.person_id, 10)
+    if (!person_id) return res.status(400).send({ error: 'person_id is required' })
     try {
-      const grievances = await Knex('grievances')
-        .where(filter)
+      const grievances = await Knex('v_grievances')
+        .where({ person_id })
         .orderByRaw('created_at DESC, grievance_id DESC')
       return res.send(grievances)
     } catch (err) {
@@ -21,9 +20,10 @@ module.exports = {
 
   async create (req, res) {
     Common.debug(req, 'create', '')
-    const pah = (req.params.pah || '').trim().slice(0, 9)
-    const nhs = (req.params.nhs || '').trim().slice(0, 10)
-    if (!pah && !nhs) return res.status(400).send({ error: 'pah or nhs is required' })
+    // const pah = (req.params.pah || '').trim().slice(0, 9)
+    // const nhs = (req.params.nhs || '').trim().slice(0, 10)
+    const person_id = parseInt(req.params.person_id, 10)
+    if (!person_id) return res.status(400).send({ error: 'person_id is required' })
 
     const grievance_link = req.body.grievance_link ? String(req.body.grievance_link).trim().slice(0, 500) || null : null
     const grievance_ref = req.body.grievance_ref ? String(req.body.grievance_ref).trim().slice(0, 50) || null : null
@@ -31,14 +31,14 @@ module.exports = {
 
     if (!grievance_link && !grievance_ref) return res.status(400).send({ error: 'grievance_link or grievance_ref is required' })
 
-    const entity = pah ? { pah } : { nhs }
+    //const entity = pah ? { pah } : { nhs }
 
     try {
       const [inserted] = await Knex('grievances')
-        .insert({ ...entity, grievance_link, grievance_ref, date_received, is_current: true, user_id: req.userId })
+        .insert({ person_id, grievance_link, grievance_ref, date_received, is_current: true, user_id: req.userId })
         .returning('grievance_id')
 
-      const grievance = await Knex('grievances').where({ grievance_id: inserted.grievance_id }).first()
+      const grievance = await Knex('v_grievances').where({ grievance_id: inserted.grievance_id }).first()
       return res.status(201).send(grievance)
     } catch (err) {
       Common.error(req, 'create', err)
@@ -90,20 +90,8 @@ module.exports = {
   async indexAll (req, res) {
     Common.debug(req, 'indexAll', '')
     try {
-      const result = await Knex('grievances as g')
-        .select(
-          'g.grievance_id',
-          'g.pah',
-          'g.nhs',
-          'g.grievance_ref',
-          'g.grievance_link',
-          'g.is_current',
-          'g.date_received',
-          'g.created_at',
-          Knex.raw("COALESCE(vh.fullname, vf.fullname) AS person_name")
-        )
-        .leftJoin('v_households as vh', 'g.pah', 'vh.pah')
-        .leftJoin('v_fishers as vf', 'g.nhs', 'vf.nhs')
+      const result = await Knex('v_grievances as g')
+        .select()
         .orderByRaw('g.created_at DESC, g.grievance_id DESC')
       return res.send(result)
     } catch (err) {

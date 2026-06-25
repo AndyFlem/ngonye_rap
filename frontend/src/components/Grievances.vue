@@ -1,9 +1,8 @@
 <script setup>
-import { computed, inject, onMounted, ref } from 'vue'
+import {  inject, onMounted, ref } from 'vue'
 
 const props = defineProps({
-  pah: { type: String, default: null },
-  nhs: { type: String, default: null }
+  personId: { type: Number, default: null }
 })
 
 const emit = defineEmits(['grievance-changed'])
@@ -33,20 +32,14 @@ const editingDateId = ref(null)
 const draftEditDate = ref('')
 const savingEditDate = ref(false)
 
-const grievancesUrl = computed(() =>
-  props.nhs
-    ? `/fishers/${encodeURIComponent(props.nhs)}/grievances`
-    : `/households/${encodeURIComponent(props.pah)}/grievances`
-)
-
 async function loadGrievances () {
   loading.value = true
   error.value = ''
   try {
-    const r = await axiosSecure.get(grievancesUrl.value)
+    const r = await axiosSecure.get(`/people/${encodeURIComponent(props.personId)}/grievances`)
     grievances.value = Array.isArray(r.data) ? r.data : []
   } catch (err) {
-    error.value = 'Failed to load grievances.'
+    error.value = 'Failed to load grievances.' + err.message
   } finally {
     loading.value = false
   }
@@ -68,7 +61,7 @@ async function submitGrievance () {
   saving.value = true
   saveError.value = ''
   try {
-    await axiosSecure.post(grievancesUrl.value, {
+    await axiosSecure.post(`/people/${encodeURIComponent(props.personId)}/grievances`, {
       grievance_link: newGrievanceLink.value.trim() || null,
       grievance_ref: newGrievanceRef.value.trim() || null,
       date_received: newDateReceived.value || null
@@ -77,7 +70,7 @@ async function submitGrievance () {
     await loadGrievances()
     emit('grievance-changed')
   } catch (err) {
-    saveError.value = 'Failed to save grievance.'
+    saveError.value = 'Failed to save grievance.' + err
   } finally {
     saving.value = false
   }
@@ -238,6 +231,7 @@ defineExpose({ loadGrievances })
             </td>
             <td style="white-space: nowrap;">
               <v-chip v-if="g.is_current" size="x-small" color="green">Current</v-chip>
+              <v-chip v-else size="x-small" color="grey" variant="outlined">Closed</v-chip>
             </td>
             <td style="white-space: nowrap; width: 80px;">
               <v-btn

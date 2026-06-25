@@ -2,8 +2,7 @@
 import { computed, inject, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TopBar from '@/components/TopBar.vue'
-
-
+import Grievances from '@/components/Grievances.vue'
 
 const axiosSecure = inject('axiosSecure')
 const baseUrlStatic = inject('baseUrlStatic')
@@ -211,6 +210,8 @@ onMounted(load)
             </v-container>
           </v-card-actions>
         </v-card>
+
+        <Grievances v-if="person" :personId="Number(personId)" />
       </v-container>
     </v-main>
   </div>

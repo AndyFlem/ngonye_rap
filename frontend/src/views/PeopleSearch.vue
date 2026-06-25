@@ -1,5 +1,6 @@
 <script setup>
 import { inject, nextTick, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import TopBar from '@/components/TopBar.vue'
 import PeopleSearchResult from '@/components/PeopleSearchResult.vue'
 
@@ -17,10 +18,12 @@ const defaultParams = () => ({
   is_cosignatory: null,
   is_disabled: null,
   has_photo: null,
-  is_deceased: null
+  is_deceased: null,
+  has_grievances: null
 })
 
 const axiosSecure = inject('axiosSecure')
+const router = useRouter()
 
 const search = ref({ params: defaultParams() })
 const results = ref([])
@@ -88,7 +91,8 @@ const autoSearchFields = [
   () => search.value.params.is_cosignatory,
   () => search.value.params.is_disabled,
   () => search.value.params.has_photo,
-  () => search.value.params.is_deceased
+  () => search.value.params.is_deceased,
+  () => search.value.params.has_grievances
 ]
 
 watch(autoSearchFields, () => {
@@ -235,6 +239,18 @@ onMounted(() => {
                     variant="text" @click="search.params.is_deceased = null"
                   />
                 </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded px-2">
+                  <v-checkbox
+                    v-model="search.params.has_grievances"
+                    label="Grievances?" hide-details
+                    :indeterminate="search.params.has_grievances === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle" color="grey" size="x-small"
+                    variant="text" @click="search.params.has_grievances = null"
+                  />
+                </div>
               </v-col>
             </v-row>
             <v-row class="mt-2" align="center">
@@ -245,6 +261,7 @@ onMounted(() => {
                 <v-btn color="primary" append-icon="mdi-close" @click="clearSearch">Clear</v-btn>
                 <v-btn color="primary" :loading="loading" append-icon="mdi-magnify" @click="doSearch">Search</v-btn>
                 <v-btn color="primary" :loading="downloading" append-icon="mdi-download" @click="downloadCsv">Download</v-btn>
+                <v-btn color="secondary" prepend-icon="mdi-plus" @click="router.push('/people/new')">New Person</v-btn>
               </v-col>
             </v-row>
             <v-alert v-if="error" type="error" variant="tonal" class="mt-2">{{ error }}</v-alert>

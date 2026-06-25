@@ -352,7 +352,7 @@ onMounted(async () => {
               @update:new-ica-required="val => { pah = { ...pah, new_ica_required: val } }"
               @ica-added="householdNotes?.loadNotes()"
             />
-            <Grievances :pah="pahno" @grievance-changed="householdNotes?.loadNotes()" />
+            <Grievances :person-id="pah.householdhead_id" @grievance-changed="householdNotes?.loadNotes()" />
 
             <Members :pah="pahno" class="mt-5" />
             <v-tabs v-model="tab" class="rounded mt-5" bg-color="blue-lighten-4" selected-class="bg-primary">

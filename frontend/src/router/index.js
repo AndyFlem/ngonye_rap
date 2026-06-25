@@ -93,6 +93,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/people/new',
+    name: 'PersonCreate',
+    component: PersonForm,
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/people/:person_id',
     name: 'PersonDetails',
     component: PersonDetails,

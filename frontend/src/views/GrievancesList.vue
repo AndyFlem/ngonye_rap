@@ -109,7 +109,7 @@ onMounted(load)
     <v-container class="pa-6">
       <v-card elevation="1">
         <v-card-title class="d-flex align-center table-heading">
-          <span>All Grievances</span>
+          <span>Grievances</span><span v-if="!loading">&nbsp;({{ grievances.length }})</span>
           <v-spacer />
           <v-switch
             v-model="showCurrentOnly"
@@ -146,7 +146,6 @@ onMounted(load)
                 v-for="g in displayed"
                 :key="g.grievance_id"
                 style="cursor:pointer"
-                @click="router.push(entityPath(g))"
               >
                 <td class="table-value left" style="white-space:nowrap">{{ g.grievance_ref || '—' }}</td>
                 <td>
@@ -167,13 +166,11 @@ onMounted(load)
                   <v-chip v-else size="x-small" color="grey" variant="outlined">Closed</v-chip>
                 </td>
                 <td style="white-space:nowrap">
-                  <span
-                    class="text-primary"
-                    style="text-decoration:underline"
-                    @click.stop="router.push(entityPath(g))"
-                  >{{ entityId(g) }}</span>
+                  <router-link :to="entityPath(g)" class="">{{ entityId(g) }}</router-link>
                 </td>
-                <td class="table-value left">{{ g.person_name || '—' }}</td>
+                <td class="table-value left" @click.stop>
+                  <router-link :to="`/people/${g.person_id}`">{{ g.person_name }}</router-link>
+                </td>
                 <td style="white-space:nowrap" @click.stop>
                   <template v-if="editingDateId !== g.grievance_id">
                     <span>{{ g.date_received || '—' }}</span>

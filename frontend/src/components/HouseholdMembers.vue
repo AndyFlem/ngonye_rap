@@ -85,13 +85,14 @@ const submitAdd = async () => {
 <template>
   <div v-if="pah">
     <div class="d-flex justify-end mb-1">
-      <v-btn size="small" variant="outlined" prepend-icon="mdi-plus" @click="openAdd">Add Member</v-btn>
+      
     </div>
 
     <v-table v-if="members.length" density="compact">
       <thead>
-        <tr>
-          <th colspan="8" class="table-heading">Members ({{ members.length }})</th>
+        <tr class="">
+          <th colspan="8" class="table-heading"><span class="text-title-small">Members ({{ members.length }})</span></th>
+          <th class="right table-heading"><v-btn size="small" variant="tonal" prepend-icon="mdi-plus" @click="openAdd">Add Member</v-btn></th>
         </tr>
         <tr>
           <th class="left">Role</th>

@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
-\restrict idBLeW3E5CcPQ7b71HgcjoxWusgQgwXrmbBcMpdQbMmpsdkgwTBWD3Grobvk3OO
+\restrict KfPox3Fac3bjhoyBkE2wLTlarYM0uqQqfng2xxXDBrAtLRPpowdjaKGANoOzhrF
 
--- Dumped from database version 14.22 (Ubuntu 14.22-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.22 (Ubuntu 14.22-0ubuntu0.22.04.1)
+-- Dumped from database version 14.23 (Ubuntu 14.23-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.23 (Ubuntu 14.23-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -103,15 +103,15 @@ BEGIN
       LEFT JOIN v_household_compensation hc ON h.pah = hc.pah
       LEFT JOIN person p ON h.householdhead_id = p.person_id
     WHERE
-      (h.vulnerable = p_vulnerable OR p_vulnerable IS NULL) AND
-      (h.nonaffected = p_nonaffected OR p_nonaffected IS NULL) AND
-      (h.landholding_only = p_landholding_only OR p_landholding_only IS NULL) AND
-      (h.silumesii = p_silumesii OR p_silumesii IS NULL) AND
-      (h.new_ica_required = p_new_ica_required OR p_new_ica_required IS NULL) AND
-      (h.no_ica_required = p_no_ica_required OR p_no_ica_required IS NULL) AND
+      (COALESCE(h.vulnerable,false) = p_vulnerable OR p_vulnerable IS NULL) AND
+      (COALESCE(h.nonaffected,false) = p_nonaffected OR p_nonaffected IS NULL) AND
+      (COALESCE(h.landholding_only,false) = p_landholding_only OR p_landholding_only IS NULL) AND
+      (COALESCE(h.silumesii,false) = p_silumesii OR p_silumesii IS NULL) AND
+      (COALESCE(h.new_ica_required,false) = p_new_ica_required OR p_new_ica_required IS NULL) AND
+      (COALESCE(h.no_ica_required,false) = p_no_ica_required OR p_no_ica_required IS NULL) AND
       ((h.date_signed IS NULL AND p_icasigned = False) OR (h.date_signed IS NOT NULL AND p_icasigned = True) OR p_icasigned IS NULL) AND
-      (h.household_followup_flag = p_followup_flag OR p_followup_flag IS NULL) AND
-      (h.physically_displaced = p_physically_displaced OR p_physically_displaced IS NULL) AND
+      (COALESCE(h.household_followup_flag,false) = p_followup_flag OR p_followup_flag IS NULL) AND
+      (COALESCE(h.physically_displaced,false) = p_physically_displaced OR p_physically_displaced IS NULL) AND
       (h.pah = p_pah OR p_pah IS NULL) AND
       (p.nrc ILIKE '%' || p_nrc || '%' OR p_nrc IS NULL) AND
       (h.village_id = p_village_id OR p_village_id IS NULL) AND
@@ -123,11 +123,11 @@ BEGIN
       (h.icaoption_transport = p_icaoption_transport OR p_icaoption_transport IS NULL) AND
       ((COALESCE(h.replacement_structures_count, 0) > 0) = p_has_replacement_structures OR p_has_replacement_structures IS NULL) AND
       ((COALESCE(h.replacement_land_area, 0) > 0) = p_has_replacement_land OR p_has_replacement_land IS NULL) AND
-      (h.has_protected = p_has_protected OR p_has_protected IS NULL) AND
-      (h.survey_complete = p_survey_complete OR p_survey_complete IS NULL) AND
+      (COALESCE(h.has_protected,false) = p_has_protected OR p_has_protected IS NULL) AND
+      (COALESCE(h.survey_complete,false) = p_survey_complete OR p_survey_complete IS NULL) AND
       ((EXISTS (SELECT 1 FROM public.grievances g WHERE g.pah = h.pah AND g.is_current = true)) = p_has_current_grievance OR p_has_current_grievance IS NULL) AND
       (((SELECT COUNT(*) FROM public.icas WHERE icas.pah = h.pah) > 1) = p_has_multiple_icas OR p_has_multiple_icas IS NULL) AND
-      ((EXISTS (SELECT 1 FROM public.person pm WHERE pm.pah = h.pah AND pm.nhs IS NOT NULL)) = p_has_linked_fisher OR p_has_linked_fisher IS NULL) AND
+      ((EXISTS (SELECT 1 FROM public.v_person pm WHERE pm.pah = h.pah AND pm.nhs IS NOT NULL)) = p_has_linked_fisher OR p_has_linked_fisher IS NULL) AND
       ((EXISTS (SELECT 1 FROM public.notes n WHERE n.pah = h.pah)) = p_has_notes OR p_has_notes IS NULL) AND
       (
         (SIMILARITY(p.firstname, p_household_head) > 0.4 OR p_household_head IS NULL) OR
@@ -177,7 +177,7 @@ BEGIN
     (p_nhs IS NULL OR p.nhs ILIKE '%' || p_nhs || '%') AND
     (p_pah IS NULL OR p.pah ILIKE '%' || p_pah || '%') AND
     (p_gender IS NULL OR p.gender = p_gender) AND
-    (p_is_fisher IS NULL OR COALESCE(p.fisher,false) = p_is_fisher) AND
+    (p_is_fisher IS NULL OR (p.nhs IS NOT NULL) = p_is_fisher) AND
     (p_is_head IS NULL OR COALESCE(p.household_head,false) = p_is_head) AND
     (p_is_cosignatory IS NULL OR COALESCE(p.cosignatory,false) = p_is_cosignatory) AND
     (p_is_disabled IS NULL OR COALESCE(p.disabled,false) = p_is_disabled) AND
@@ -290,14 +290,13 @@ CREATE TABLE public.fishers (
 
 CREATE TABLE public.grievances (
     grievance_id bigint NOT NULL,
-    pah character varying(9),
     grievance_link character varying(500),
     is_current boolean DEFAULT true NOT NULL,
     user_id bigint,
     created_at timestamp with time zone DEFAULT now(),
     grievance_ref character varying(50),
-    nhs character varying(10),
-    CONSTRAINT grievances_entity_check CHECK (((pah IS NOT NULL) OR (nhs IS NOT NULL)))
+    date_received date,
+    person_id bigint NOT NULL
 );
 
 
@@ -639,10 +638,11 @@ CREATE TABLE public.person (
     fisher boolean,
     year_of_birth bigint,
     village_id bigint,
-    nhs character varying(10),
     fisher_village_id bigint,
     photo_file text,
-    deceased_date date
+    deceased_date date,
+    created_at date,
+    created_user_id bigint
 );
 
 
@@ -970,6 +970,79 @@ CREATE VIEW public.v_fishers AS
 
 
 --
+-- Name: villages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.villages (
+    village_id bigint NOT NULL,
+    village character varying(100) NOT NULL
+);
+
+
+--
+-- Name: v_person; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.v_person AS
+ SELECT p.person_id,
+    p.pah,
+    f.nhs,
+    p.household_head,
+    p.cosignatory,
+    p.village_id,
+    v.village,
+    p.firstname,
+    p.middlename,
+    p.lastname,
+    concat(p.lastname, ', ', concat_ws(' '::text, p.firstname, p.middlename)) AS fullname,
+    p.nrc,
+    p.contact,
+    p.contact2,
+    p.gender,
+    p.year_of_birth,
+    p.relationship,
+    p.marital_status,
+    p.pregnant_this_year,
+    p.residential_status,
+    p.education,
+    p.primary_occupation,
+    p.secondary_occupation,
+    p.primary_skill,
+    p.secondary_skill,
+    p.disabled,
+    p.disabilities,
+    p.district,
+    p.origin,
+    p.photo_file,
+    p.deceased_date
+   FROM ((public.person p
+     LEFT JOIN public.villages v ON ((p.village_id = v.village_id)))
+     LEFT JOIN public.fishers f ON ((p.person_id = f.person_id)));
+
+
+--
+-- Name: v_grievances; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.v_grievances AS
+ SELECT g.grievance_id,
+    g.person_id,
+    h.pah,
+    f.nhs,
+    g.grievance_link,
+    g.is_current,
+    g.user_id,
+    g.created_at,
+    g.grievance_ref,
+    g.date_received,
+    vf.fullname AS person_name
+   FROM (((public.grievances g
+     LEFT JOIN public.households h ON ((g.person_id = h.householdhead_id)))
+     LEFT JOIN public.fishers f ON ((g.person_id = f.person_id)))
+     LEFT JOIN public.v_person vf ON ((g.person_id = vf.person_id)));
+
+
+--
 -- Name: v_land_assets; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -1153,16 +1226,6 @@ CREATE VIEW public.v_trees_summary AS
     sum(t.compensation) AS compensation
    FROM public.v_trees t
   GROUP BY t.pah, t.tree_type;
-
-
---
--- Name: villages; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.villages (
-    village_id bigint NOT NULL,
-    village character varying(100) NOT NULL
-);
 
 
 --
@@ -1372,47 +1435,6 @@ CREATE VIEW public.v_notes AS
     (((u.first_name)::text || ' '::text) || (u.last_name)::text) AS created_by
    FROM (public.notes n
      LEFT JOIN public."user" u ON ((u.user_id = n.user_id)));
-
-
---
--- Name: v_person; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.v_person AS
- SELECT p.person_id,
-    p.pah,
-    p.nhs,
-    p.household_head,
-    p.cosignatory,
-    p.fisher,
-    p.village_id,
-    v.village,
-    p.firstname,
-    p.middlename,
-    p.lastname,
-    concat(p.lastname, ', ', concat_ws(' '::text, p.firstname, p.middlename)) AS fullname,
-    p.nrc,
-    p.contact,
-    p.contact2,
-    p.gender,
-    p.year_of_birth,
-    p.relationship,
-    p.marital_status,
-    p.pregnant_this_year,
-    p.residential_status,
-    p.education,
-    p.primary_occupation,
-    p.secondary_occupation,
-    p.primary_skill,
-    p.secondary_skill,
-    p.disabled,
-    p.disabilities,
-    p.district,
-    p.origin,
-    p.photo_file,
-    p.deceased_date
-   FROM (public.person p
-     LEFT JOIN public.villages v ON ((p.village_id = v.village_id)));
 
 
 --
@@ -1802,22 +1824,6 @@ ALTER TABLE ONLY public.fishers
 
 
 --
--- Name: grievances grievances_nhs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.grievances
-    ADD CONSTRAINT grievances_nhs_fkey FOREIGN KEY (nhs) REFERENCES public.fishers(nhs);
-
-
---
--- Name: grievances grievances_pah_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.grievances
-    ADD CONSTRAINT grievances_pah_fkey FOREIGN KEY (pah) REFERENCES public.households(pah);
-
-
---
 -- Name: grievances grievances_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1853,5 +1859,5 @@ ALTER TABLE ONLY public.notes
 -- PostgreSQL database dump complete
 --
 
-\unrestrict idBLeW3E5CcPQ7b71HgcjoxWusgQgwXrmbBcMpdQbMmpsdkgwTBWD3Grobvk3OO
+\unrestrict KfPox3Fac3bjhoyBkE2wLTlarYM0uqQqfng2xxXDBrAtLRPpowdjaKGANoOzhrF
 
