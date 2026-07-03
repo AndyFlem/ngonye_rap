@@ -15,8 +15,9 @@ const search = ref({
     replacement_class: null,
     icaoption_structure_location: null,
     phase: null,
-    protected: null,
+    protected: false,
     flag_followup: null,
+    silumesii: null,
   }
 })
 
@@ -55,6 +56,7 @@ const autoSearchFields = [
   () => search.value.params.phase,
   () => search.value.params.protected,
   () => search.value.params.flag_followup,
+  () => search.value.params.silumesii,
 ]
 
 watch(autoSearchFields, () => {
@@ -115,8 +117,9 @@ function clearSearch () {
     replacement_class: null,
     icaoption_structure_location: null,
     phase: null,
-    protected: null,
+    protected: false,
     flag_followup: null,
+    silumesii: null,
   }
 }
 
@@ -230,6 +233,17 @@ onMounted(() => {
                   clearable
                 />
               </v-col>
+              <v-col cols="12" md="3">
+                <v-select
+                  density="compact"
+                  hide-details
+                  v-model="search.params.phase"
+                  :items="options.phase"
+                  label="Phase"
+                  placeholder="Any"
+                  clearable
+                />
+              </v-col>
             </v-row>
             <v-row>
               <v-col cols="12">
@@ -268,6 +282,22 @@ onMounted(() => {
                     size="x-small"
                     variant="text"
                     @click="search.params.flag_followup = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.silumesii"
+                    label="Silumesii"
+                    hide-details
+                    :indeterminate="search.params.silumesii === null"
+                    density="comfortable"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.silumesii = null"
                   />
                 </div>
               </v-col>

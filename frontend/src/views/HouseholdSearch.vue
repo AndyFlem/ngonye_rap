@@ -37,7 +37,8 @@ const search = ref({
     has_current_grievance: null,
     has_multiple_icas: null,
     has_linked_fisher: null,
-    has_notes: null
+    has_notes: null,
+    is_duplicate: null
   }
 })
 
@@ -106,6 +107,7 @@ const autoSearchFields = [
   () => search.value.params.has_multiple_icas,
   () => search.value.params.has_linked_fisher,
   () => search.value.params.has_notes,
+  () => search.value.params.is_duplicate,
   icarequired,
 ]
 
@@ -442,6 +444,22 @@ onMounted(() => {
                     size="x-small"
                     variant="text"
                     @click="search.params.has_multiple_icas = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.is_duplicate"
+                    label="Duplicate?"
+                    hide-details
+                    :indeterminate="search.params.is_duplicate === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.is_duplicate = null"
                   />
                 </div>
               </v-col>

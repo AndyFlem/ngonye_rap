@@ -92,6 +92,7 @@ function buildSearchParams (defn) {
   if (defn.has_multiple_icas !== undefined && defn.has_multiple_icas !== null) { params.push(`p_has_multiple_icas=> ${defn.has_multiple_icas}`) }
   if (defn.has_linked_fisher !== undefined && defn.has_linked_fisher !== null) { params.push(`p_has_linked_fisher=> ${defn.has_linked_fisher}`) }
   if (defn.has_notes !== undefined && defn.has_notes !== null) { params.push(`p_has_notes=> ${defn.has_notes}`) }
+  if (defn.is_duplicate !== undefined && defn.is_duplicate !== null) { params.push(`p_is_duplicate=> ${defn.is_duplicate}`) }
   return params
 }
 function csvEscape (val) {
@@ -112,7 +113,8 @@ module.exports = {
     const allowed = {
       village_id: 'village_id',
       household_followup_flag: 'followup_flag',
-      new_ica_required: 'new_ica_required'
+      new_ica_required: 'new_ica_required',
+      duplicate_pah: 'duplicate_pah'
     }
     const fields = {}
     for (const [bodyKey, colName] of Object.entries(allowed)) {

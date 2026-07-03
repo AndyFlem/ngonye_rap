@@ -30,6 +30,9 @@ const villages = ref([])
 const editingVillage = ref(false)
 const draftVillageId = ref(null)
 const savingVillage = ref(false)
+const editingDuplicatePah = ref(false)
+const draftDuplicatePah = ref('')
+const savingDuplicatePah = ref(false)
 const togglingFlag = ref(false)
 const householdNotes = ref(null)
 
@@ -65,6 +68,26 @@ async function saveVillage () {
     error.value = 'Failed to save village.'
   } finally {
     savingVillage.value = false
+  }
+}
+
+function startEditDuplicatePah () {
+  draftDuplicatePah.value = pah.value?.duplicate_pah ?? ''
+  editingDuplicatePah.value = true
+}
+
+async function saveDuplicatePah () {
+  savingDuplicatePah.value = true
+  try {
+    const val = draftDuplicatePah.value.trim() || null
+    await axiosSecure.patch(`/households/${encodeURIComponent(pahno.value)}`, { duplicate_pah: val })
+    pah.value = { ...pah.value, duplicate_pah: val }
+    editingDuplicatePah.value = false
+  } catch (err) {
+    console.error('Failed to save duplicate_pah:', err)
+    error.value = 'Failed to save Duplicate PAH.'
+  } finally {
+    savingDuplicatePah.value = false
   }
 }
 
@@ -333,6 +356,23 @@ onMounted(async () => {
                   >Open ICA Link</v-btn>
                 </div>
                 <div v-else><strong>ICA:</strong> <span class="table-value">Not Required</span></div>
+                <div class="d-flex align-center">
+                  <template v-if="!editingDuplicatePah">
+                    <strong>Duplicate PAH:</strong>&nbsp;<span class="table-value">{{ pah.duplicate_pah }}</span>
+                    <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
+                      @click="startEditDuplicatePah"
+                      style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
+                  </template>
+                  <template v-else>
+                    <strong>Duplicate PAH:</strong>&nbsp;
+                    <v-text-field v-model="draftDuplicatePah" density="compact" hide-details
+                      variant="underlined" style="max-width: 180px" maxlength="20" />
+                    <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check"
+                      :loading="savingDuplicatePah" @click="saveDuplicatePah" />
+                    <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close"
+                      @click="editingDuplicatePah = false" />
+                  </template>
+                </div>
                 <div v-if="pah_survey">
                   <strong>Survey Completed:&nbsp;</strong>
                   <span class="table-value" :class="!pah?.survey_complete ? 'highlight' : ''">{{ pah?.survey_complete ? formatDateTime(pah_survey.survey_date) : 'No' }}</span>

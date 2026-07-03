@@ -86,7 +86,11 @@ module.exports = (app) => {
   app.post(prefix + '/replacements_search', ReplacementsController.search)
   app.post(prefix + '/replacements_export', ReplacementsController.exportSearch)
   app.get(prefix + '/replacements', ReplacementsController.index)
+  app.get(prefix + '/replacements/:id/notes',        ReplacementsController.indexNotes)
+  app.post(prefix + '/replacements/:id/notes',       ReplacementsController.createNote)
+  app.delete(prefix + '/replacement_notes/:note_id', ReplacementsController.destroyNote)
   app.get(prefix + '/replacements/:id', ReplacementsController.show)
+  app.patch(prefix + '/replacements/:id', ReplacementsController.patch)
 
   // LIVELIHOOD RESTORATION
   app.get(prefix + '/livelihood-restoration/households', RAPController.lrHouseholds)

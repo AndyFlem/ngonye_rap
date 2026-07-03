@@ -5,6 +5,7 @@ import PersonView from '@/components/PersonView.vue'
 
 const axiosSecure = inject('axiosSecure')
 const replacement = ref(null)
+const latestNote = ref(null)
 const loading = ref(false)
 const error = ref('')
 
@@ -20,9 +21,14 @@ watch(() => props.replacementId, async (newId) => {
     loading.value = true
     error.value = ''
     replacement.value = null
+    latestNote.value = null
     try {
       const response = await axiosSecure.get(`/replacements/${newId}`)
       replacement.value = response.data
+      if (replacement.value?.flag_followup) {
+        const notesResponse = await axiosSecure.get(`/replacements/${newId}/notes`)
+        latestNote.value = notesResponse.data?.[0] ?? null
+      }
     } catch (err) {
       console.error('Failed to load replacement structure:', err)
       error.value = 'An error occurred while loading the replacement structure.'
@@ -52,6 +58,9 @@ watch(() => props.replacementId, async (newId) => {
           <v-chip color="purple" class="mr-2" size="small" v-if="replacement && replacement.flag_followup">
             Follow-Up
           </v-chip>
+          <v-chip color="green" class="mr-2" size="small" v-if="replacement && replacement.silumesii">
+            Silumesii
+          </v-chip>          
         </v-col>
       </v-row>
     </v-card-title>
@@ -70,8 +79,19 @@ watch(() => props.replacementId, async (newId) => {
         </v-col>
         <v-col cols="12" sm="6">
           <div><strong>Option:</strong> <span class="table-value">{{ replacement.replacement_option }}</span></div>
-          <div v-if="replacement.replacement_value"><strong>Value:</strong> <span class="table-value">K{{ formatCurrency(replacement.replacement_value) }}</span></div>
+          <div v-if="replacement.replacement_cost_2024"><strong>Value:</strong> <span class="table-value">${{ formatCurrency(replacement.replacement_cost_2024) }}</span></div>
           <div v-if="replacement.icaoption_structure_location"><strong>Location:</strong> <span class="table-value">{{ replacement.icaoption_structure_location }}</span></div>
+        </v-col>
+      </v-row>
+      <v-row v-if="latestNote">
+        <v-col cols="12">
+          <div class="d-flex align-start ga-2 mt-1">
+            <v-icon icon="mdi-note-text" size="small" color="purple" class="mt-1" />
+            <div>
+              <span class="text-body-2">{{ latestNote.note }}</span>
+              <span class="text-caption text-medium-emphasis ml-2">— {{ latestNote.created_by }}, {{ latestNote.created_at?.slice(0, 10) }}</span>
+            </div>
+          </div>
         </v-col>
       </v-row>
     </v-card-text>
