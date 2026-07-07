@@ -114,7 +114,10 @@ module.exports = {
       village_id: 'village_id',
       household_followup_flag: 'followup_flag',
       new_ica_required: 'new_ica_required',
-      duplicate_pah: 'duplicate_pah'
+      duplicate_pah: 'duplicate_pah',
+      icaoption_landholding: 'icaoption_landholding',
+      icaoption_dryland: 'icaoption_dryland',
+      icaoption_garden: 'icaoption_garden'
     }
     const fields = {}
     for (const [bodyKey, colName] of Object.entries(allowed)) {
@@ -204,6 +207,12 @@ module.exports = {
         .where({ pah })
         .first()
       household.compensation = comp || null
+
+      const landComp = await Knex('v_household_land_compensation')
+        .where({ pah })
+        .orderBy('acquisition_class')
+        .orderBy('rate_acquisition_class')
+      household.land_compensation = landComp || []
 
       return res.send(household)
     } catch (err) {

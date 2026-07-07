@@ -12,6 +12,7 @@ const LandController = require('./controllers/LandController')
 const PersonController = require('./controllers/PersonController')
 const FishersController = require('./controllers/FishersController')
 const NotesController = require('./controllers/NotesController')
+const CertificateController = require('./controllers/CertificateController')
 
 module.exports = (app) => {
   const prefix = '/api/' + config.api_version
@@ -49,6 +50,7 @@ module.exports = (app) => {
   app.get(prefix + '/households_ica_options', HouseholdsController.indexIcaOptions)
   app.get(prefix + '/households/:pah', HouseholdsController.show)
   app.patch(prefix + '/households/:pah', HouseholdsController.patch)
+  app.get(prefix + '/households/:pah/certificate', CertificateController.generate)
   app.get(prefix + '/households/:pah/survey', HouseholdsController.showSurvey)
   app.get(prefix + '/households/:pah/members', PersonController.indexMembers)
   app.get(prefix + '/fishers/:nhs/members',    PersonController.indexMembers)

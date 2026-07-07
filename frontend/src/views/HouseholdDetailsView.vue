@@ -33,8 +33,40 @@ const savingVillage = ref(false)
 const editingDuplicatePah = ref(false)
 const draftDuplicatePah = ref('')
 const savingDuplicatePah = ref(false)
+
+const icaOptionChoices = [
+  { title: 'None', value: null },
+  { title: '1: Self-Source', value: '1: Self-Source' },
+  { title: '2: Land Allocation', value: '2: Land Allocation' },
+  { title: '3: Cash Compensation', value: '3: Cash Compensation' }
+]
+const editingIcaOption = ref(null)
+const draftIcaOption = ref(null)
+const savingIcaOption = ref(false)
 const togglingFlag = ref(false)
+const downloadingCert = ref(false)
 const householdNotes = ref(null)
+
+async function downloadCertificate () {
+  downloadingCert.value = true
+  try {
+    const response = await axiosSecure.get(
+      `/households/${encodeURIComponent(pahno.value)}/certificate`,
+      { responseType: 'blob' }
+    )
+    const url = URL.createObjectURL(response.data)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `CompCert_${pahno.value}.docx`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (err) {
+    console.error('Failed to download certificate:', err)
+    error.value = 'Failed to generate certificate.'
+  } finally {
+    downloadingCert.value = false
+  }
+}
 
 async function toggleFollowupFlag () {
   togglingFlag.value = true
@@ -91,6 +123,25 @@ async function saveDuplicatePah () {
   }
 }
 
+
+function startEditIcaOption (field) {
+  draftIcaOption.value = pah.value?.[field] ?? null
+  editingIcaOption.value = field
+}
+
+async function saveIcaOption (field) {
+  savingIcaOption.value = true
+  try {
+    await axiosSecure.patch(`/households/${encodeURIComponent(pahno.value)}`, { [field]: draftIcaOption.value })
+    pah.value = { ...pah.value, [field]: draftIcaOption.value }
+    editingIcaOption.value = null
+  } catch (err) {
+    console.error(`Failed to save ${field}:`, err)
+    error.value = 'Failed to save ICA option.'
+  } finally {
+    savingIcaOption.value = false
+  }
+}
 
 const surveyFields = [
   ['pah', 'PAH No'],
@@ -174,19 +225,6 @@ const landOptions = computed(() => {
   ].filter(opt => opt !== null && opt !== undefined && opt !== '')
   return [...new Set(options)].join(', ')
 })
-
-const hasIcaOption = (value) => {
-  if (value === null || value === undefined) return false
-  if (typeof value === 'boolean') return value
-  if (typeof value === 'number') return value > 0
-  const normalized = String(value).trim().toLowerCase()
-  return normalized !== '' && normalized !== '0' && normalized !== 'false' && normalized !== 'no'
-}
-
-const formatIcaOption = (value) => {
-  if (typeof value === 'boolean') return value ? 'Yes' : 'No'
-  return String(value)
-}
 
 const isTrueValue = (value) => {
   if (value === true || value === 1) return true
@@ -310,6 +348,18 @@ onMounted(async () => {
               @click="toggleFollowupFlag"
             >
               {{ pah.household_followup_flag ? 'Flagged' : 'Flag' }}
+            </v-btn>
+            <v-btn
+              v-if="pah"
+              color="primary"
+              variant="tonal"
+              size="small"
+              class="mr-2"
+              prepend-icon="mdi-file-word"
+              :loading="downloadingCert"
+              @click="downloadCertificate"
+            >
+              Certificate
             </v-btn>
           </v-card-title>
           <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4" />
@@ -517,29 +567,74 @@ onMounted(async () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-if="hasIcaOption(pah.icaoption_primary_structure)">
+                        <tr v-if="pah.icaoption_primary_structure">
                           <td class="table-label">Primary Structure</td>
-                          <td class="table-value">{{ formatIcaOption(pah.icaoption_primary_structure) }}</td>
+                          <td class="table-value">{{ pah.icaoption_primary_structure }}</td>
                         </tr>
-                        <tr v-if="hasIcaOption(pah.icaoption_landholding)">
-                          <td class="table-label">Landholding</td>
-                          <td class="table-value">{{ formatIcaOption(pah.icaoption_landholding) }}</td>
-                        </tr>
-                        <tr v-if="hasIcaOption(pah.icaoption_structure_location)">
+                        <tr v-if="pah.icaoption_structure_location">
                           <td class="table-label">Structure Location</td>
-                          <td class="table-value">{{ formatIcaOption(pah.icaoption_structure_location) }}</td>
+                          <td class="table-value">{{ pah.icaoption_structure_location }}</td>
                         </tr>
-                        <tr v-if="hasIcaOption(pah.icaoption_dryland)">
-                          <td class="table-label">Dryland</td>
-                          <td class="table-value">{{ formatIcaOption(pah.icaoption_dryland) }}</td>
-                        </tr>
-                        <tr v-if="hasIcaOption(pah.icaoption_garden)">
-                          <td class="table-label">Garden</td>
-                          <td class="table-value">{{ formatIcaOption(pah.icaoption_garden) }}</td>
-                        </tr>
-                        <tr v-if="hasIcaOption(pah.icaoption_transport)">
+                        <tr v-if="pah.icaoption_transport">
                           <td class="table-label">Transport</td>
-                          <td class="table-value">{{ formatIcaOption(pah.icaoption_transport) }}</td>
+                          <td class="table-value">{{ pah.icaoption_transport }}</td>
+                        </tr>
+                        <tr v-if="pah.icaoption_landholding || pah.land_compensation.filter(v=>v.acquisition_class == 'Permanent' && v.land_class == 'Landholding').length > 0 || editingIcaOption === 'icaoption_landholding'">
+                          <td class="table-label">Landholding</td>
+                          <td class="table-value">
+                            <template v-if="editingIcaOption !== 'icaoption_landholding'">
+                              {{ pah.icaoption_landholding || 'none' }}
+                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
+                                @click="startEditIcaOption('icaoption_landholding')"
+                                style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
+                            </template>
+                            <template v-else>
+                              <v-select v-model="draftIcaOption" :items="icaOptionChoices" item-title="title" item-value="value"
+                                density="compact" hide-details variant="underlined" style="max-width: 220px; display: inline-block" />
+                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check"
+                                :loading="savingIcaOption" @click="saveIcaOption('icaoption_landholding')" />
+                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close"
+                                @click="editingIcaOption = null" />
+                            </template>
+                          </td>
+                        </tr>
+                        <tr v-if="pah.icaoption_dryland || pah.land_compensation.filter(v=>v.acquisition_class == 'Permanent' && v.land_class == 'Dryland').length > 0 || editingIcaOption === 'icaoption_dryland'">
+                          <td class="table-label">Dryland</td>
+                          <td class="table-value">
+                            <template v-if="editingIcaOption !== 'icaoption_dryland'">
+                              {{ pah.icaoption_dryland || 'none' }}
+                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
+                                @click="startEditIcaOption('icaoption_dryland')"
+                                style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
+                            </template>
+                            <template v-else>
+                              <v-select v-model="draftIcaOption" :items="icaOptionChoices" item-title="title" item-value="value"
+                                density="compact" hide-details variant="underlined" style="max-width: 220px; display: inline-block" />
+                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check"
+                                :loading="savingIcaOption" @click="saveIcaOption('icaoption_dryland')" />
+                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close"
+                                @click="editingIcaOption = null" />
+                            </template>
+                          </td>
+                        </tr>
+                        <tr v-if="pah.icaoption_garden || pah.land_compensation.filter(v=>v.acquisition_class == 'Permanent' && v.land_class == 'Garden').length > 0 || editingIcaOption === 'icaoption_garden'">
+                          <td class="table-label">Garden</td>
+                          <td class="table-value">
+                            <template v-if="editingIcaOption !== 'icaoption_garden'">
+                              {{ pah.icaoption_garden || 'none' }}
+                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
+                                @click="startEditIcaOption('icaoption_garden')"
+                                style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
+                            </template>
+                            <template v-else>
+                              <v-select v-model="draftIcaOption" :items="icaOptionChoices" item-title="title" item-value="value"
+                                density="compact" hide-details variant="underlined" style="max-width: 220px; display: inline-block" />
+                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check"
+                                :loading="savingIcaOption" @click="saveIcaOption('icaoption_garden')" />
+                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close"
+                                @click="editingIcaOption = null" />
+                            </template>
+                          </td>
                         </tr>
                       </tbody>
                       <TableCopyFooter :colspan="2" />
@@ -553,32 +648,79 @@ onMounted(async () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-if="hasIcaOption(pah.lr_agricultural)">
+                        <tr v-if="pah.lr_agricultural">
                           <td class="table-label">Agricultural</td>
-                          <td class="table-value">{{ formatIcaOption(pah.lr_agricultural) }}</td>
+                          <td class="table-value">{{ pah.lr_agricultural }}</td>
                         </tr>
-                        <tr v-if="hasIcaOption(pah.lr_livestock)">
+                        <tr v-if="pah.lr_livestock">
                           <td class="table-label">Livestock</td>
-                          <td class="table-value">{{ formatIcaOption(pah.lr_livestock) }}</td>
+                          <td class="table-value">{{ pah.lr_livestock }}</td>
                         </tr>
-                        <tr v-if="hasIcaOption(pah.lr_water)">
+                        <tr v-if="pah.lr_water">
                           <td class="table-label">Water</td>
-                          <td class="table-value">{{ formatIcaOption(pah.lr_water) }}</td>
+                          <td class="table-value">{{ pah.lr_water }}</td>
                         </tr>
-                        <tr v-if="hasIcaOption(pah.lr_fisheries)">
+                        <tr v-if="pah.lr_fisheries">
                           <td class="table-label">Fisheries</td>
-                          <td class="table-value">{{ formatIcaOption(pah.lr_fisheries) }}</td>
+                          <td class="table-value">{{ pah.lr_fisheries }}</td>
                         </tr>
-                        <tr v-if="hasIcaOption(pah.lr_reedbeds)">
+                        <tr v-if="pah.lr_reedbeds">
                           <td class="table-label">Reedbeds</td>
-                          <td class="table-value">{{ formatIcaOption(pah.lr_reedbeds) }}</td>
+                          <td class="table-value">{{ pah.lr_reedbeds }}</td>
                         </tr>
-                        <tr v-if="hasIcaOption(pah.lr_agricultureinputs)">
+                        <tr v-if="pah.lr_agricultureinputs">
                           <td class="table-label">Agriculture Inputs</td>
-                          <td class="table-value">{{ formatIcaOption(pah.lr_agricultureinputs) }}</td>
+                          <td class="table-value">{{ pah.lr_agricultureinputs }}</td>
                         </tr>
                       </tbody>
                       <TableCopyFooter :colspan="2" />
+                    </v-table>
+                  </v-col>
+                </v-row>
+                <v-row v-if="pah.land_compensation && pah.land_compensation.length > 0" class="mt-4">
+                  <v-col cols="12">
+                    <v-table density="compact">
+                      <thead>
+                        <tr>
+                          <th colspan="9" class="table-heading">Land Compensation Summary</th>
+                        </tr>
+                        <tr>
+                          <th>Land Class</th>
+                          <th>Acquisition Class</th>
+                          <th class="center">Parcels</th>
+                          <th class="right">Acquisition Area</th>
+                          <th class="right">Acquisition Rate</th>
+                          <th class="right">Acquisition Cost</th>
+                          <th class="right">Lease Rate</th>
+                          <th class="right">Lease Cost</th>
+                          <th class="right">Lease Total</th>
+
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in pah.land_compensation" :key="index">
+                          <td class="table-value left">{{ item.rate_acquisition_class }}</td>
+                          <td class="table-value left">{{ item.acquisition_class }}</td>
+                          <td class="table-value center">{{ item.asset_count }}</td>
+                          <td class="table-value right">{{ formatArea(item.area_sqm) }}</td>
+                          <td class="table-value right">{{ item.rate_acquisition != null ? `K${item.rate_acquisition}/sqm` : '-' }}</td>
+                          <td class="table-value right">{{ item.land_value != null ? `K${formatCurrency(item.land_value)}` : '-' }}</td>
+                          <td class="table-value right">{{ item.rate_lease != null ? `K${item.rate_lease}/sqm/year` : '-' }}</td>
+                          <td class="table-value right">{{ item.lease_cost != null ? `K${formatCurrency(item.lease_cost)}/year` : '-' }}</td>
+                          <td class="table-value right">{{ item.lease_cost_total != null ? `K${formatCurrency(item.lease_cost_total)}` : '-' }}</td>
+                        </tr>
+                        <tr class="table-total">
+                          <td class="table-value" colspan="2">Total</td>
+                          <td class="table-value center">{{ pah.land_compensation.reduce((sum, i) => sum + (i.asset_count || 0), 0) }}</td>
+                          <td class="table-value right">{{ formatArea(pah.land_compensation.reduce((sum, i) => sum + (i.area_sqm || 0), 0)) }}</td>
+                          <td class="table-value right"></td>
+                          <td class="table-value">K{{ formatCurrency(pah.land_compensation.reduce((sum, i) => sum + (i.land_value || 0), 0)) }}</td>
+                          <td class="table-value"></td>
+                          <td class="table-value right"></td>
+                          <td class="table-value">K{{ formatCurrency(pah.land_compensation.reduce((sum, i) => sum + (i.lease_cost_total || 0), 0)) }}</td>
+                        </tr>
+                      </tbody>
+                      <TableCopyFooter :colspan="9" />
                     </v-table>
                   </v-col>
                 </v-row>
@@ -587,7 +729,7 @@ onMounted(async () => {
                     <v-table density="compact">
                       <thead>
                         <tr>
-                          <th colspan="9" class="table-heading">Land</th>
+                          <th colspan="9" class="table-heading">Land Details</th>
                         </tr>
                         <tr>
                           <th>ID</th>

@@ -2,10 +2,8 @@
 -- PostgreSQL database dump
 --
 
-\restrict KfPox3Fac3bjhoyBkE2wLTlarYM0uqQqfng2xxXDBrAtLRPpowdjaKGANoOzhrF
-
--- Dumped from database version 14.23 (Ubuntu 14.23-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.23 (Ubuntu 14.23-0ubuntu0.22.04.1)
+-- Dumped from database version 14.18 (Ubuntu 14.18-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.18 (Ubuntu 14.18-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -68,9 +66,9 @@ BEGIN
     (p_catch_survey IS NULL OR f.catch_survey = p_catch_survey) AND
     (p_maungwe_active IS NULL OR f.maungwe_active = p_maungwe_active) AND
     (p_limbelo_active IS NULL OR f.limbelo_active = p_limbelo_active) AND
-    (p_followup_flag IS NULL OR f.followup_flag = p_followup_flag) AND
+    (p_followup_flag IS NULL OR COALESCE(f.followup_flag,false) = p_followup_flag) AND
     (p_ica_signed IS NULL OR (i.date_signed IS NOT NULL) = p_ica_signed) AND
-    (p_new_ica_required IS NULL OR f.new_ica_required = p_new_ica_required) AND
+    (p_new_ica_required IS NULL OR COALESCE(f.new_ica_required,false) = p_new_ica_required) AND
     (p_has_multiple_icas IS NULL OR ((SELECT COUNT(*) FROM public.icas WHERE icas.nhs = f.nhs) > 1) = p_has_multiple_icas) AND
     (p_has_linked_household IS NULL OR (p.pah IS NOT NULL) = p_has_linked_household) AND
     (p_has_notes IS NULL OR (EXISTS (SELECT 1 FROM public.notes n WHERE n.nhs = f.nhs)) = p_has_notes) AND
@@ -86,10 +84,10 @@ $$;
 
 
 --
--- Name: a_households_search(character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, character varying, bigint, character varying, character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
+-- Name: a_households_search(character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, character varying, bigint, character varying, character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.a_households_search(p_household_head character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_vulnerable boolean DEFAULT NULL::boolean, p_nonaffected boolean DEFAULT NULL::boolean, p_landholding_only boolean DEFAULT NULL::boolean, p_silumesii boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_no_ica_required boolean DEFAULT NULL::boolean, p_icasigned boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_physically_displaced boolean DEFAULT NULL::boolean, p_nrc character varying DEFAULT NULL::character varying, p_village_id bigint DEFAULT NULL::bigint, p_icaoption_primary_structure character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_icaoption_landholding character varying DEFAULT NULL::character varying, p_icaoption_dryland character varying DEFAULT NULL::character varying, p_icaoption_garden character varying DEFAULT NULL::character varying, p_icaoption_transport character varying DEFAULT NULL::character varying, p_has_replacement_structures boolean DEFAULT NULL::boolean, p_has_replacement_land boolean DEFAULT NULL::boolean, p_has_protected boolean DEFAULT NULL::boolean, p_survey_complete boolean DEFAULT NULL::boolean, p_has_current_grievance boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_fisher boolean DEFAULT NULL::boolean, p_has_notes boolean DEFAULT NULL::boolean) RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
+CREATE FUNCTION public.a_households_search(p_household_head character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_vulnerable boolean DEFAULT NULL::boolean, p_nonaffected boolean DEFAULT NULL::boolean, p_landholding_only boolean DEFAULT NULL::boolean, p_silumesii boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_no_ica_required boolean DEFAULT NULL::boolean, p_icasigned boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_physically_displaced boolean DEFAULT NULL::boolean, p_nrc character varying DEFAULT NULL::character varying, p_village_id bigint DEFAULT NULL::bigint, p_icaoption_primary_structure character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_icaoption_landholding character varying DEFAULT NULL::character varying, p_icaoption_dryland character varying DEFAULT NULL::character varying, p_icaoption_garden character varying DEFAULT NULL::character varying, p_icaoption_transport character varying DEFAULT NULL::character varying, p_has_replacement_structures boolean DEFAULT NULL::boolean, p_has_replacement_land boolean DEFAULT NULL::boolean, p_has_protected boolean DEFAULT NULL::boolean, p_survey_complete boolean DEFAULT NULL::boolean, p_has_current_grievance boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_fisher boolean DEFAULT NULL::boolean, p_has_notes boolean DEFAULT NULL::boolean, p_is_duplicate boolean DEFAULT NULL::boolean) RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -125,10 +123,11 @@ BEGIN
       ((COALESCE(h.replacement_land_area, 0) > 0) = p_has_replacement_land OR p_has_replacement_land IS NULL) AND
       (COALESCE(h.has_protected,false) = p_has_protected OR p_has_protected IS NULL) AND
       (COALESCE(h.survey_complete,false) = p_survey_complete OR p_survey_complete IS NULL) AND
-      ((EXISTS (SELECT 1 FROM public.grievances g WHERE g.pah = h.pah AND g.is_current = true)) = p_has_current_grievance OR p_has_current_grievance IS NULL) AND
+      ((EXISTS (SELECT 1 FROM public.v_grievances g WHERE g.pah = h.pah AND g.is_current = true)) = p_has_current_grievance OR p_has_current_grievance IS NULL) AND
       (((SELECT COUNT(*) FROM public.icas WHERE icas.pah = h.pah) > 1) = p_has_multiple_icas OR p_has_multiple_icas IS NULL) AND
       ((EXISTS (SELECT 1 FROM public.v_person pm WHERE pm.pah = h.pah AND pm.nhs IS NOT NULL)) = p_has_linked_fisher OR p_has_linked_fisher IS NULL) AND
       ((EXISTS (SELECT 1 FROM public.notes n WHERE n.pah = h.pah)) = p_has_notes OR p_has_notes IS NULL) AND
+      ((h.duplicate_pah IS NOT NULL) = p_is_duplicate OR p_is_duplicate IS NULL) AND
       (
         (SIMILARITY(p.firstname, p_household_head) > 0.4 OR p_household_head IS NULL) OR
         (SIMILARITY(p.lastname, p_household_head) > 0.4 OR p_household_head IS NULL) OR
@@ -162,10 +161,10 @@ $$;
 
 
 --
--- Name: a_person_search(character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
+-- Name: a_person_search(character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.a_person_search(p_name character varying DEFAULT NULL::character varying, p_nrc character varying DEFAULT NULL::character varying, p_nhs character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_gender character varying DEFAULT NULL::character varying, p_is_fisher boolean DEFAULT NULL::boolean, p_is_head boolean DEFAULT NULL::boolean, p_is_cosignatory boolean DEFAULT NULL::boolean, p_is_disabled boolean DEFAULT NULL::boolean, p_has_photo boolean DEFAULT NULL::boolean, p_is_deceased boolean DEFAULT NULL::boolean) RETURNS TABLE(person_id bigint)
+CREATE FUNCTION public.a_person_search(p_name character varying DEFAULT NULL::character varying, p_nrc character varying DEFAULT NULL::character varying, p_nhs character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_gender character varying DEFAULT NULL::character varying, p_is_fisher boolean DEFAULT NULL::boolean, p_is_head boolean DEFAULT NULL::boolean, p_is_cosignatory boolean DEFAULT NULL::boolean, p_is_disabled boolean DEFAULT NULL::boolean, p_has_photo boolean DEFAULT NULL::boolean, p_is_deceased boolean DEFAULT NULL::boolean, p_has_grievances boolean DEFAULT NULL::boolean) RETURNS TABLE(person_id bigint)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -183,6 +182,7 @@ BEGIN
     (p_is_disabled IS NULL OR COALESCE(p.disabled,false) = p_is_disabled) AND
     (p_has_photo IS NULL OR (p.photo_file IS NOT NULL) = p_has_photo) AND
     (p_is_deceased IS NULL OR (p.deceased_date IS NOT NULL) = p_is_deceased) AND
+    (p_has_grievances IS NULL OR (EXISTS (SELECT 1 FROM public.grievances g WHERE g.person_id = p.person_id)) = p_has_grievances) AND
     (
       p_name IS NULL OR
       SIMILARITY(p.firstname, p_name) > 0.4 OR
@@ -194,10 +194,10 @@ $$;
 
 
 --
--- Name: a_replacements_search(character varying, character varying, character varying, character varying, character varying, boolean, boolean, character varying); Type: FUNCTION; Schema: public; Owner: -
+-- Name: a_replacements_search(character varying, character varying, character varying, character varying, character varying, boolean, boolean, character varying, boolean); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.a_replacements_search(p_pah character varying DEFAULT NULL::character varying, p_replacement_structure_id character varying DEFAULT NULL::character varying, p_replacement_option character varying DEFAULT NULL::character varying, p_replacement_class character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_protected boolean DEFAULT NULL::boolean, p_flag_followup boolean DEFAULT NULL::boolean, p_phase character varying DEFAULT NULL::character varying) RETURNS TABLE(replacement_structure_id character varying, pah character varying)
+CREATE FUNCTION public.a_replacements_search(p_pah character varying DEFAULT NULL::character varying, p_replacement_structure_id character varying DEFAULT NULL::character varying, p_replacement_option character varying DEFAULT NULL::character varying, p_replacement_class character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_protected boolean DEFAULT NULL::boolean, p_flag_followup boolean DEFAULT NULL::boolean, p_phase character varying DEFAULT NULL::character varying, p_silumesii boolean DEFAULT NULL::boolean) RETURNS TABLE(replacement_structure_id character varying, pah character varying)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -209,9 +209,10 @@ BEGIN
     AND  (p_replacement_option IS NULL OR rs.replacement_option = p_replacement_option)
     AND  (p_replacement_class IS NULL OR rs.replacement_class = p_replacement_class)
     AND  (p_icaoption_structure_location IS NULL OR rs.icaoption_structure_location = p_icaoption_structure_location)
-    AND  (p_protected IS NULL OR rs.protected = p_protected)
-    AND  (p_flag_followup IS NULL OR rs.flag_followup = p_flag_followup)
-    AND  (p_phase IS NULL OR rs.phase = p_phase);
+    AND  (p_protected IS NULL OR COALESCE(rs.protected,false) = p_protected)
+    AND  (p_flag_followup IS NULL OR COALESCE(rs.flag_followup,false) = p_flag_followup)
+    AND  (p_phase IS NULL OR rs.phase = p_phase)
+    AND  (p_silumesii IS NULL OR COALESCE(rs.silumesii,false) = p_silumesii);
 END;
 $$;
 
@@ -348,7 +349,8 @@ CREATE TABLE public.households (
     icaoption_transport character varying(100),
     village_id bigint,
     householdhead_id bigint,
-    cosignatory_id bigint
+    cosignatory_id bigint,
+    duplicate_pah character varying(20)
 );
 
 
@@ -661,6 +663,38 @@ ALTER TABLE public.person ALTER COLUMN person_id ADD GENERATED ALWAYS AS IDENTIT
 
 
 --
+-- Name: replacement_structure_notes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.replacement_structure_notes (
+    note_id bigint NOT NULL,
+    replacement_structure_id character varying(9) NOT NULL,
+    user_id bigint NOT NULL,
+    note text NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: replacement_structure_notes_note_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.replacement_structure_notes_note_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: replacement_structure_notes_note_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.replacement_structure_notes_note_id_seq OWNED BY public.replacement_structure_notes.note_id;
+
+
+--
 -- Name: replacement_structure_types; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -668,7 +702,8 @@ CREATE TABLE public.replacement_structure_types (
     replacement_class character varying(100),
     replacement_option character varying(100),
     replacement_value numeric(12,3),
-    replacement_type_ref character varying(100) NOT NULL
+    replacement_type_ref character varying(100) NOT NULL,
+    replacement_cost_2024 numeric(12,2)
 );
 
 
@@ -680,7 +715,6 @@ CREATE TABLE public.replacement_structures (
     replacement_structure_id character varying(9) NOT NULL,
     pah character varying(9) NOT NULL,
     phase character varying(100),
-    data_notes text,
     structure_id character varying(9),
     flag_followup boolean,
     replacement_type_ref character varying(100) NOT NULL
@@ -1112,7 +1146,6 @@ CREATE VIEW public.v_replacement_structures AS
  SELECT rs.replacement_structure_id,
     rs.pah,
     rs.phase,
-    rs.data_notes,
     rs.structure_id,
     rs.flag_followup,
     rs.replacement_type_ref,
@@ -1122,10 +1155,12 @@ CREATE VIEW public.v_replacement_structures AS
     h.icaoption_primary_structure,
     h.icaoption_structure_location,
     s.protected,
-    h.householdhead_id
+    h.householdhead_id,
+    rst.replacement_cost_2024,
+    h.silumesii
    FROM (((public.replacement_structures rs
      JOIN public.replacement_structure_types rst ON (((rs.replacement_type_ref)::text = (rst.replacement_type_ref)::text)))
-     JOIN public.households h ON (((rs.pah)::text = (h.pah)::text)))
+     LEFT JOIN public.households h ON (((rs.pah)::text = (h.pah)::text)))
      LEFT JOIN public.structures s ON (((rs.structure_id)::text = (s.structure_id)::text)));
 
 
@@ -1324,7 +1359,8 @@ CREATE VIEW public.v_households AS
           WHERE (((s.pah)::text = (h.pah)::text) AND (s.protected = true)))) AS has_protected,
     (EXISTS ( SELECT 1
            FROM public.households_survey hs
-          WHERE (hs.pah = (h.pah)::text))) AS survey_complete
+          WHERE (hs.pah = (h.pah)::text))) AS survey_complete,
+    h.duplicate_pah
    FROM (((((public.households h
      LEFT JOIN public.person ph ON ((h.householdhead_id = ph.person_id)))
      LEFT JOIN public.person pc ON ((h.cosignatory_id = pc.person_id)))
@@ -1438,6 +1474,21 @@ CREATE VIEW public.v_notes AS
 
 
 --
+-- Name: v_replacement_structure_notes; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.v_replacement_structure_notes AS
+ SELECT n.note_id,
+    n.replacement_structure_id,
+    n.user_id,
+    n.note,
+    n.created_at,
+    (((u.first_name)::text || ' '::text) || (u.last_name)::text) AS created_by
+   FROM (public.replacement_structure_notes n
+     LEFT JOIN public."user" u ON ((u.user_id = n.user_id)));
+
+
+--
 -- Name: v_structures_gis; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -1528,6 +1579,13 @@ ALTER TABLE ONLY public.impact_zones ALTER COLUMN id SET DEFAULT nextval('public
 --
 
 ALTER TABLE ONLY public.land_parcels_geom ALTER COLUMN id SET DEFAULT nextval('public.land_parcels_geom_id_seq'::regclass);
+
+
+--
+-- Name: replacement_structure_notes note_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.replacement_structure_notes ALTER COLUMN note_id SET DEFAULT nextval('public.replacement_structure_notes_note_id_seq'::regclass);
 
 
 --
@@ -1639,6 +1697,14 @@ ALTER TABLE ONLY public.notes
 
 ALTER TABLE ONLY public.person
     ADD CONSTRAINT person_pkey PRIMARY KEY (person_id);
+
+
+--
+-- Name: replacement_structure_notes replacement_structure_notes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.replacement_structure_notes
+    ADD CONSTRAINT replacement_structure_notes_pkey PRIMARY KEY (note_id);
 
 
 --
@@ -1856,8 +1922,22 @@ ALTER TABLE ONLY public.notes
 
 
 --
--- PostgreSQL database dump complete
+-- Name: replacement_structure_notes replacement_structure_notes_replacement_structure_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-\unrestrict KfPox3Fac3bjhoyBkE2wLTlarYM0uqQqfng2xxXDBrAtLRPpowdjaKGANoOzhrF
+ALTER TABLE ONLY public.replacement_structure_notes
+    ADD CONSTRAINT replacement_structure_notes_replacement_structure_id_fkey FOREIGN KEY (replacement_structure_id) REFERENCES public.replacement_structures(replacement_structure_id);
+
+
+--
+-- Name: replacement_structure_notes replacement_structure_notes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.replacement_structure_notes
+    ADD CONSTRAINT replacement_structure_notes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public."user"(user_id);
+
+
+--
+-- PostgreSQL database dump complete
+--
 

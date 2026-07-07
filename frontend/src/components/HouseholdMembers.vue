@@ -85,7 +85,7 @@ const submitAdd = async () => {
 <template>
   <div v-if="pah">
     <div class="d-flex justify-end mb-1">
-      
+
     </div>
 
     <v-table v-if="members.length" density="compact">
@@ -126,7 +126,7 @@ const submitAdd = async () => {
           <td class="table-value left">{{ m.primary_occupation || '—' }}</td>
         </tr>
       </tbody>
-      <TableCopyFooter :colspan="8" />
+      <TableCopyFooter :colspan="9" />
     </v-table>
 
     <v-dialog v-model="showAddDialog" max-width="800">
