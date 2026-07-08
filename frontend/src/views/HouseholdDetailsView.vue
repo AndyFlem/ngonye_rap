@@ -22,6 +22,7 @@ const structures = ref([])
 const replacements = ref([])
 const trees = ref([])
 const crops = ref([])
+const graves = ref([])
 const loading = ref(false)
 const error = ref('')
 const tab = ref('ica')
@@ -288,6 +289,9 @@ const loadHousehold = async () => {
       trees.value = Array.isArray(treesResponse.data) ? treesResponse.data : []
       const cropsResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/crops`)
       crops.value = Array.isArray(cropsResponse.data) ? cropsResponse.data : []
+
+      const gravesResponse = await axiosSecure.get(`/households/${encodeURIComponent(pahno.value)}/graves`)
+      graves.value = Array.isArray(gravesResponse.data) ? gravesResponse.data : []
 
     }
 
@@ -990,6 +994,40 @@ onMounted(async () => {
                         </tr>
                       </tbody>
                       <TableCopyFooter :colspan="6" />
+                    </v-table>
+                  </v-col>
+                </v-row>
+                <v-row v-if="graves.length > 0" >
+                  <v-col cols="12">
+                    <v-table>
+                      <thead>
+                        <tr>
+                          <th colspan="8" class="table-heading">Graves</th>
+                        </tr>
+                        <tr>
+                          <th>Deceased</th>
+                          <th>Year of Death</th>
+                          <th>Age</th>
+                          <th>Relation</th>
+                          <th class="center">Coffin</th>
+                          <th>Marker</th>
+                          <th>Location</th>
+                          <th>ICA Option</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(grave, index) in graves" :key="index">
+                          <td class="table-value left">{{ grave.deceased }}</td>
+                          <td class="table-value left">{{ grave.year_of_death }}</td>
+                          <td class="table-value left">{{ grave.age }}</td>
+                          <td class="table-value left">{{ grave.relation }}</td>
+                          <td class="table-value center">{{ formatYesNo(grave.coffin) }}</td>
+                          <td class="table-value left">{{ grave.marker }}</td>
+                          <td class="table-value left">{{ grave.location }}</td>
+                          <td class="table-value left">{{ grave.ica_option }}</td>
+                        </tr>
+                      </tbody>
+                      <TableCopyFooter :colspan="8" />
                     </v-table>
                   </v-col>
                 </v-row>

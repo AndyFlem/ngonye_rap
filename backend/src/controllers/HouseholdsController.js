@@ -312,6 +312,23 @@ module.exports = {
       return res.status(500).send({ error: 'an error has occurred trying to fetch the crops for the household: ' + err })
     }
   },
+  async indexGraves (req, res) {
+    Common.debug(req, 'indexGraves')
+    const pah = (req.params.pah || '').trim().slice(0, 120)
+
+    if (!pah) {
+      return res.status(400).send({ error: 'pah is required' })
+    }
+    try {
+      const graves = await Knex('v_graves')
+        .where({ pah })
+
+      return res.send(graves)
+    } catch (err) {
+      Common.error(req, 'indexGraves', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch the graves for the household: ' + err })
+    }
+  },
   async showSurvey (req, res) {
     Common.debug(req, 'showSurvey')
     const pah = (req.params.pah || '').trim().slice(0, 120)
