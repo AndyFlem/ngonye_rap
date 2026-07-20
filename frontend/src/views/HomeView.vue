@@ -371,14 +371,13 @@ onMounted(() => {
             <h3 class="text-h3 mb-4">
               Replacement Structures
             </h3>
-            {{  replacementStructs }}
+
             <v-table v-if="replacementStructs" density="compact">
               <thead class="">
                 <tr>
                   <th class="table-heading">Replacement Option</th>
                   <th class="table-heading center">Count</th>
-                  <th class="table-heading center">Protected</th>
-                  <th class="table-heading center">Est Cost K000s</th>
+                  <th class="table-heading center">Est Cost $000s</th>
                 </tr>
               </thead>
               <tbody>
@@ -390,21 +389,46 @@ onMounted(() => {
                     {{ item.count }}
                   </td>
                   <td class="table-value center">
-                    {{ item.protected_count }}
-                  </td>
-                  <td class="table-value center">
-                    <span v-if="item.value && item.value>0">{{ formatCurrency(item.value/1000)  }}</span>
+                    <span v-if="item.cost && item.cost>0">{{ formatCurrency(item.cost/1000)  }}</span>
                     <span v-else>unknown</span>
                   </td>
                 </tr>
                 <tr class="table-total">
                   <td>Total:</td>
                   <td class="center">{{ replacementStructs.total }}</td>
-                  <td class="center">{{ replacementStructs.totalProtected }}</td>
-                  <td class="center">{{ formatCurrency(replacementStructs.totalValue/1000) }}</td>
+                  <td class="center">${{ formatCurrency(replacementStructs.totalCost) }}</td>
                 </tr>
               </tbody>
-              <TableCopyFooter :colspan="4" />
+              <TableCopyFooter :colspan="3" />
+            </v-table>
+            <v-table v-if="replacementStructs" density="compact">
+              <thead class="">
+                <tr>
+                  <th class="table-heading">Protected Structures</th>
+                  <th class="table-heading center">Count</th>
+                  <th class="table-heading center">Est Cost $000s</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in replacementStructs.optionsProtected" :key="item.id">
+                  <td>
+                    {{ item.replacement_option }}
+                  </td>
+                  <td class="table-value center">
+                    {{ item.count }}
+                  </td>
+                  <td class="table-value center">
+                    <span v-if="item.cost && item.cost>0">{{ formatCurrency(item.cost/1000)  }}</span>
+                    <span v-else>unknown</span>
+                  </td>
+                </tr>
+                <tr class="table-total">
+                  <td>Total:</td>
+                  <td class="center">{{ replacementStructs.totalProtected }}</td>
+                  <td class="center">${{ formatCurrency(replacementStructs.totalCostProtected) }}</td>
+                </tr>
+              </tbody>
+              <TableCopyFooter :colspan="3" />
             </v-table>
             <v-table class="mt-5" v-if="replacementStructs" density="compact">
               <thead class="table-header">

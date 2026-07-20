@@ -70,6 +70,13 @@ module.exports = {
         .first()
       summary.structures.totalCost = totalValue.cost
 
+      // Total cost of all replacement structures
+      const totalValueProtected = await Knex('v_replacement_structures')
+        .sum('replacement_cost_2024 as cost')
+        .where('protected', true)
+        .first()
+      summary.structures.totalCostProtected = totalValueProtected.cost
+
       // // Total of all protected replacement structures
       // const totalProtected = await Knex('v_replacement_structures')
       //   .count('* as count')
@@ -105,7 +112,9 @@ module.exports = {
         .select('icaoption_structure_location')
         .count('* as count')
         .sum('replacement_cost_2024 as cost')
-        .whereNot('protected', true)
+        .where(function() {
+          this.whereNull('protected').orWhere('protected', false)
+        })
         .orderBy('icaoption_structure_location', 'asc')
         .groupBy('icaoption_structure_location')
       summary.structures.icaOptionStructureLocation = icaOptionStructureLocation
