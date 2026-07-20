@@ -58,7 +58,8 @@ async function downloadCertificate () {
     const url = URL.createObjectURL(response.data)
     const a = document.createElement('a')
     a.href = url
-    a.download = `CompCert_${pahno.value}.docx`
+    const dateString = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    a.download = `${pahno.value} ${dateString} ${pah.value?.fullname}.docx`
     a.click()
     URL.revokeObjectURL(url)
   } catch (err) {
@@ -353,18 +354,6 @@ onMounted(async () => {
             >
               {{ pah.household_followup_flag ? 'Flagged' : 'Flag' }}
             </v-btn>
-            <v-btn
-              v-if="pah"
-              color="primary"
-              variant="tonal"
-              size="small"
-              class="mr-2"
-              prepend-icon="mdi-file-word"
-              :loading="downloadingCert"
-              @click="downloadCertificate"
-            >
-              Certificate
-            </v-btn>
           </v-card-title>
           <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4" />
           <v-card-text v-if="pah">
@@ -392,24 +381,8 @@ onMounted(async () => {
                     <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check" :loading="savingVillage"
                       @click="saveVillage" />
                     <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close" @click="editingVillage = false" />
-                  </template>
+                  </template>                  
                 </div>
-                <v-divider class="my-2" />
-                <div v-if="!pah.no_ica_required" :style="{ color: pah.date_signed ? 'inherit' : 'red' }">
-                  <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah.date_signed ? formatDateTime(pah.date_signed) : 'not signed' }}</span>
-                  <v-btn
-                    v-if="getSafeExternalUrl(pah.ica_link)"
-                    :href="getSafeExternalUrl(pah.ica_link)"
-                    prepend-icon="mdi-open-in-new"
-                    variant="text"
-                    size="small"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="ml-2"
-                    title="Open ICA link"
-                  >Open ICA Link</v-btn>
-                </div>
-                <div v-else><strong>ICA:</strong> <span class="table-value">Not Required</span></div>
                 <div class="d-flex align-center">
                   <template v-if="!editingDuplicatePah">
                     <strong>Duplicate PAH:</strong>&nbsp;<span class="table-value">{{ pah.duplicate_pah }}</span>
@@ -426,26 +399,63 @@ onMounted(async () => {
                     <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close"
                       @click="editingDuplicatePah = false" />
                   </template>
-                </div>
-                <div v-if="pah_survey">
-                  <strong>Survey Completed:&nbsp;</strong>
-                  <span class="table-value" :class="!pah?.survey_complete ? 'highlight' : ''">{{ pah?.survey_complete ? formatDateTime(pah_survey.survey_date) : 'No' }}</span>
-                </div>
+                </div>                
+
               </v-col>
               <v-col cols="12" md="6">
                 <template v-if="pah.cosignatory_id">
                   <person-view :person-id="pah.cosignatory_id" title="Cosignatory:" />
                 </template>
               </v-col>
+              <v-col cols="12">
+                <v-divider class="my-2" />
+              </v-col>
             </v-row>
-            <Notes ref="householdNotes" :pah="pahno" />
+            <v-row>
+              <v-col cols="12">
+                <template v-if="!pah.no_ica_required">
+                  <div :style="{ color: pah.date_signed ? 'inherit' : 'red' }">
+                    <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah.date_signed ? formatDateTime(pah.date_signed) : 'not signed' }}</span>
+                  </div>
+                  <div><strong>Signed ICA:</strong>
+                    <v-btn
+                      v-if="getSafeExternalUrl(pah.ica_link)"
+                      :href="getSafeExternalUrl(pah.ica_link)"
+                      prepend-icon="mdi-open-in-new"
+                      variant="text"
+                      size="small"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="ml-2"
+                      title="Open ICA link"
+                    >Open Signed ICA</v-btn>
+                  </div>
+                  <div v-if="!pah.nonaffected"><strong>Generate new ICA: </strong>
+                    <v-btn
+                      v-if="pah"
+                      @click="downloadCertificate"
+                      prepend-icon="mdi-file-word-outline"
+                      variant="text"
+                      size="small"
+                      class="ml-2"
+                      title="Generate new ICA"
+                      :loading="downloadingCert"
+                    >Generate</v-btn>                    
+                  </div>
+                </template>
+                <template v-else>
+                  <div><strong>ICA:</strong> <span class="table-value">Not Required</span></div>
+                </template>
+              </v-col>
+            </v-row>
             <Icas
               ref="householdIcas"
               :pah="pahno"
               :new-ica-required="pah?.new_ica_required ?? false"
               @update:new-ica-required="val => { pah = { ...pah, new_ica_required: val } }"
               @ica-added="householdNotes?.loadNotes()"
-            />
+            />            
+            <Notes ref="householdNotes" :pah="pahno" />
             <Grievances :person-id="pah.householdhead_id" @grievance-changed="householdNotes?.loadNotes()" />
 
             <Members :pah="pahno" class="mt-5" />
@@ -1048,8 +1058,12 @@ onMounted(async () => {
                       >Open Survey Form</v-btn>
                     </div>
                     <div>
-                    Survey location: <MapLink :lat="pah_survey.lat" :lon="pah_survey.lon" />
+                      <strong>Survey location:</strong> <MapLink :lat="pah_survey.lat" :lon="pah_survey.lon" />
                     </div>
+                    <div>
+                      <strong>Survey completed:&nbsp;</strong>
+                      <span class="table-value" :class="!pah?.survey_complete ? 'highlight' : ''">{{ pah?.survey_complete ? formatDateTime(pah_survey.survey_date) : 'No' }}</span>
+                    </div>                    
                   </v-col>
                 </v-row>
                 <v-table density="compact" class="survey-table pt-5" v-if="pah_survey">

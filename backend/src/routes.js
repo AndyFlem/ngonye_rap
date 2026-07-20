@@ -112,6 +112,7 @@ module.exports = (app) => {
   app.post(prefix + '/fishers_export', FishersController.exportSearch)
   app.get(prefix + '/fishers/:nhs',    FishersController.show)
   app.patch(prefix + '/fishers/:nhs',  FishersController.patch)
+   app.get(prefix + '/fishers/:nhs/certificate', CertificateController.generateFisher)
   // fisher notes and icas are registered above in their respective blocks
 
   // USER MANAGEMENT

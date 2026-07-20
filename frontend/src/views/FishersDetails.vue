@@ -18,6 +18,7 @@ const loading = ref(false)
 const error = ref('')
 const fisherNotes = ref(null)
 const togglingFlag = ref(false)
+const downloadingCert = ref(false)
 
 const nhs = computed(() => String(route.params.nhs || '').trim())
 
@@ -33,6 +34,28 @@ async function toggleFollowupFlag () {
     error.value = 'Failed to update followup flag.'
   } finally {
     togglingFlag.value = false
+  }
+}
+
+async function downloadCertificate () {
+  downloadingCert.value = true
+  try {
+    const response = await axiosSecure.get(
+      `/fishers/${encodeURIComponent(nhs.value)}/certificate`,
+      { responseType: 'blob' }
+    )
+    const url = URL.createObjectURL(response.data)
+    const a = document.createElement('a')
+    a.href = url
+    const dateString = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    a.download = `${nhs.value} ${dateString} ${fisher.value?.fullname}.docx`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (err) {
+    console.error('Failed to download certificate:', err)
+    error.value = 'Failed to generate certificate.'
+  } finally {
+    downloadingCert.value = false
   }
 }
 
@@ -108,6 +131,7 @@ onMounted(load)
               </v-col>
             </v-row>
             <v-row>
+              <v-col cols="12">
               <div :style="{ color: fisher.date_signed ? 'inherit' : 'red' }">
                 <strong>ICA Signature Date:</strong> <span class="table-value">{{ fisher.date_signed ? formatDateTime(fisher.date_signed) : 'not signed' }}</span>
                 <v-btn
@@ -122,6 +146,19 @@ onMounted(load)
                   title="Open ICA link"
                 >Open ICA Link</v-btn>
               </div>
+              <div><strong>Generate new ICA: </strong>
+                <v-btn
+                  v-if="nhs"
+                  @click="downloadCertificate"
+                  prepend-icon="mdi-file-word-outline"
+                  variant="text"
+                  size="small"
+                  class="ml-2"
+                  title="Generate new ICA"
+                  :loading="downloadingCert"
+                >Generate</v-btn>                    
+              </div>           
+              </v-col>   
             </v-row>
             <Notes ref="fisherNotes" :nhs="nhs" class="mb-4" />
             <Grievances :person-id="fisher.person_id" class="mb-4" @grievance-changed="fisherNotes?.loadNotes()" />
@@ -132,7 +169,27 @@ onMounted(load)
               @ica-added="fisherNotes?.loadNotes()"
               class="mb-4"
             />
-
+            <v-row class="pt-4">
+              <v-col cols="12" md="6">
+                <v-table density="compact">
+                  <thead>
+                    <tr>
+                      <th colspan="2" class="table-heading">Livlihood Restoration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Fish Farming</td>
+                      <td class="table-value">{{ formatYesNo(fisher.lr_fishfarming) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Goat Rearing</td>
+                      <td class="table-value">{{ formatYesNo(fisher.lr_goatrearing) }}</td>
+                    </tr>
+                  </tbody>
+                </v-table>
+              </v-col>  
+            </v-row>
             <v-row class="pt-4">
               <v-col cols="12" md="6">
                 <v-table density="compact">

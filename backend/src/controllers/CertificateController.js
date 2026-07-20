@@ -5,6 +5,7 @@ const Knex = require('../services/db')
 const Common = require('./CommonDebug')('Certificate')
 
 const TEMPLATE_PATH = path.join(__dirname, '..', '..', 'templates', 'ica_template_2026_01.docx')
+const TEMPLATE_PATH_NHS = path.join(__dirname, '..', '..', 'templates', 'f_ica_template_2026_01.docx')
 
 const fmtm2 = (v) => (v != null ? Number(v).toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '0') + ' m²'
 const fmtZMW = (v) => 'K' + (v != null ? Number(v).toLocaleString('en-GB', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) : '0')
@@ -118,7 +119,7 @@ module.exports = {
       const buffer = await createReport({ template, data, cmdDelimiter: ['{{', '}}'] })
 
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
-      res.setHeader('Content-Disposition', `attachment; filename="CompCert_${pah}.docx"`)
+      res.setHeader('Content-Disposition', `attachment; filename="${pah}.docx"`)
       return res.send(Buffer.from(buffer))
 
     } catch (err) {
@@ -126,4 +127,52 @@ module.exports = {
       return res.status(500).send({ error: `certificate generation failed: ${err.message}` })
     }
   },
+  async generateFisher (req, res) {
+    const { nhs } = req.params
+    Common.debug(req, 'generate', nhs)
+
+    if (!nhs) return res.status(400).send({ error: 'nhs is required' })
+
+    try {
+      const fisher = await Knex('v_fishers').where({ nhs }).first()
+
+
+      if (!fisher) return res.status(404).send({ error: 'fisher not found' })
+
+      // const [survey, landCompensation, landPermanent,structures, crops, trees, graves] = await Promise.all([
+      //   Knex('households_survey').where({ pah }).first(),
+      //   Knex('v_household_land_compensation').where({ pah }).orderBy('acquisition_class').orderBy('rate_acquisition_class'),
+      //   Knex('v_household_land_permanent').where({ pah }),
+      //   //Knex('v_land_parcels').where({ pah }),
+      //   Knex('v_structures').where({ pah }).orderBy('structure_class').orderBy('structure_type'),
+      //   Knex('v_crops').where({ pah }).orderBy('crop_type'),
+      //   Knex('v_trees_summary').where({ pah }).orderBy('tree_type'),
+      //   Knex('v_graves').where({ pah })
+      // ])
+
+      fisher.site_compensation = fmtZMW(fisher.site_compensation)
+      fisher.maungwe_annual_earnings = fmtZMW(fisher.maungwe_annual_earnings)
+      fisher.limbelo_annual_earnings = fmtZMW(fisher.limbelo_annual_earnings)
+      fisher.transitional_allowance = fmtZMW(fisher.transitional_allowance)
+
+      const data = {
+        fisher: fisher,
+        generation_date: fmtDate(new Date(), { day: '2-digit', month: 'long', year: 'numeric' })
+      }
+
+      // Debug section — split JSON into one array entry per line for the template loop
+      data.debug_lines = JSON.stringify(data, null, 2).split('\n')
+
+      const template = fs.readFileSync(TEMPLATE_PATH_NHS)
+      const buffer = await createReport({ template, data, cmdDelimiter: ['{{', '}}'] })
+
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+      res.setHeader('Content-Disposition', `attachment; filename="ICA_${nhs}.docx"`)
+      return res.send(Buffer.from(buffer))
+
+    } catch (err) {
+      Common.error(req, 'generate', err)
+      return res.status(500).send({ error: `certificate generation failed: ${err.message}` })
+    }
+  },  
 }

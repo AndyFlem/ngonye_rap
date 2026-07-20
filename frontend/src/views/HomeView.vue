@@ -371,6 +371,7 @@ onMounted(() => {
             <h3 class="text-h3 mb-4">
               Replacement Structures
             </h3>
+            {{  replacementStructs }}
             <v-table v-if="replacementStructs" density="compact">
               <thead class="">
                 <tr>

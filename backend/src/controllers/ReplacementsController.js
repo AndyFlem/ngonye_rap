@@ -49,38 +49,63 @@ module.exports = {
 
       const total = await Knex('v_replacement_structures')
         .count('* as count')
+        .where(function() {
+          this.whereNull('protected').orWhere('protected', false)
+        })        
         .first()
       summary.structures.total = total.count
-
-      // Total cost of all replacement structures
-      const totalValue = await Knex('v_replacement_structures')
-        .sum('replacement_cost_2024 as cost')
-        .first()
-      summary.structures.totalValue = totalValue.cost
-
-      // Total of all protected replacement structures
+   
       const totalProtected = await Knex('v_replacement_structures')
         .count('* as count')
         .where('protected', true)
         .first()
-      summary.structures.totalProtected = totalProtected.count
+      summary.structures.totalProtected = totalProtected.count      
+
+      // Total cost of all replacement structures
+      const totalValue = await Knex('v_replacement_structures')
+        .sum('replacement_cost_2024 as cost')
+        .where(function() {
+          this.whereNull('protected').orWhere('protected', false)
+        })
+        .first()
+      summary.structures.totalCost = totalValue.cost
+
+      // // Total of all protected replacement structures
+      // const totalProtected = await Knex('v_replacement_structures')
+      //   .count('* as count')
+      //   .where('protected', true)
+      //   .first()
+      // summary.structures.totalProtected = totalProtected.count
 
       // Agrregate the rows of v_replacement_structures by replacement_option and count the number of rows for each 
       const options = await Knex('v_replacement_structures')
         .select('replacement_option')
         .count('* as count')
         .sum('replacement_cost_2024 as cost')
-        .sum({ protected_count: Knex.raw('CASE WHEN protected THEN 1 ELSE 0 END') })
+        //.sum({ protected_count: Knex.raw('CASE WHEN protected THEN 1 ELSE 0 END') })
+        .where(function() {
+          this.whereNull('protected').orWhere('protected', false)
+        })
         .orderBy('replacement_option', 'asc')
         .groupBy('replacement_option')
       summary.structures.options = options
 
+      const optionsProtected = await Knex('v_replacement_structures')
+        .select('replacement_option')
+        .count('* as count')
+        .sum('replacement_cost_2024 as cost')
+        //.sum({ protected_count: Knex.raw('CASE WHEN protected THEN 1 ELSE 0 END') })
+        .where('protected', true)
+        .orderBy('replacement_option', 'asc')
+        .groupBy('replacement_option')
+      summary.structures.optionsProtected = optionsProtected      
 
       // Agrregate the rows of v_replacement_structures by icaoption_structure_location and count the number of rows for each
       const icaOptionStructureLocation = await Knex('v_replacement_structures')
         .select('icaoption_structure_location')
         .count('* as count')
         .sum('replacement_cost_2024 as cost')
+        .whereNot('protected', true)
         .orderBy('icaoption_structure_location', 'asc')
         .groupBy('icaoption_structure_location')
       summary.structures.icaOptionStructureLocation = icaOptionStructureLocation

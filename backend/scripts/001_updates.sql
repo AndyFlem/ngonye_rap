@@ -87,7 +87,7 @@ where land_assets.land_parcel_id=lp.land_parcel_id and acquisition_class='Tempor
 update land_assets set rate_acquisition_class='Temporary Uncultivated' from land_parcels lp
 where land_assets.land_parcel_id=lp.land_parcel_id and acquisition_class='Temporary' and lp.cultivated=False;
 
-CREATE OR REPLACE VIEW select * from public.v_household_land_permanent
+CREATE OR REPLACE VIEW public.v_household_land_permanent
  AS
  SELECT lp.pah,
     lp.land_class,
