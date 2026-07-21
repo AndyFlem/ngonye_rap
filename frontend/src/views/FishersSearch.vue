@@ -69,6 +69,7 @@ function clearSearch () {
   results.value = []
   error.value = ''
   localStorage.removeItem(STORAGE_KEY)
+  doSearch()
 }
 
 function downloadCsv () {
