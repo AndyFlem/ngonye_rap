@@ -34,6 +34,7 @@ const savingVillage = ref(false)
 const editingDuplicatePah = ref(false)
 const draftDuplicatePah = ref('')
 const savingDuplicatePah = ref(false)
+const savingNoIcaRequired = ref(false)
 
 const icaOptionChoices = [
   { title: 'None', value: null },
@@ -125,6 +126,19 @@ async function saveDuplicatePah () {
   }
 }
 
+
+async function clearNoIcaRequired () {
+  savingNoIcaRequired.value = true
+  try {
+    await axiosSecure.patch(`/households/${encodeURIComponent(pahno.value)}`, { no_ica_required: false })
+    pah.value = { ...pah.value, no_ica_required: false }
+  } catch (err) {
+    console.error('Failed to update no_ica_required:', err)
+    error.value = 'Failed to update No ICA Required.'
+  } finally {
+    savingNoIcaRequired.value = false
+  }
+}
 
 function startEditIcaOption (field) {
   draftIcaOption.value = pah.value?.[field] ?? null
@@ -420,7 +434,7 @@ onMounted(async () => {
                   <div :style="{ color: pah.date_signed ? 'inherit' : 'red' }">
                     <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah.date_signed ? formatDateTime(pah.date_signed) : 'not signed' }}</span>
                   </div>
-                  <div><strong>Signed ICA:</strong>
+                  <div v-if="pah.ica_link"><strong>Signed ICA:</strong>
                     <v-btn
                       v-if="getSafeExternalUrl(pah.ica_link)"
                       :href="getSafeExternalUrl(pah.ica_link)"
@@ -447,7 +461,17 @@ onMounted(async () => {
                   </div>
                 </template>
                 <template v-else>
-                  <div><strong>ICA:</strong> <span class="table-value">Not Required</span></div>
+                  <div><strong>ICA:</strong>
+                    <v-btn
+                      variant="tonal"
+                      size="small"
+                      color="grey"
+                      class="ml-2"
+                      :loading="savingNoIcaRequired"
+                      @click="clearNoIcaRequired"
+                      title="Click to mark ICA as required"
+                    >Not Required</v-btn>
+                  </div>
                 </template>
               </v-col>
             </v-row>

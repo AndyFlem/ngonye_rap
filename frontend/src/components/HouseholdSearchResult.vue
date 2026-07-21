@@ -80,6 +80,9 @@ watch(() => props.pahNo, async (newPah) => {
           <v-chip color="orange" class="mr-2" size="small" v-if="pah && pah.new_ica_required">
             New ICA Required
           </v-chip>
+          <v-chip color="blue" class="mr-2" size="small" v-if="pah && pah.silumesii">
+            Silumesii
+          </v-chip>          
           <v-chip color="" class="mr-2" size="small" v-if="pah && pah.no_ica_required">
             ICA Not Required
           </v-chip>

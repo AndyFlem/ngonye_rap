@@ -117,7 +117,8 @@ module.exports = {
       duplicate_pah: 'duplicate_pah',
       icaoption_landholding: 'icaoption_landholding',
       icaoption_dryland: 'icaoption_dryland',
-      icaoption_garden: 'icaoption_garden'
+      icaoption_garden: 'icaoption_garden',
+      no_ica_required: 'no_ica_required'
     }
     const fields = {}
     for (const [bodyKey, colName] of Object.entries(allowed)) {
