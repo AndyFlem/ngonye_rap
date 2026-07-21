@@ -198,7 +198,8 @@ function clearSearch () {
     has_current_grievance: null,
     has_multiple_icas: null,
     has_linked_fisher: null,
-    has_notes: null
+    has_notes: null,
+    is_duplicate: null
   }
 }
 
@@ -436,7 +437,7 @@ onMounted(() => {
                     label="Has Multiple ICAs"
                     hide-details
                     :indeterminate="search.params.has_multiple_icas === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -472,7 +473,7 @@ onMounted(() => {
                     label="Vulnerable"
                     hide-details
                     :indeterminate="search.params.vulnerable === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -488,7 +489,7 @@ onMounted(() => {
                     label="Physically displaced"
                     hide-details
                     :indeterminate="search.params.physically_displaced === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -504,7 +505,7 @@ onMounted(() => {
                     label="Follow-Up Flag"
                     hide-details
                     :indeterminate="search.params.followup_flag === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -520,7 +521,7 @@ onMounted(() => {
                     label="Silumesii"
                     hide-details
                     :indeterminate="search.params.silumesii === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -536,7 +537,7 @@ onMounted(() => {
                     label="New ICA Required"
                     hide-details
                     :indeterminate="search.params.new_ica_required === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -552,7 +553,7 @@ onMounted(() => {
                     label="Survey Complete"
                     hide-details
                     :indeterminate="search.params.survey_complete === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -573,7 +574,7 @@ onMounted(() => {
                     label="Has replacement structures"
                     hide-details
                     :indeterminate="search.params.has_replacement_structures === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -589,7 +590,7 @@ onMounted(() => {
                     label="Has replacement land"
                     hide-details
                     :indeterminate="search.params.has_replacement_land === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -605,7 +606,7 @@ onMounted(() => {
                     label="Has protected"
                     hide-details
                     :indeterminate="search.params.has_protected === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -621,7 +622,7 @@ onMounted(() => {
                     label="Landholding Only"
                     hide-details
                     :indeterminate="search.params.landholding_only === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -637,7 +638,7 @@ onMounted(() => {
                     label="Has Grievance"
                     hide-details
                     :indeterminate="search.params.has_current_grievance === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -653,7 +654,7 @@ onMounted(() => {
                     label="Has Linked Fisher"
                     hide-details
                     :indeterminate="search.params.has_linked_fisher === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
@@ -669,7 +670,7 @@ onMounted(() => {
                     label="Has Notes"
                     hide-details
                     :indeterminate="search.params.has_notes === null"
-                    density="comfortable"
+                    density="compact"
                   />
                   <v-btn
                     icon="mdi-close-circle"
