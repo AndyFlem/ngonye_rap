@@ -10,7 +10,7 @@ const grievances = ref([])
 const loading = ref(false)
 const error = ref('')
 const showCurrentOnly = ref(false)
-const sortKey = ref(null)   // 'ref' | 'entity' | 'date'
+const sortKey = ref(null)   // 'ref' | 'entity' | 'date' | 'status'
 const sortDir = ref(1)      // 1 = asc, -1 = desc
 
 const toggleSort = (key) => {
@@ -36,6 +36,11 @@ const displayed = computed(() => {
 
   return [...rows].sort((a, b) => {
     let va, vb
+    if (sortKey.value === 'status') {
+      va = a.is_current ? 1 : 0
+      vb = b.is_current ? 1 : 0
+      return (va - vb) * sortDir.value
+    }
     if (sortKey.value === 'ref') {
       va = a.grievance_ref ?? ''
       vb = b.grievance_ref ?? ''
@@ -206,7 +211,9 @@ onMounted(load)
                   Ref <v-icon size="x-small" :icon="sortIcon('ref')" />
                 </th>
                 <th class="table-heading">Link</th>
-                <th class="table-heading">Status</th>
+                <th class="table-heading" style="cursor:pointer; white-space:nowrap" @click="toggleSort('status')">
+                  Status <v-icon size="x-small" :icon="sortIcon('status')" />
+                </th>
                 <th class="table-heading" style="cursor:pointer; white-space:nowrap" @click="toggleSort('entity')">
                   PAH / NHS <v-icon size="x-small" :icon="sortIcon('entity')" />
                 </th>
