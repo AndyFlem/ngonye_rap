@@ -17,10 +17,9 @@ const EXPORT_COLUMNS = {
   landholding_only: 'Landholding Only',
   village: 'Village',
   vulnerable: 'Vulnerable',
-  nonaffected: 'Non-Affected',
   physically_displaced: 'Physically Displaced',
   silumesii: 'Silumesii',
-  no_ica_required: 'No ICA Required',
+  ica_type: 'ICA Type',
   new_ica_required: 'New ICA Required',
   date_signed: 'ICA Date Signed',
   ica_link: 'ICA Link',
@@ -67,13 +66,10 @@ function buildSearchParams (defn) {
   if (defn.household_head) { params.push(`p_household_head=> '${defn.household_head.replace(/'/g, "''")}'`) }
   if (defn.pah) { params.push(`p_pah=> '${defn.pah.replace(/'/g, "''")}'`) }
   if (defn.vulnerable !== undefined && defn.vulnerable !== null) { params.push(`p_vulnerable=> ${defn.vulnerable}`) }
-  if (defn.nonaffected !== undefined && defn.nonaffected !== null) { params.push(`p_nonaffected=> ${defn.nonaffected}`) }
   if (defn.landholding_only !== undefined && defn.landholding_only !== null) { params.push(`p_landholding_only=> ${defn.landholding_only}`) }
-  if (defn.silumesii !== undefined && defn.silumesii !== null) { params.push(`p_silumesii=> ${defn.silumesii}`) }
   if (defn.new_ica_required !== undefined && defn.new_ica_required !== null) { params.push(`p_new_ica_required=> ${defn.new_ica_required}`) }
   if (defn.followup_flag !== undefined && defn.followup_flag !== null) { params.push(`p_followup_flag=> ${defn.followup_flag}`) }
   if (defn.physically_displaced !== undefined && defn.physically_displaced !== null) { params.push(`p_physically_displaced=> ${defn.physically_displaced}`) }
-  if (defn.no_ica_required !== undefined && defn.no_ica_required !== null) { params.push(`p_no_ica_required=> ${defn.no_ica_required}`) }
   if (defn.icasigned !== undefined && defn.icasigned !== null) { params.push(`p_icasigned=> ${defn.icasigned}`) }
   if (defn.nrc) { params.push(`p_nrc=> '${defn.nrc.replace(/'/g, "''")}'`) }
   if (defn.village_id && defn.village_id !== 'all') {
@@ -93,6 +89,7 @@ function buildSearchParams (defn) {
   if (defn.has_linked_fisher !== undefined && defn.has_linked_fisher !== null) { params.push(`p_has_linked_fisher=> ${defn.has_linked_fisher}`) }
   if (defn.has_notes !== undefined && defn.has_notes !== null) { params.push(`p_has_notes=> ${defn.has_notes}`) }
   if (defn.is_duplicate !== undefined && defn.is_duplicate !== null) { params.push(`p_is_duplicate=> ${defn.is_duplicate}`) }
+  if (defn.ica_type) { params.push(`p_ica_type=> '${defn.ica_type.replace(/'/g, "''")}'`) }
   return params
 }
 function csvEscape (val) {
@@ -118,7 +115,7 @@ module.exports = {
       icaoption_landholding: 'icaoption_landholding',
       icaoption_dryland: 'icaoption_dryland',
       icaoption_garden: 'icaoption_garden',
-      no_ica_required: 'no_ica_required'
+      ica_type: 'ica_type'
     }
     const fields = {}
     for (const [bodyKey, colName] of Object.entries(allowed)) {
@@ -266,7 +263,7 @@ module.exports = {
   },
   async indexIcaOptions (req, res) {
     Common.debug(req, 'indexIcaOptions')
-    const fields = ['icaoption_primary_structure', 'icaoption_structure_location', 'icaoption_landholding', 'icaoption_dryland', 'icaoption_garden', 'icaoption_transport']
+    const fields = ['ica_type', 'icaoption_primary_structure', 'icaoption_structure_location', 'icaoption_landholding', 'icaoption_dryland', 'icaoption_garden', 'icaoption_transport']
     try {
       const result = {}
       for (const field of fields) {

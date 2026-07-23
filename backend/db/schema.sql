@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.18 (Ubuntu 14.18-0ubuntu0.22.04.1)
--- Dumped by pg_dump version 14.18 (Ubuntu 14.18-0ubuntu0.22.04.1)
+\restrict zVJOCEzTmzToRJcfVyiSBpN2WGLfwj2imlWnsOpKyX75lGpxyBDfmujbRpKh04c
+
+-- Dumped from database version 14.23 (Ubuntu 14.23-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.23 (Ubuntu 14.23-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -72,7 +74,7 @@ BEGIN
     (p_has_multiple_icas IS NULL OR ((SELECT COUNT(*) FROM public.icas WHERE icas.nhs = f.nhs) > 1) = p_has_multiple_icas) AND
     (p_has_linked_household IS NULL OR (p.pah IS NOT NULL) = p_has_linked_household) AND
     (p_has_notes IS NULL OR (EXISTS (SELECT 1 FROM public.notes n WHERE n.nhs = f.nhs)) = p_has_notes) AND
-    (p_has_grievances IS NULL OR (EXISTS (SELECT 1 FROM public.grievances g WHERE g.nhs = f.nhs)) = p_has_grievances) AND
+    (p_has_grievances IS NULL OR (EXISTS (SELECT 1 FROM public.v_grievances g WHERE g.nhs = f.nhs AND g.is_current = true)) = p_has_grievances) AND
     (
       p_name IS NULL OR
       SIMILARITY(p.firstname, p_name) > 0.4 OR
@@ -84,10 +86,10 @@ $$;
 
 
 --
--- Name: a_households_search(character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, character varying, bigint, character varying, character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
+-- Name: a_households_search(character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, character varying, bigint, character varying, character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.a_households_search(p_household_head character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_vulnerable boolean DEFAULT NULL::boolean, p_nonaffected boolean DEFAULT NULL::boolean, p_landholding_only boolean DEFAULT NULL::boolean, p_silumesii boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_no_ica_required boolean DEFAULT NULL::boolean, p_icasigned boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_physically_displaced boolean DEFAULT NULL::boolean, p_nrc character varying DEFAULT NULL::character varying, p_village_id bigint DEFAULT NULL::bigint, p_icaoption_primary_structure character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_icaoption_landholding character varying DEFAULT NULL::character varying, p_icaoption_dryland character varying DEFAULT NULL::character varying, p_icaoption_garden character varying DEFAULT NULL::character varying, p_icaoption_transport character varying DEFAULT NULL::character varying, p_has_replacement_structures boolean DEFAULT NULL::boolean, p_has_replacement_land boolean DEFAULT NULL::boolean, p_has_protected boolean DEFAULT NULL::boolean, p_survey_complete boolean DEFAULT NULL::boolean, p_has_current_grievance boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_fisher boolean DEFAULT NULL::boolean, p_has_notes boolean DEFAULT NULL::boolean, p_is_duplicate boolean DEFAULT NULL::boolean) RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
+CREATE FUNCTION public.a_households_search(p_household_head character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_vulnerable boolean DEFAULT NULL::boolean, p_landholding_only boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_icasigned boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_physically_displaced boolean DEFAULT NULL::boolean, p_nrc character varying DEFAULT NULL::character varying, p_village_id bigint DEFAULT NULL::bigint, p_icaoption_primary_structure character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_icaoption_landholding character varying DEFAULT NULL::character varying, p_icaoption_dryland character varying DEFAULT NULL::character varying, p_icaoption_garden character varying DEFAULT NULL::character varying, p_icaoption_transport character varying DEFAULT NULL::character varying, p_has_replacement_structures boolean DEFAULT NULL::boolean, p_has_replacement_land boolean DEFAULT NULL::boolean, p_has_protected boolean DEFAULT NULL::boolean, p_survey_complete boolean DEFAULT NULL::boolean, p_has_current_grievance boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_fisher boolean DEFAULT NULL::boolean, p_has_notes boolean DEFAULT NULL::boolean, p_is_duplicate boolean DEFAULT NULL::boolean) RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -102,11 +104,8 @@ BEGIN
       LEFT JOIN person p ON h.householdhead_id = p.person_id
     WHERE
       (COALESCE(h.vulnerable,false) = p_vulnerable OR p_vulnerable IS NULL) AND
-      (COALESCE(h.nonaffected,false) = p_nonaffected OR p_nonaffected IS NULL) AND
       (COALESCE(h.landholding_only,false) = p_landholding_only OR p_landholding_only IS NULL) AND
-      (COALESCE(h.silumesii,false) = p_silumesii OR p_silumesii IS NULL) AND
       (COALESCE(h.new_ica_required,false) = p_new_ica_required OR p_new_ica_required IS NULL) AND
-      (COALESCE(h.no_ica_required,false) = p_no_ica_required OR p_no_ica_required IS NULL) AND
       ((h.date_signed IS NULL AND p_icasigned = False) OR (h.date_signed IS NOT NULL AND p_icasigned = True) OR p_icasigned IS NULL) AND
       (COALESCE(h.household_followup_flag,false) = p_followup_flag OR p_followup_flag IS NULL) AND
       (COALESCE(h.physically_displaced,false) = p_physically_displaced OR p_physically_displaced IS NULL) AND
@@ -286,6 +285,38 @@ CREATE TABLE public.fishers (
 
 
 --
+-- Name: graves; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.graves (
+    grave_id bigint NOT NULL,
+    pah character varying(9) NOT NULL,
+    deceased character varying(200),
+    year_of_death integer,
+    age character varying(20),
+    coffin boolean,
+    marker character varying(50),
+    relation character varying(50),
+    location character varying(200),
+    ica_option character varying(200)
+);
+
+
+--
+-- Name: graves_grave_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+ALTER TABLE public.graves ALTER COLUMN grave_id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.graves_grave_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: grievances; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -350,7 +381,12 @@ CREATE TABLE public.households (
     village_id bigint,
     householdhead_id bigint,
     cosignatory_id bigint,
-    duplicate_pah character varying(20)
+    duplicate_pah character varying(20),
+    confidential boolean DEFAULT false,
+    sdate_structures date,
+    sdate_landholdings date,
+    sdate_gardensdryland date,
+    ica_type character varying(100)
 );
 
 
@@ -514,7 +550,8 @@ CREATE TABLE public.land_assets (
     acquisition_class character varying(100),
     area_sqm numeric(12,3),
     compensation_option character varying(100),
-    lease_cost numeric(12,3)
+    lease_cost numeric(12,3),
+    rate_acquisition_class character varying(100)
 );
 
 
@@ -997,10 +1034,30 @@ CREATE VIEW public.v_fishers AS
     f.followup_flag,
     ph.pah AS linked_pah,
     f.lr_fishfarming,
-    f.lr_goatrearing
+    f.lr_goatrearing,
+    ph.contact,
+    ph.nrc
    FROM ((public.fishers f
      JOIN public.person ph ON ((f.person_id = ph.person_id)))
      LEFT JOIN public.icas i ON ((((f.nhs)::text = (i.nhs)::text) AND (i.is_current = true))));
+
+
+--
+-- Name: v_graves; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.v_graves AS
+ SELECT graves.grave_id,
+    graves.pah,
+    graves.deceased,
+    graves.year_of_death,
+    graves.age,
+    graves.coffin,
+    graves.marker,
+    graves.relation,
+    graves.location,
+    graves.ica_option
+   FROM public.graves;
 
 
 --
@@ -1215,7 +1272,11 @@ CREATE VIEW public.v_structures AS
     s.followup_flag,
     s.data_notes,
     public.st_asgeojson(public.st_transform(sg.geom, 4326)) AS centroid,
-    s.protected
+    s.protected,
+        CASE
+            WHEN ((s.structure_class)::text = 'Primary Structure'::text) THEN s.structure_value
+            ELSE NULL::numeric
+        END AS primary_value
    FROM ((public.structures s
      JOIN public.structures_geom sg ON (((s.structure_id)::text = (sg.structure_id)::text)))
      LEFT JOIN public.v_replacement_structures rs ON (((s.replacement_structure_id)::text = (rs.replacement_structure_id)::text)));
@@ -1280,8 +1341,27 @@ CREATE VIEW public.v_households AS
     concat(pc.lastname, ', ', concat_ws(' '::text, pc.firstname, pc.middlename)) AS cosignatory_fullname,
     pc.nrc AS cosignatory_nrc,
     pc.contact AS cosignatory_contact,
+    v.village_id,
+    v.village,
     h.linked_pah,
+    h.ica_type,
+    i.date_signed,
+    i.ica_link,
     h.landholding_only,
+    (EXISTS ( SELECT true AS bool
+           FROM public.structures s
+          WHERE (((s.pah)::text = (h.pah)::text) AND (s.protected = false)))) AS physically_displaced,
+    h.vulnerable,
+    h.silumesii,
+    h.followup_flag AS household_followup_flag,
+    h.duplicate_pah,
+    h.new_ica_required,
+    (EXISTS ( SELECT true AS bool
+           FROM public.structures s
+          WHERE (((s.pah)::text = (h.pah)::text) AND (s.protected = true)))) AS has_protected,
+    (EXISTS ( SELECT 1
+           FROM public.households_survey hs
+          WHERE (hs.pah = (h.pah)::text))) AS survey_complete,
     h.allowance_disturbance,
     h.allowance_transport,
     h.allowance_transitional,
@@ -1296,17 +1376,7 @@ CREATE VIEW public.v_households AS
     h.lr_fisheries,
     h.lr_reedbeds,
     h.lr_agricultureinputs,
-    h.vulnerable,
-    i.date_signed,
-    h.no_ica_required,
-    i.ica_link,
-    h.nonaffected,
-    h.silumesii,
-    h.followup_flag AS household_followup_flag,
-    h.physically_displaced,
-    h.new_ica_required,
-    v.village_id,
-    v.village,
+    h.confidential,
     h.icaoption_primary_structure,
     h.icaoption_landholding,
     h.icaoption_structure_location,
@@ -1354,13 +1424,12 @@ CREATE VIEW public.v_households AS
     ( SELECT sum(cp.crop_value) AS sum
            FROM public.v_crops cp
           WHERE ((cp.pah)::text = (h.pah)::text)) AS crop_value,
-    (EXISTS ( SELECT true AS bool
-           FROM public.structures s
-          WHERE (((s.pah)::text = (h.pah)::text) AND (s.protected = true)))) AS has_protected,
-    (EXISTS ( SELECT 1
-           FROM public.households_survey hs
-          WHERE (hs.pah = (h.pah)::text))) AS survey_complete,
-    h.duplicate_pah
+    ( SELECT sum(s.primary_value) AS sum
+           FROM public.v_structures s
+          WHERE ((s.pah)::text = (h.pah)::text)) AS primary_structures_value,
+    h.sdate_structures,
+    h.sdate_landholdings,
+    h.sdate_gardensdryland
    FROM (((((public.households h
      LEFT JOIN public.person ph ON ((h.householdhead_id = ph.person_id)))
      LEFT JOIN public.person pc ON ((h.cosignatory_id = pc.person_id)))
@@ -1384,6 +1453,44 @@ CREATE VIEW public.v_household_compensation AS
     v_households.crop_value,
     ((((((COALESCE(v_households.primary_structures_compensation_value, (0)::numeric) + COALESCE(v_households.secondary_structures_compensation_value, (0)::numeric)) + COALESCE(v_households.allowance_total, (0)::numeric)) + COALESCE(v_households.lease_cost_total, (0)::numeric)) + COALESCE(v_households.land_compensation_value, (0)::numeric)) + COALESCE(v_households.trees_compensation, (0)::numeric)) + COALESCE(v_households.crop_value, (0)::numeric)) AS total_cash_compensation
    FROM public.v_households;
+
+
+--
+-- Name: v_household_land_compensation; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.v_household_land_compensation AS
+ SELECT lp.pah,
+    la.acquisition_class,
+    la.rate_acquisition_class,
+    lp.cultivated,
+    count(la.land_asset_id) AS asset_count,
+    sum(la.area_sqm) AS area_sqm,
+    sum(la.land_value) AS land_value,
+    sum(la.lease_cost) AS lease_cost,
+    sum((la.lease_cost * (la.lease_years)::numeric)) AS lease_cost_total,
+    max(la.rate_acquisition) AS rate_acquisition,
+    max(la.rate_lease) AS rate_lease
+   FROM (public.land_assets la
+     JOIN public.land_parcels lp ON (((la.land_parcel_id)::text = (lp.land_parcel_id)::text)))
+  WHERE ((la.acquisition_class)::text <> 'None'::text)
+  GROUP BY lp.pah, la.acquisition_class, la.rate_acquisition_class, lp.cultivated;
+
+
+--
+-- Name: v_household_land_permanent; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.v_household_land_permanent AS
+ SELECT lp.pah,
+    lp.land_class,
+    count(la.land_asset_id) AS asset_count,
+    sum(la.area_sqm) AS area_sqm,
+    sum(la.land_value) AS land_value
+   FROM (public.land_assets la
+     JOIN public.land_parcels lp ON (((la.land_parcel_id)::text = (lp.land_parcel_id)::text)))
+  WHERE ((la.acquisition_class)::text = 'Permanent'::text)
+  GROUP BY lp.pah, lp.land_class;
 
 
 --
@@ -1503,7 +1610,8 @@ CREATE VIEW public.v_structures_gis AS
     s.land_zone,
     s.structure_class,
     s.structure_type,
-    s.secondary_description
+    s.secondary_description,
+    s.protected
    FROM (public.structures s
      JOIN public.structures_geom sg ON (((s.structure_id)::text = (sg.structure_id)::text)));
 
@@ -1617,6 +1725,14 @@ ALTER TABLE ONLY public.crops
 
 ALTER TABLE ONLY public.fishers
     ADD CONSTRAINT fishers_pkey PRIMARY KEY (nhs);
+
+
+--
+-- Name: graves graves_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.graves
+    ADD CONSTRAINT graves_pkey PRIMARY KEY (grave_id);
 
 
 --
@@ -1890,6 +2006,14 @@ ALTER TABLE ONLY public.fishers
 
 
 --
+-- Name: graves graves_pah_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.graves
+    ADD CONSTRAINT graves_pah_fkey FOREIGN KEY (pah) REFERENCES public.households(pah);
+
+
+--
 -- Name: grievances grievances_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1940,4 +2064,6 @@ ALTER TABLE ONLY public.replacement_structure_notes
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict zVJOCEzTmzToRJcfVyiSBpN2WGLfwj2imlWnsOpKyX75lGpxyBDfmujbRpKh04c
 

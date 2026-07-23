@@ -34,7 +34,7 @@ const savingVillage = ref(false)
 const editingDuplicatePah = ref(false)
 const draftDuplicatePah = ref('')
 const savingDuplicatePah = ref(false)
-const savingNoIcaRequired = ref(false)
+//const savingNoIcaRequired = ref(false)
 
 const icaOptionChoices = [
   { title: 'None', value: null },
@@ -46,30 +46,10 @@ const editingIcaOption = ref(null)
 const draftIcaOption = ref(null)
 const savingIcaOption = ref(false)
 const togglingFlag = ref(false)
-const downloadingCert = ref(false)
+
 const householdNotes = ref(null)
 
-async function downloadCertificate () {
-  downloadingCert.value = true
-  try {
-    const response = await axiosSecure.get(
-      `/households/${encodeURIComponent(pahno.value)}/certificate`,
-      { responseType: 'blob' }
-    )
-    const url = URL.createObjectURL(response.data)
-    const a = document.createElement('a')
-    a.href = url
-    const dateString = new Date().toISOString().slice(0, 10).replace(/-/g, '')
-    a.download = `${pahno.value} ${dateString} ${pah.value?.fullname}.docx`
-    a.click()
-    URL.revokeObjectURL(url)
-  } catch (err) {
-    console.error('Failed to download certificate:', err)
-    error.value = 'Failed to generate certificate.'
-  } finally {
-    downloadingCert.value = false
-  }
-}
+
 
 async function toggleFollowupFlag () {
   togglingFlag.value = true
@@ -123,20 +103,6 @@ async function saveDuplicatePah () {
     error.value = 'Failed to save Duplicate PAH.'
   } finally {
     savingDuplicatePah.value = false
-  }
-}
-
-
-async function clearNoIcaRequired () {
-  savingNoIcaRequired.value = true
-  try {
-    await axiosSecure.patch(`/households/${encodeURIComponent(pahno.value)}`, { no_ica_required: false })
-    pah.value = { ...pah.value, no_ica_required: false }
-  } catch (err) {
-    console.error('Failed to update no_ica_required:', err)
-    error.value = 'Failed to update No ICA Required.'
-  } finally {
-    savingNoIcaRequired.value = false
   }
 }
 
@@ -354,12 +320,6 @@ onMounted(async () => {
             <v-chip color="orange" class="mr-2" size="small" v-if="pah && pah.new_ica_required">
               New ICA Required
             </v-chip>
-            <v-chip color="" class="mr-2" size="small" v-if="pah && pah.no_ica_required">
-              ICA Not Required
-            </v-chip>
-            <v-chip color="" class="mr-2" size="small" v-if="pah && pah.nonaffected">
-              Disturbance only
-            </v-chip>
             <v-btn
               v-if="pah"
               :color="pah.household_followup_flag ? 'purple' : 'grey'"
@@ -417,61 +377,15 @@ onMounted(async () => {
                       @click="editingDuplicatePah = false" />
                   </template>
                 </div>                
-
+                <div>
+                  <strong>ICA Type:</strong>&nbsp;<span class="table-value">{{ pah?.ica_type || 'Not specified' }}</span>
+                </div>
+                <div><strong>Physically Displaced: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.physically_displaced) }">{{ formatYesNo(pah.physically_displaced) }}</span></div>
+                <div><strong>Landholding only: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.landholding_only) }">{{ formatYesNo(pah.landholding_only) }}</span></div>
               </v-col>
               <v-col cols="12" md="6">
                 <template v-if="pah.cosignatory_id">
                   <person-view :person-id="pah.cosignatory_id" title="Cosignatory:" />
-                </template>
-              </v-col>
-              <v-col cols="12">
-                <v-divider class="my-2" />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12">
-                <template v-if="!pah.no_ica_required">
-                  <div :style="{ color: pah.date_signed ? 'inherit' : 'red' }">
-                    <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah.date_signed ? formatDateTime(pah.date_signed) : 'not signed' }}</span>
-                  </div>
-                  <div v-if="pah.ica_link"><strong>Signed ICA:</strong>
-                    <v-btn
-                      v-if="getSafeExternalUrl(pah.ica_link)"
-                      :href="getSafeExternalUrl(pah.ica_link)"
-                      prepend-icon="mdi-open-in-new"
-                      variant="text"
-                      size="small"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="ml-2"
-                      title="Open ICA link"
-                    >Open Signed ICA</v-btn>
-                  </div>
-                  <div v-if="!pah.nonaffected"><strong>Generate new ICA: </strong>
-                    <v-btn
-                      v-if="pah"
-                      @click="downloadCertificate"
-                      prepend-icon="mdi-file-word-outline"
-                      variant="text"
-                      size="small"
-                      class="ml-2"
-                      title="Generate new ICA"
-                      :loading="downloadingCert"
-                    >Generate</v-btn>                    
-                  </div>
-                </template>
-                <template v-else>
-                  <div><strong>ICA:</strong>
-                    <v-btn
-                      variant="tonal"
-                      size="small"
-                      color="grey"
-                      class="ml-2"
-                      :loading="savingNoIcaRequired"
-                      @click="clearNoIcaRequired"
-                      title="Click to mark ICA as required"
-                    >Not Required</v-btn>
-                  </div>
                 </template>
               </v-col>
             </v-row>
@@ -493,15 +407,6 @@ onMounted(async () => {
             <v-window v-model="tab" class="border pl-5 pt-3">
               <v-window-item value="ica">
                 <v-row>
-                  <v-col cols="12" md="6">
-                    <div><strong>Physically Displaced: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.physically_displaced) }">{{ formatYesNo(pah.physically_displaced) }}</span></div>
-                    <div><strong>Landholding only: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.landholding_only) }">{{ formatYesNo(pah.landholding_only) }}</span></div>
-                    <div><strong>No ICA Required: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.no_ica_required) }">{{ formatYesNo(pah.no_ica_required) }}</span></div>
-                    <div><strong>New ICA Required: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.new_ica_required) }">{{ formatYesNo(pah.new_ica_required) }}</span></div>
-                    <div><strong>Disturbance only: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.nonaffected) }">{{ formatYesNo(pah.nonaffected) }}</span></div>
-                    <div><strong>Is Silumesii: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.silumesii) }">{{ formatYesNo(pah.silumesii) }}</span></div>
-                    <div><strong>Flagged: </strong><span class="table-value" :class="{ 'highlight-true': isTrueValue(pah.household_followup_flag) }">{{ formatYesNo(pah.household_followup_flag) }}</span></div>
-                  </v-col>
                   <v-col cols="12" md="6">
                     <div><strong>Cash Compensation:</strong> <span class="table-value">K{{ formatCurrency(pah.compensation?.total_cash_compensation || 0) }}</span></div>
                     <div v-if="pah.replacement_land_area>0"><strong>Replacement Land:</strong> <span class="table-value">{{ formatArea(pah.replacement_land_area) }} ({{ landOptions }})</span></div>
@@ -625,7 +530,7 @@ onMounted(async () => {
                           <td class="table-value">
                             <template v-if="editingIcaOption !== 'icaoption_landholding'">
                               {{ pah.icaoption_landholding || 'none' }}
-                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
+                              <v-btn v-if="false" size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
                                 @click="startEditIcaOption('icaoption_landholding')"
                                 style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
                             </template>
@@ -644,7 +549,7 @@ onMounted(async () => {
                           <td class="table-value">
                             <template v-if="editingIcaOption !== 'icaoption_dryland'">
                               {{ pah.icaoption_dryland || 'none' }}
-                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
+                              <v-btn v-if="false" size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
                                 @click="startEditIcaOption('icaoption_dryland')"
                                 style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
                             </template>
@@ -663,7 +568,7 @@ onMounted(async () => {
                           <td class="table-value">
                             <template v-if="editingIcaOption !== 'icaoption_garden'">
                               {{ pah.icaoption_garden || 'none' }}
-                              <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
+                              <v-btn v-if="false" size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
                                 @click="startEditIcaOption('icaoption_garden')"
                                 style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
                             </template>

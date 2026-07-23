@@ -80,21 +80,18 @@ watch(() => props.pahNo, async (newPah) => {
           <v-chip color="orange" class="mr-2" size="small" v-if="pah && pah.new_ica_required">
             New ICA Required
           </v-chip>
-          <v-chip color="blue" class="mr-2" size="small" v-if="pah && pah.silumesii">
-            Silumesii
-          </v-chip>          
-          <v-chip color="" class="mr-2" size="small" v-if="pah && pah.no_ica_required">
-            ICA Not Required
-          </v-chip>
-          <v-chip color="" class="mr-2" size="small" v-if="pah && pah.nonaffected">
-            Disturbance only
-          </v-chip>
         </v-col>
       </v-row>
     </v-card-title>
     <v-card-text v-if="pah">
       <v-row>
         <v-col cols="12" sm="6">
+          <div>
+            <b>Village:</b> <span class="table-value">{{ pah?.village }}</span>
+          </div>
+          <div>
+            <strong>ICA Type:</strong> <span class="table-value">{{ pah?.ica_type || 'Not specified' }}</span>
+          </div>          
           <div>
             <span v-if="!pah.no_ica_required" :style="{ color: pah?.date_signed ? 'inherit' : 'red' }">
               <strong>ICA Signature Date:</strong> <span class="table-value">{{ pah?.date_signed || 'not signed' }}</span>
@@ -116,9 +113,6 @@ watch(() => props.pahNo, async (newPah) => {
           </div>
           <div>
             <strong>Survey Completed:</strong> <span class="table-value">{{ pah?.survey_complete ? 'Yes' : 'No' }}</span>
-          </div>
-          <div>
-            <b>Village:</b> <span class="table-value">{{ pah?.village }}</span>
           </div>
           <div>
             <b>Physically Displaced:</b> <span class="table-value">{{ formatYesNo(pah?.physically_displaced) }}</span>

@@ -7,8 +7,6 @@ import HouseholdSearchResult from '@/components/HouseholdSearchResult.vue'
 const axiosSecure = inject('axiosSecure')
 
 
-const icarequired = ref(true)
-
 const search = ref({
   params: {
     pah: '',
@@ -17,8 +15,7 @@ const search = ref({
     village_id: 'all',
     vulnerable: null,
     physically_displaced: null,
-    nonaffected: null,
-    no_ica_required: false,
+    ica_type: null,
     icasigned: null,
     icaoption_primary_structure: null,
     icaoption_structure_location: null,
@@ -30,7 +27,6 @@ const search = ref({
     has_replacement_land: null,
     has_protected: null,
     followup_flag: null,
-    silumesii: null,
     new_ica_required: null,
     survey_complete: null,
     landholding_only: null,
@@ -42,7 +38,7 @@ const search = ref({
   }
 })
 
-const getICARequiredIndet = computed(() => icarequired.value === null)
+
 const villages = ref([])
 const loading = ref(false)
 const downloading = ref(false)
@@ -54,8 +50,7 @@ const STORAGE_KEY = 'household_search_state'
 
 function saveSearchState () {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    params: search.value.params,
-    icarequired: icarequired.value
+    params: search.value.params
   }))
 }
 
@@ -63,23 +58,14 @@ function restoreSearchState () {
   const saved = localStorage.getItem(STORAGE_KEY)
   if (!saved) return
   try {
-    const { params, icarequired: savedIca } = JSON.parse(saved)
+    const { params } = JSON.parse(saved)
     search.value.params = params
-    icarequired.value = savedIca
   } catch {
     localStorage.removeItem(STORAGE_KEY)
   }
 }
 
-watch(icarequired, (newValue) => {
-  if (newValue === null) {
-    search.value.params.no_ica_required = null
-  } else {
-    search.value.params.no_ica_required = !newValue
-  }
-}, { immediate: true })
-
-watch([() => search.value.params, icarequired], saveSearchState, { deep: true })
+watch([() => search.value.params], saveSearchState, { deep: true })
 
 let autoSearchReady = false
 
@@ -87,7 +73,7 @@ const autoSearchFields = [
   () => search.value.params.village_id,
   () => search.value.params.vulnerable,
   () => search.value.params.physically_displaced,
-  () => search.value.params.nonaffected,
+  () => search.value.params.ica_type,
   () => search.value.params.icasigned,
   () => search.value.params.icaoption_primary_structure,
   () => search.value.params.icaoption_structure_location,
@@ -99,7 +85,6 @@ const autoSearchFields = [
   () => search.value.params.has_replacement_land,
   () => search.value.params.has_protected,
   () => search.value.params.followup_flag,
-  () => search.value.params.silumesii,
   () => search.value.params.new_ica_required,
   () => search.value.params.survey_complete,
   () => search.value.params.landholding_only,
@@ -107,8 +92,7 @@ const autoSearchFields = [
   () => search.value.params.has_multiple_icas,
   () => search.value.params.has_linked_fisher,
   () => search.value.params.has_notes,
-  () => search.value.params.is_duplicate,
-  icarequired,
+  () => search.value.params.is_duplicate
 ]
 
 watch(autoSearchFields, () => {
@@ -170,7 +154,7 @@ function doSearch () {
 
 function clearSearch () {
   localStorage.removeItem(STORAGE_KEY)
-  icarequired.value = true
+  
   search.value.params = {
     pah: '',
     household_head: '',
@@ -178,8 +162,7 @@ function clearSearch () {
     village_id: 'all',
     vulnerable: null,
     physically_displaced: null,
-    nonaffected: null,
-    no_ica_required: false,
+    ica_type: null,
     icasigned: null,
     icaoption_primary_structure: null,
     icaoption_structure_location: null,
@@ -191,7 +174,6 @@ function clearSearch () {
     has_replacement_land: null,
     has_protected: null,
     followup_flag: null,
-    silumesii: null,
     new_ica_required: null,
     survey_complete: null,
     landholding_only: null,
@@ -303,9 +285,286 @@ onMounted(() => {
               </v-col>
             </v-row>
             <v-row>
+              <v-col cols="12" md="8" class="d-flex flex-wrap align-center ga-4">
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.vulnerable"
+                    label="Vulnerable"
+                    hide-details
+                    :indeterminate="search.params.vulnerable === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.vulnerable = null"
+                  />
+                </div>       
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.physically_displaced"
+                    label="Physically displaced"
+                    hide-details
+                    :indeterminate="search.params.physically_displaced === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.physically_displaced = null"
+                  />
+                </div>              
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.landholding_only"
+                    label="Landholding Only"
+                    hide-details
+                    :indeterminate="search.params.landholding_only === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.landholding_only = null"
+                  />
+                </div>                                    
+              </v-col>                       
+            </v-row>
+            <v-row>
+              <v-col cols="12" class="d-flex flex-wrap align-center ga-4">            
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.is_duplicate"
+                    label="Duplicate?"
+                    hide-details
+                    :indeterminate="search.params.is_duplicate === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.is_duplicate = null"
+                  />
+                </div>
+         
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.followup_flag"
+                    label="Follow-Up Flag"
+                    hide-details
+                    :indeterminate="search.params.followup_flag === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.followup_flag = null"
+                  />
+                </div>
+
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.survey_complete"
+                    label="Survey Complete"
+                    hide-details
+                    :indeterminate="search.params.survey_complete === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.survey_complete = null"
+                  />
+                </div>                 
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_current_grievance"
+                    label="Has Grievance"
+                    hide-details
+                    :indeterminate="search.params.has_current_grievance === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_current_grievance = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_linked_fisher"
+                    label="Has Linked Fisher"
+                    hide-details
+                    :indeterminate="search.params.has_linked_fisher === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_linked_fisher = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_notes"
+                    label="Has Notes"
+                    hide-details
+                    :indeterminate="search.params.has_notes === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_notes = null"
+                  />
+                </div>                    
+              </v-col>
+            </v-row>         
+            <v-row>
+              <v-col cols="12" class="d-flex flex-wrap align-center ga-4">
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_replacement_structures"
+                    label="Has replacement structures"
+                    hide-details
+                    :indeterminate="search.params.has_replacement_structures === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_replacement_structures = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_replacement_land"
+                    label="Has replacement land"
+                    hide-details
+                    :indeterminate="search.params.has_replacement_land === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_replacement_land = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_protected"
+                    label="Has protected"
+                    hide-details
+                    :indeterminate="search.params.has_protected === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_protected = null"
+                  />
+                </div>
+              </v-col>
+            </v-row>               
+            <v-row>
+              <v-col cols="12">
+                <strong>ICA:</strong>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols="12" md="4">
+                <v-select
+                  density="compact"
+                  hide-details
+                  v-model="search.params.ica_type"
+                  :items="icaOptions.ica_type"
+                  label="ICA Type"
+                  placeholder="Any"
+                  clearable
+                />
+              </v-col>
+            </v-row>            
+            <v-row>
+              <v-col cols="12" md="8" class="d-flex flex-wrap align-center ga-4">
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.new_ica_required"
+                    label="New ICA Required"
+                    hide-details
+                    :indeterminate="search.params.new_ica_required === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.new_ica_required = null"
+                  />
+                </div>                
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.icasigned"
+                    label="ICA Signed"
+                    hide-details
+                    :indeterminate="search.params.icasigned === null"
+                    density="compact"
+
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.icasigned = null"
+                  />
+                </div>
+                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
+                  <v-checkbox
+                    v-model="search.params.has_multiple_icas"
+                    label="Has Multiple ICAs"
+                    hide-details
+                    :indeterminate="search.params.has_multiple_icas === null"
+                    density="compact"
+                  />
+                  <v-btn
+                    icon="mdi-close-circle"
+                    color="grey"
+                    size="x-small"
+                    variant="text"
+                    @click="search.params.has_multiple_icas = null"
+                  />
+                </div>              
+              </v-col>                  
+            </v-row>
+            <v-row>
               <v-col cols="12">
                 <strong>ICA Options:</strong>
-              </v-col>
+              </v-col>            
             </v-row>
             <v-row>
               <v-col cols="12" md="4">
@@ -375,313 +634,7 @@ onMounted(() => {
                 />
               </v-col>
             </v-row>
-            <v-row>
-              <v-col cols="12">
-                <strong>Flags:</strong>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" md="8" class="d-flex flex-wrap align-center ga-4">
-                <div class="d-flex align-center ga-1 pr-4 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.nonaffected"
-                    label="Disturbance only"
-                    hide-details
-                    :indeterminate="search.params.nonaffected === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.nonaffected = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 pr-4 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="icarequired"
-                    label="ICA Required"
-                    hide-details
-                    :indeterminate="getICARequiredIndet"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="icarequired = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.icasigned"
-                    label="ICA Signed"
-                    hide-details
-                    :indeterminate="search.params.icasigned === null"
-                    density="compact"
 
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.icasigned = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.has_multiple_icas"
-                    label="Has Multiple ICAs"
-                    hide-details
-                    :indeterminate="search.params.has_multiple_icas === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.has_multiple_icas = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.is_duplicate"
-                    label="Duplicate?"
-                    hide-details
-                    :indeterminate="search.params.is_duplicate === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.is_duplicate = null"
-                  />
-                </div>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" class="d-flex flex-wrap align-center ga-4">
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.vulnerable"
-                    label="Vulnerable"
-                    hide-details
-                    :indeterminate="search.params.vulnerable === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.vulnerable = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.physically_displaced"
-                    label="Physically displaced"
-                    hide-details
-                    :indeterminate="search.params.physically_displaced === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.physically_displaced = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.followup_flag"
-                    label="Follow-Up Flag"
-                    hide-details
-                    :indeterminate="search.params.followup_flag === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.followup_flag = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.silumesii"
-                    label="Silumesii"
-                    hide-details
-                    :indeterminate="search.params.silumesii === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.silumesii = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.new_ica_required"
-                    label="New ICA Required"
-                    hide-details
-                    :indeterminate="search.params.new_ica_required === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.new_ica_required = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.survey_complete"
-                    label="Survey Complete"
-                    hide-details
-                    :indeterminate="search.params.survey_complete === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.survey_complete = null"
-                  />
-                </div>
-
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12" class="d-flex flex-wrap align-center ga-4">
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.has_replacement_structures"
-                    label="Has replacement structures"
-                    hide-details
-                    :indeterminate="search.params.has_replacement_structures === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.has_replacement_structures = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.has_replacement_land"
-                    label="Has replacement land"
-                    hide-details
-                    :indeterminate="search.params.has_replacement_land === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.has_replacement_land = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.has_protected"
-                    label="Has protected"
-                    hide-details
-                    :indeterminate="search.params.has_protected === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.has_protected = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.landholding_only"
-                    label="Landholding Only"
-                    hide-details
-                    :indeterminate="search.params.landholding_only === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.landholding_only = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.has_current_grievance"
-                    label="Has Grievance"
-                    hide-details
-                    :indeterminate="search.params.has_current_grievance === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.has_current_grievance = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.has_linked_fisher"
-                    label="Has Linked Fisher"
-                    hide-details
-                    :indeterminate="search.params.has_linked_fisher === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.has_linked_fisher = null"
-                  />
-                </div>
-                <div class="d-flex align-center ga-1 bg-grey-lighten-4 rounded">
-                  <v-checkbox
-                    v-model="search.params.has_notes"
-                    label="Has Notes"
-                    hide-details
-                    :indeterminate="search.params.has_notes === null"
-                    density="compact"
-                  />
-                  <v-btn
-                    icon="mdi-close-circle"
-                    color="grey"
-                    size="x-small"
-                    variant="text"
-                    @click="search.params.has_notes = null"
-                  />
-                </div>
-              </v-col>
-            </v-row>
             <v-row >
               <v-col cols="6">
                 {{ pahs.length }} result(s) found.

@@ -18,11 +18,12 @@ const error = ref('')
 const dialog = ref(false)
 const newIcaLink = ref('')
 const newIcaDateSigned = ref('')
-const newIcaType = ref(null)
+
 const saving = ref(false)
 const saveError = ref('')
+const downloadingCert = ref(false)
 
-const ICA_TYPES = ['Household', 'Non-affected']
+
 
 const togglingFlag = ref(false)
 
@@ -31,6 +32,31 @@ const icasUrl = computed(() =>
     ? `/fishers/${encodeURIComponent(props.nhs)}/icas`
     : `/households/${encodeURIComponent(props.pah)}/icas`
 )
+
+async function downloadCertificate () {
+  downloadingCert.value = true
+  try {
+    const reqURL = props.nhs
+      ? `/fishers/${encodeURIComponent(props.nhs)}/certificate`
+      : `/households/${encodeURIComponent(props.pah)}/certificate`
+
+    const pahno = props.nhs ? ref(props.nhs) : ref(props.pah)
+    const response = await axiosSecure.get( reqURL, { responseType: 'blob' } )
+    
+    const url = URL.createObjectURL(response.data)
+    const a = document.createElement('a')
+    a.href = url
+    const dateString = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    a.download = `${pahno.value} ${dateString}.docx`
+    a.click()
+    URL.revokeObjectURL(url)
+  } catch (err) {
+    console.error('Failed to download certificate:', err)
+    error.value = 'Failed to generate certificate.'
+  } finally {
+    downloadingCert.value = false
+  }
+}
 
 async function toggleNewIcaRequired () {
   togglingFlag.value = true
@@ -71,7 +97,7 @@ async function loadIcas () {
 function openDialog () {
   newIcaLink.value = ''
   newIcaDateSigned.value = ''
-  newIcaType.value = null
+
   saveError.value = ''
   dialog.value = true
 }
@@ -87,7 +113,7 @@ async function submitIca () {
     await axiosSecure.post(icasUrl.value, {
       ica_link: newIcaLink.value.trim() || null,
       date_signed: newIcaDateSigned.value || null,
-      type: newIcaType.value || null
+
     })
     dialog.value = false
     await loadIcas()
@@ -134,6 +160,18 @@ defineExpose({ loadIcas, currentIca })
     <v-card-title class="d-flex align-center table-heading">
       <span class="text-title-small">Signed ICAs</span>
       <v-spacer />
+      <div>
+        <v-btn
+          @click="downloadCertificate"
+          prepend-icon="mdi-file-word-outline"
+          variant="tonal"
+          size="small"
+          class="mr-2"
+          color="green"
+          title="Generate new ICA"
+          :loading="downloadingCert"
+        >Generate</v-btn>        
+      </div>
       <v-btn
         :color="newIcaRequired ? 'orange' : 'grey'"
         :variant="newIcaRequired ? 'tonal' : 'outlined'"
@@ -158,7 +196,6 @@ defineExpose({ loadIcas, currentIca })
         <thead>
           <tr>
             <th>Date Signed</th>
-            <th>Type</th>
             <th>ICA Link</th>
             <th>Status</th>
             <th></th>
@@ -167,7 +204,6 @@ defineExpose({ loadIcas, currentIca })
         <tbody>
           <tr v-for="ica in icas" :key="ica.ica_id">
             <td class="table-value left" style="white-space: nowrap;">{{ ica.date_signed || '—' }}</td>
-            <td class="table-value left" style="white-space: nowrap;">{{ ica.type || '—' }}</td>
             <td class="table-value left">
               <template v-if="editingIcaId !== ica.ica_id">
                 <span>{{ ica.ica_link ? decodeURIComponent(ica.ica_link.split('/').pop().split('?')[0]) : '—' }}</span>
@@ -203,8 +239,6 @@ defineExpose({ loadIcas, currentIca })
       <v-card-title>Add ICA</v-card-title>
       <v-card-text>
         <v-alert v-if="saveError" type="error" variant="tonal" class="mb-3">{{ saveError }}</v-alert>
-        <v-select v-if="!nhs" v-model="newIcaType" label="Type" :items="ICA_TYPES"
-          density="compact" variant="outlined" class="mb-3" clearable />
         <v-text-field v-model="newIcaLink" label="ICA Link" placeholder="https://..."
           density="compact" variant="outlined" class="mb-3" />
         <v-text-field v-model="newIcaDateSigned" label="Date Signed" type="date"

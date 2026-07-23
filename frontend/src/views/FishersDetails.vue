@@ -130,38 +130,6 @@ onMounted(load)
                 <div v-if="fisher.lr_goatrearing"><strong>Goat Rearing:</strong> <span class="ml-1">{{ formatYesNo(fisher.lr_goatrearing) }}</span></div>
               </v-col>
             </v-row>
-            <v-row>
-              <v-col cols="12">
-              <div :style="{ color: fisher.date_signed ? 'inherit' : 'red' }">
-                <strong>ICA Signature Date:</strong> <span class="table-value">{{ fisher.date_signed ? formatDateTime(fisher.date_signed) : 'not signed' }}</span>
-                <v-btn
-                  v-if="getSafeExternalUrl(fisher.ica_link)"
-                  :href="getSafeExternalUrl(fisher.ica_link)"
-                  prepend-icon="mdi-open-in-new"
-                  variant="text"
-                  size="x-small"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="ml-2"
-                  title="Open ICA link"
-                >Open ICA Link</v-btn>
-              </div>
-              <div><strong>Generate new ICA: </strong>
-                <v-btn
-                  v-if="nhs"
-                  @click="downloadCertificate"
-                  prepend-icon="mdi-file-word-outline"
-                  variant="text"
-                  size="small"
-                  class="ml-2"
-                  title="Generate new ICA"
-                  :loading="downloadingCert"
-                >Generate</v-btn>                    
-              </div>           
-              </v-col>   
-            </v-row>
-            <Notes ref="fisherNotes" :nhs="nhs" class="mb-4" />
-            <Grievances :person-id="fisher.person_id" class="mb-4" @grievance-changed="fisherNotes?.loadNotes()" />
             <Icas
               :nhs="nhs"
               :new-ica-required="fisher?.new_ica_required ?? false"
@@ -169,6 +137,9 @@ onMounted(load)
               @ica-added="fisherNotes?.loadNotes()"
               class="mb-4"
             />
+            <Notes ref="fisherNotes" :nhs="nhs" class="mb-4" />
+            <Grievances :person-id="fisher.person_id" class="mb-4" @grievance-changed="fisherNotes?.loadNotes()" />
+
             <v-row class="pt-4">
               <v-col cols="12" md="6">
                 <v-table density="compact">
