@@ -101,16 +101,36 @@ onMounted(() => {
     <TopBar />
     <v-main>
       <v-container class="pa-6">
+        
         <v-row>
-          <v-col cols="12" sm="6" md="4">
+          <v-col cols="12">
             <h3 class="text-h3 mb-4">
               Households (PAH)
             </h3>
+          </v-col>          
+          <v-col cols="12" sm="6" md="4">
             <v-table density="compact" v-if="households">
               <thead>
                 <tr>
-                <th class="table-heading">Affected households</th>
-                <th class="table-heading right">{{ households.ICARequiredHouseholds }}</th>
+                  <th class="table-heading">ICA Types</th>
+                  <th class="table-heading right">{{ households.totalHouseholds }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="icaType in households.icaTypes" :key="icaType.ica_type">
+                  <td>{{ icaType.ica_type }}</td>
+                  <td class="table-value">{{ icaType.count }}</td>
+                </tr>
+              </tbody>
+              <TableCopyFooter :colspan="2" />
+            </v-table>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <v-table density="compact" v-if="households">
+              <thead>
+                <tr>
+                <th class="table-heading">Households</th>
+                <th class="table-heading right"></th>
                 </tr>
               </thead>
               <tbody>
@@ -123,29 +143,48 @@ onMounted(() => {
                 <td class="table-value">{{ households.physicallyDisplacedHouseholds }}</td>
               </tr>
               <tr>
-                <td>Replacement Structure Households</td>
+                <td>With Replacement Structure</td>
                 <td class="table-value">{{ households.replacementHouseholds }}</td>
               </tr>
               <tr>
-                <td>Replacement Land Households</td>
+                <td>With Replacement Land</td>
                 <td class="table-value">{{ households.replacementLandHouseholds }}</td>
               </tr>
               <tr>
-                <td>Flagged Households</td>
-                <td class="table-value">{{ households.followUpFlagHouseholds }}</td>
-              </tr>
-              <tr>
-                <td>Landholding Only Households</td>
+                <td>Landholding Only</td>
                 <td class="table-value">{{ households.landholdingOnlyHouseholds }}</td>
-              </tr>
-              <tr>
-                <td>Silumesii Households</td>
-                <td class="table-value">{{ households.silumesiiHouseholds }}</td>
               </tr>
               </tbody>
               <TableCopyFooter :colspan="2" />
             </v-table>
           </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <v-table density="compact" v-if="households">
+              <thead>
+                <tr>
+                <th class="table-heading">ICA State</th>
+                <th class="table-heading right">{{ households.totalHouseholds }}</th>
+                </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Signed</td>
+                <td class="table-value">{{ households.signedHouseholds }}</td>
+              </tr>
+              <tr>
+                <td>Unsigned</td>
+                <td class="table-value">{{ households.unsignedHouseholds }}</td>
+              </tr>
+              <tr>
+                <td>Revised ICA Required</td>
+                <td class="table-value">{{ households.newICARequiredHouseholds }}</td>
+              </tr>
+              </tbody>
+              <TableCopyFooter :colspan="2" />
+            </v-table>
+          </v-col>          
+        </v-row>
+        <v-row>
           <v-col cols="12" sm="6" md="4">
             <h3 class="text-h3 mb-4">
               Socio-economic Surveys
@@ -172,34 +211,6 @@ onMounted(() => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col cols="12" sm="6" md="4">
-            <h3 class="text-h3 mb-4">
-              Compensation Agreements (ICAs)
-            </h3>
-            <v-table density="compact" v-if="households">
-              <thead>
-                <tr>
-                <th class="table-heading">Affected households</th>
-                <th class="table-heading right">{{ households.ICARequiredHouseholds }}</th>
-                </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td>Signed</td>
-                <td class="table-value">{{ households.signedHouseholds }}</td>
-              </tr>
-              <tr>
-                <td>Unsigned</td>
-                <td class="table-value">{{ households.unsignedHouseholds }}</td>
-              </tr>
-              <tr>
-                <td>Revised ICA Required</td>
-                <td class="table-value">{{ households.newICARequiredHouseholds }}</td>
-              </tr>
-              </tbody>
-              <TableCopyFooter :colspan="2" />
-            </v-table>
-          </v-col>
           <v-col cols="12" sm="6" md="4">
             <h3 class="text-h3 mb-4">
               Fishers Compensation Agreements

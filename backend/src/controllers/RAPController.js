@@ -12,6 +12,14 @@ module.exports = {
       const totalHouseholdsResult = await Knex('v_households').count('pah as count').first()
       summary.totalHouseholds = parseInt(totalHouseholdsResult.count) || 0
 
+      // Counts by ICA type
+      const icaTypes = await Knex('v_households')
+        .select('ica_type')
+        .count('* as count')
+        .orderBy('ica_type', 'asc')
+        .groupBy('ica_type')
+      summary.icaTypes = icaTypes
+
       // Add a count of vulnerable households
       const vulnerableHouseholdsResult = await Knex('v_households').where('vulnerable', true).count('pah as count').first()
       summary.vulnerableHouseholds = parseInt(vulnerableHouseholdsResult.count) || 0
@@ -20,20 +28,10 @@ module.exports = {
       const displacedHouseholdsResult = await Knex('v_households').where('physically_displaced', true).count('pah as count').first()
       summary.physicallyDisplacedHouseholds = parseInt(displacedHouseholdsResult.count) || 0
 
-      // Add a count of households with no ICA required
-      const noICAHouseholdsResult = await Knex('v_households').where('no_ica_required', true).count('pah as count').first()
-      summary.noICARequiredHouseholds = parseInt(noICAHouseholdsResult.count) || 0
-
-      // Add a count of non-affected households
-      const nonAffectedHouseholdsResult = await Knex('v_households').where('nonaffected', true).count('pah as count').first()
-      summary.nonAffectedHouseholds = parseInt(nonAffectedHouseholdsResult.count) || 0
-
       // Add a count of signed households
       const signedHouseholdsResult = await Knex('v_households').whereNotNull('date_signed').count('pah as count').first()
       summary.signedHouseholds = parseInt(signedHouseholdsResult.count) || 0
-
-      summary.ICARequiredHouseholds = summary.totalHouseholds - summary.noICARequiredHouseholds
-      summary.unsignedHouseholds = summary.totalHouseholds - summary.signedHouseholds - summary.noICARequiredHouseholds
+      summary.unsignedHouseholds = summary.totalHouseholds - summary.signedHouseholds
 
       // Add a count of households with follow-up flag
       const followUpHouseholdsResult = await Knex('v_households').where('household_followup_flag', true).count('pah as count').first()
@@ -47,11 +45,7 @@ module.exports = {
       const newICAHouseholdsResult = await Knex('v_households').where('new_ica_required', true).count('pah as count').first()
       summary.newICARequiredHouseholds = parseInt(newICAHouseholdsResult.count) || 0
 
-      // Add a count of households that are silumesii
-      const silumesiiHouseholdsResult = await Knex('v_households').where('silumesii', true).count('pah as count').first()
-      summary.silumesiiHouseholds = parseInt(silumesiiHouseholdsResult.count) || 0
-
-      // Add a count of households that have replacement households (replacement_structures_count>0)
+      // Add a count of households that have replacement structures (replacement_structures_count>0)
       const replacementHouseholdsResult = await Knex('v_households').where('replacement_structures_count', '>', 0).count('pah as count').first()
       summary.replacementHouseholds = parseInt(replacementHouseholdsResult.count) || 0
 
