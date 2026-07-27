@@ -5,6 +5,7 @@ const EXPORT_COLUMNS = {
   nhs: 'NHS',
   fullname: 'Full Name',
   type: 'Type',
+  village: 'Village',
   survey_phase: 'Survey Phase',
   social_survey: 'Social Survey',
   catch_survey: 'Catch Survey',

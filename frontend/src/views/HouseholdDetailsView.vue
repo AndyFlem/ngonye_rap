@@ -27,10 +27,6 @@ const loading = ref(false)
 const error = ref('')
 const tab = ref('ica')
 
-const villages = ref([])
-const editingVillage = ref(false)
-const draftVillageId = ref(null)
-const savingVillage = ref(false)
 const editingDuplicatePah = ref(false)
 const draftDuplicatePah = ref('')
 const savingDuplicatePah = ref(false)
@@ -66,25 +62,6 @@ async function toggleFollowupFlag () {
   }
 }
 
-function startEditVillage () {
-  draftVillageId.value = pah.value?.village_id ?? null
-  editingVillage.value = true
-}
-
-async function saveVillage () {
-  savingVillage.value = true
-  try {
-    await axiosSecure.patch(`/households/${encodeURIComponent(pahno.value)}`, { village_id: draftVillageId.value })
-    const selected = villages.value.find(v => v.village_id === draftVillageId.value)
-    pah.value = { ...pah.value, village_id: draftVillageId.value, village: selected?.village ?? null }
-    editingVillage.value = false
-  } catch (err) {
-    console.error('Failed to save village:', err)
-    error.value = 'Failed to save village.'
-  } finally {
-    savingVillage.value = false
-  }
-}
 
 function startEditDuplicatePah () {
   draftDuplicatePah.value = pah.value?.duplicate_pah ?? ''
@@ -290,12 +267,6 @@ const goBack = () => {
 
 onMounted(async () => {
   loadHousehold()
-  try {
-    const r = await axiosSecure.get('/villages')
-    villages.value = r.data
-  } catch (err) {
-    console.error('Failed to load villages:', err)
-  }
 })
 
 </script>
@@ -337,29 +308,6 @@ onMounted(async () => {
             <v-row>
               <v-col cols="12" md="6">
                 <person-view :person-id="pah.householdhead_id" title="Head of Household:" />
-                <div class="d-flex align-center">
-                  <template v-if="!editingVillage">
-                    <strong>Village:</strong>&nbsp;<span class="table-value">{{ pah?.village || 'none' }}</span>
-                    <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil" @click="startEditVillage"
-                      style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
-                  </template>
-                  <template v-else>
-                    <strong>Village:</strong>&nbsp;
-                    <v-select
-                      v-model="draftVillageId"
-                      :items="villages"
-                      item-title="village"
-                      item-value="village_id"
-                      density="compact"
-                      hide-details
-                      variant="underlined"
-                      style="max-width: 220px"
-                    />
-                    <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check" :loading="savingVillage"
-                      @click="saveVillage" />
-                    <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close" @click="editingVillage = false" />
-                  </template>                  
-                </div>
                 <div class="d-flex align-center">
                   <template v-if="!editingDuplicatePah">
                     <strong>Duplicate PAH:</strong>&nbsp;<span class="table-value">{{ pah.duplicate_pah }}</span>
