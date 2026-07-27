@@ -12,7 +12,7 @@ where
 	and structures_count=0
 	and 	(SELECT count(*) from land_parcels lp where lp.pah=h.pah and lp.land_class<>'Landholding')=0
 	and (SELECT count(*) from land_parcels lp where lp.pah=h.pah and lp.land_class='Landholding')>0
-)
+);
 
 
 update households set ica_type='Silumesii' where silumesii=true and ica_type='None';
