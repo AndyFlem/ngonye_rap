@@ -44,6 +44,31 @@ function csvEscape (val) {
 }
 
 module.exports = {
+    async summary (req, res) {
+    Common.debug(req, 'summary')
+
+    try {
+      const summary = {}
+
+      const types = await Knex('v_structures')
+        .select('structure_type')
+        .count('* as count')
+        .sum('structure_value as value')
+        //.sum({ protected_count: Knex.raw('CASE WHEN protected THEN 1 ELSE 0 END') })
+        .where(function() {
+          this.whereNull('protected').orWhere('protected', false)
+        })
+        .orderBy('structure_type', 'asc')
+        .groupBy('structure_type')
+      
+        summary.types = types
+
+        return res.send(summary)
+    } catch (err) {
+      Common.error(req, 'summary', err)
+      return res.status(500).send({ error: 'an error has occurred trying to fetch the structures summary: ' + err })
+    }
+  },
   async indexForPAH (req, res) {
     Common.debug(req, 'indexForPAH')
     const pah = (req.params.pah || '').trim().slice(0, 120)

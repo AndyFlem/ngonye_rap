@@ -96,6 +96,7 @@ module.exports = (app) => {
   app.patch(prefix + '/replacements/:id', ReplacementsController.patch)
 
   // STRUCTURES
+  app.get(prefix + '/structures/summary', StructuresController.summary)
   app.get(prefix + '/households/:pah/structures', StructuresController.indexForPAH)
   app.get(prefix + '/structures/options', StructuresController.indexOptions)
   app.post(prefix + '/structures_search', StructuresController.search)

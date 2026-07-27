@@ -9,6 +9,7 @@ const households = ref(null)
 const replacementStructs = ref(null)
 const replacementLand = ref(null)
 const landAquisition = ref(null)
+const structures = ref(null)
 const loading = ref(false)
 const error = ref('')
 
@@ -63,6 +64,14 @@ const replacementLandRows = computed(() => {
   return rows
 })
 
+const structureTypeTotals = computed(() => {
+  const types = structures.value?.types ?? []
+  return {
+    count: types.reduce((sum, t) => sum + (t.count ?? 0), 0),
+    value: types.reduce((sum, t) => sum + (t.value ?? 0), 0)
+  }
+})
+
 //const user = inject('user')
 const axiosSecure = inject('axiosSecure')
 
@@ -80,6 +89,9 @@ const load = async () => {
 
     const landAquisitionResponse = await axiosSecure.get(`/land/summary`)
     landAquisition.value = landAquisitionResponse.data || null
+
+    const structuresResponse = await axiosSecure.get(`/structures/summary`)
+    structures.value = structuresResponse.data || null
 
   } catch (err) {
     error.value = 'Failed to load.'
@@ -297,6 +309,39 @@ onMounted(() => {
               </tbody>
               <TableCopyFooter :colspan="2" />
             </v-table>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" sm="8" md="6">
+            <h3 class="text-h3 mb-4">
+              Affected Structures
+            </h3>
+            <v-table v-if="structures?.types?.length" density="compact">
+              <thead>
+                <tr>
+                  <th class="table-heading">Structure Type</th>
+                  <th class="table-heading center">Count</th>
+                  <th class="table-heading center">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in structures.types" :key="item.structure_type">
+                  <td>{{ item.structure_type }}</td>
+                  <td class="table-value center">{{ item.count }}</td>
+                  <td class="table-value center">
+                    <span v-if="item.value != null">{{ formatCurrency(item.value) }}</span>
+                    <span v-else>unknown</span>
+                  </td>
+                </tr>
+                <tr class="table-total">
+                  <td>Total:</td>
+                  <td class="center">{{ structureTypeTotals.count }}</td>
+                  <td class="center">{{ formatCurrency(structureTypeTotals.value) }}</td>
+                </tr>
+              </tbody>
+              <TableCopyFooter :colspan="3" />
+            </v-table>
+            <span v-else>No data available</span>
           </v-col>
         </v-row>
         <v-row>
