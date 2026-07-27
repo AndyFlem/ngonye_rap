@@ -8,6 +8,7 @@ const IcasController = require('./controllers/IcasController')
 const GrievancesController = require('./controllers/GrievancesController')
 const RAPController = require('./controllers/RAPController')
 const ReplacementsController = require('./controllers/ReplacementsController')
+const StructuresController = require('./controllers/StructuresController')
 const LandController = require('./controllers/LandController')
 const PersonController = require('./controllers/PersonController')
 const FishersController = require('./controllers/FishersController')
@@ -77,7 +78,6 @@ module.exports = (app) => {
   app.delete(prefix + '/grievances/:grievance_id', GrievancesController.destroy)
 
   app.get(prefix + '/households/:pah/parcels', HouseholdsController.indexParcels)
-  app.get(prefix + '/households/:pah/structures', HouseholdsController.indexStructures)
   app.get(prefix + '/households/:pah/trees', HouseholdsController.indexTrees)
   app.get(prefix + '/households/:pah/crops', HouseholdsController.indexCrops)
   app.get(prefix + '/households/:pah/graves', HouseholdsController.indexGraves)
@@ -94,6 +94,14 @@ module.exports = (app) => {
   app.delete(prefix + '/replacement_notes/:note_id', ReplacementsController.destroyNote)
   app.get(prefix + '/replacements/:id', ReplacementsController.show)
   app.patch(prefix + '/replacements/:id', ReplacementsController.patch)
+
+  // STRUCTURES
+  app.get(prefix + '/households/:pah/structures', StructuresController.indexForPAH)
+  app.get(prefix + '/structures/options', StructuresController.indexOptions)
+  app.post(prefix + '/structures_search', StructuresController.search)
+  app.post(prefix + '/structures_export', StructuresController.exportSearch)
+  app.get(prefix + '/structures/:id', StructuresController.show)
+  app.patch(prefix + '/structures/:id', StructuresController.patch)
 
   // LIVELIHOOD RESTORATION
   app.get(prefix + '/livelihood-restoration/households', RAPController.lrHouseholds)

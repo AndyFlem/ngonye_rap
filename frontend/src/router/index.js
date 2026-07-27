@@ -5,6 +5,8 @@ import HouseholdSearch from '@/views/HouseholdSearch.vue'
 import HouseholdDetailsView from '@/views/HouseholdDetailsView.vue'
 import ReplacementSearch from '@/views/ReplacementSearch.vue'
 import ReplacementDetails from '@/views/ReplacementDetails.vue'
+import StructuresSearch from '@/views/StructuresSearch.vue'
+import StructureDetails from '@/views/StructureDetails.vue'
 import ParcelSearch from '@/views/ParcelSearch.vue'
 import ParcelDetails from '@/views/ParcelDetails.vue'
 import UserList from '@/views/UserList.vue'
@@ -60,6 +62,18 @@ const routes = [
     path: '/replacements/:id',
     name: 'ReplacementDetails',
     component: ReplacementDetails,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/structures',
+    name: 'Structures',
+    component: StructuresSearch,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/structures/:id',
+    name: 'StructureDetails',
+    component: StructureDetails,
     meta: { requiresAuth: true }
   },
   {

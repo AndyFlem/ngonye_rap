@@ -640,7 +640,7 @@ onMounted(async () => {
                       <tbody>
                         <template v-for="parcel in parcels" :key="parcel.land_parcel_id">
                           <tr class="parcel-row">
-                            <td>{{ parcel.land_parcel_id }}<MapLink :lat="parseLatLon(parcel).lat" :lon="parseLatLon(parcel).lon" /></td>
+                            <td><router-link :to="{ name: 'ParcelDetails', params: { id: parcel.land_parcel_id } }">{{ parcel.land_parcel_id }}</router-link><MapLink :lat="parseLatLon(parcel).lat" :lon="parseLatLon(parcel).lon" /></td>
                             <td>{{ parcel.land_class || 'N/A' }}</td>
                             <td>{{ parcel.land_zone || 'N/A' }}</td>
                             <td>{{ formatYesNo(parcel.cultivated) }}</td>
@@ -736,7 +736,10 @@ onMounted(async () => {
                             <v-expansion-panel-title :class="structure.protected ? 'bg-green-lighten-4' : ''">
 
                               <div class="structure-panel-title">
-                                <span><span v-if="structure.protected"><b>[PROTECTED]</b>&nbsp;</span>{{ structure.structure_id }} </span>&nbsp;
+                                <span><span v-if="structure.protected"><b>[PROTECTED]</b>&nbsp;</span><span
+                                  class="panel-link"
+                                  @click.stop.prevent="router.push(`/structures/${structure.structure_id}`)"
+                                >{{ structure.structure_id }}</span> </span>&nbsp;
                                 <span>{{ structure.structure_class }}</span> - <span><strong>{{ structure.structure_type }}</strong></span>
                                 <MapLink :lat="parseLatLon(structure).lat" :lon="parseLatLon(structure).lon" />
                               </div>
@@ -991,6 +994,17 @@ onMounted(async () => {
 .structure-panel-title {
   width: 100%;
   gap: 6px;
+}
+/* Rendered as a span rather than a router-link: the expansion panel title is a
+   <button>, which swallows clicks on any anchor nested inside it. The title's
+   absolutely-positioned __overlay also sits above static content, so the link
+   needs its own stacking context to receive the click at all. */
+.panel-link {
+  position: relative;
+  z-index: 1;
+  color: rgb(var(--v-theme-primary));
+  text-decoration: underline;
+  cursor: pointer;
 }
 .v-expansion-panel-title {
     padding: 0px 15px 0px 15px;

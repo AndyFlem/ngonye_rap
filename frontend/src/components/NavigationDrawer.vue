@@ -31,6 +31,11 @@ const handleReplacementsClick = () => {
   emit('close-drawer')
 }
 
+const handleStructuresClick = () => {
+  router.push('/structures')
+  emit('close-drawer')
+}
+
 const handleParcelsClick = () => {
   router.push('/parcels')
   emit('close-drawer')
@@ -90,6 +95,11 @@ const handleLogout = () => {
         prepend-icon="mdi-home-city"
         title="Replacement Structures"
         @click="handleReplacementsClick"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-home-outline"
+        title="Structures"
+        @click="handleStructuresClick"
       ></v-list-item>
       <v-list-item
         prepend-icon="mdi-map"

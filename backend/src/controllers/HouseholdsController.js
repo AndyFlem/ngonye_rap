@@ -243,24 +243,6 @@ module.exports = {
       return res.status(500).send({ error: 'an error has occurred trying to fetch the parcels for the household: ' + err })
     }
   },
-  async indexStructures (req, res) {
-    Common.debug(req, 'indexStructures')
-    const pah = (req.params.pah || '').trim().slice(0, 120)
-
-    if (!pah) {
-      return res.status(400).send({ error: 'pah is required' })
-    }
-
-    try {
-      const structures = await Knex('v_structures')
-        .where({ pah })
-
-      return res.send(structures)
-    } catch (err) {
-      Common.error(req, 'indexStructures', err)
-      return res.status(500).send({ error: 'an error has occurred trying to fetch the structures for the household: ' + err })
-    }
-  },
   async indexIcaOptions (req, res) {
     Common.debug(req, 'indexIcaOptions')
     const fields = ['ica_type', 'icaoption_primary_structure', 'icaoption_structure_location', 'icaoption_landholding', 'icaoption_dryland', 'icaoption_garden', 'icaoption_transport']
