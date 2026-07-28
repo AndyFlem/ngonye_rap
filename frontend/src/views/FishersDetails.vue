@@ -20,7 +20,33 @@ const fisherNotes = ref(null)
 const togglingFlag = ref(false)
 const downloadingCert = ref(false)
 
+const villages = ref([])
+const editingVillage = ref(false)
+const draftVillage = ref(null)
+const savingVillage = ref(false)
+
 const nhs = computed(() => String(route.params.nhs || '').trim())
+
+function startEditVillage () {
+  draftVillage.value = fisher.value?.village_id ?? null
+  editingVillage.value = true
+}
+
+async function saveVillage () {
+  savingVillage.value = true
+  try {
+    const villageId = draftVillage.value ?? null
+    await axiosSecure.patch(`/fishers/${encodeURIComponent(nhs.value)}`, { village_id: villageId })
+    const village = villages.value.find(v => v.village_id === villageId)?.village ?? null
+    fisher.value = { ...fisher.value, village_id: villageId, village }
+    editingVillage.value = false
+  } catch (err) {
+    console.error('Failed to save village:', err)
+    error.value = 'Failed to save Village.'
+  } finally {
+    savingVillage.value = false
+  }
+}
 
 async function toggleFollowupFlag () {
   togglingFlag.value = true
@@ -73,6 +99,15 @@ const load = async () => {
   }
 }
 
+const loadVillages = async () => {
+  try {
+    const response = await axiosSecure.get('/villages')
+    villages.value = Array.isArray(response.data) ? response.data : []
+  } catch (err) {
+    console.error('Failed to load villages:', err)
+  }
+}
+
 const goBack = () => {
   router.back()
 }
@@ -84,7 +119,10 @@ const getSafeExternalUrl = (value) => {
   return null
 }
 
-onMounted(load)
+onMounted(() => {
+  load()
+  loadVillages()
+})
 </script>
 
 <template>
@@ -116,9 +154,26 @@ onMounted(load)
             <v-row>
               <v-col cols="12" md="6">
                 <PersonView v-if="fisher.person_id" :fisher="true" :person-id="fisher.person_id" title="Fisher:" />
-                <div v-if="fisher.person" class="mt-1">
-                  <div><strong>Gender:</strong> <span class="ml-1">{{ fisher.person.gender || '—' }}</span></div>
-                  <div><strong>Village:</strong> <span class="ml-1">{{ fisher.person.village || '—' }}</span></div>
+                <div class="mt-1">
+                  <div v-if="fisher.person"><strong>Gender:</strong> <span class="ml-1">{{ fisher.person.gender || '—' }}</span></div>
+                  <div class="d-flex align-center">
+                    <template v-if="!editingVillage">
+                      <strong>Village:</strong> <span class="ml-1">{{ fisher.village || '—' }}</span>
+                      <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
+                        @click="startEditVillage"
+                        style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
+                    </template>
+                    <template v-else>
+                      <strong>Village:</strong>&nbsp;
+                      <v-autocomplete v-model="draftVillage" :items="villages" item-title="village"
+                        item-value="village_id" density="compact" hide-details variant="underlined"
+                        style="max-width: 220px" clearable no-data-text="No villages found" />
+                      <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check"
+                        :loading="savingVillage" @click="saveVillage" />
+                      <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close"
+                        @click="editingVillage = false" />
+                    </template>
+                  </div>
                 </div>
               </v-col>
               <v-col cols="12" md="6">

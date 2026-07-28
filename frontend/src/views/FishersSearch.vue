@@ -13,6 +13,7 @@ const defaultParams = () => ({
   nhs: '',
   name: '',
   nrc: '',
+  village_id: null,
   type: null,
   survey_phase: null,
   social_survey: null,
@@ -31,6 +32,7 @@ const defaultParams = () => ({
 const axiosSecure = inject('axiosSecure')
 
 const search = ref({ params: defaultParams() })
+const villages = ref([])
 const results = ref([])
 const loading = ref(false)
 const downloading = ref(false)
@@ -91,6 +93,7 @@ function downloadCsv () {
 }
 
 const autoSearchFields = [
+  () => search.value.params.village_id,
   () => search.value.params.type,
   () => search.value.params.survey_phase,
   () => search.value.params.social_survey,
@@ -110,8 +113,18 @@ watch(autoSearchFields, () => {
   if (autoSearchReady) doSearch()
 })
 
+async function loadVillages () {
+  try {
+    const response = await axiosSecure.get('/villages')
+    villages.value = Array.isArray(response.data) ? response.data : []
+  } catch (err) {
+    console.error('Failed to load villages:', err)
+  }
+}
+
 onMounted(() => {
   restoreSearchState()
+  loadVillages()
   doSearch()
   nextTick(() => { autoSearchReady = true })
 })
@@ -131,7 +144,7 @@ onMounted(() => {
         <v-card class="mb-4" elevation="1">
           <v-card-text>
             <v-row>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-text-field
                   density="compact" hide-details
                   v-model="search.params.nhs"
@@ -140,7 +153,7 @@ onMounted(() => {
                   clearable @keyup.enter="doSearch"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-text-field
                   density="compact" hide-details
                   v-model="search.params.name"
@@ -148,12 +161,24 @@ onMounted(() => {
                   clearable @keyup.enter="doSearch"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-text-field
                   density="compact" hide-details
                   v-model="search.params.nrc"
                   label="NRC" placeholder="Enter NRC"
                   clearable @keyup.enter="doSearch"
+                />
+              </v-col>
+              <v-col cols="12" md="3">
+                <v-autocomplete
+                  density="compact" hide-details
+                  v-model="search.params.village_id"
+                  :items="villages"
+                  item-title="village"
+                  item-value="village_id"
+                  label="Village" placeholder="All villages"
+                  clearable
+                  no-data-text="No villages found"
                 />
               </v-col>
             </v-row>

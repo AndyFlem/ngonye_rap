@@ -9,7 +9,6 @@ const EXPORT_COLUMNS = {
   nrc: 'NRC',
   gender: 'Gender',
   year_of_birth: 'Year of Birth',
-  village: 'Village',
   relationship: 'Relationship',
   marital_status: 'Marital Status',
   residential_status: 'Residential Status',
@@ -60,7 +59,7 @@ module.exports = {
 
     const allowed = [
       'firstname', 'middlename', 'lastname', 'gender', 'contact', 'contact2', 'nrc',
-      'year_of_birth', 'village_id', 'relationship', 'marital_status', 'district', 'origin',
+      'year_of_birth', 'relationship', 'marital_status', 'district', 'origin',
       'primary_occupation', 'secondary_occupation', 'primary_skill', 'secondary_skill',
       'residential_status', 'education', 'disabilities', 'disabled', 'deceased_date',
       'pah'
@@ -128,7 +127,7 @@ module.exports = {
     const allowed = [
       'firstname', 'middlename', 'lastname',
       'gender', 'contact', 'contact2', 'nrc',
-      'year_of_birth', 'village_id', 'relationship', 'marital_status', 'district', 'origin',
+      'year_of_birth', 'relationship', 'marital_status', 'district', 'origin',
       'primary_occupation', 'secondary_occupation', 'primary_skill', 'secondary_skill',
       'residential_status', 'education', 'disabilities', 'disabled', 'deceased_date'
     ]
@@ -283,9 +282,8 @@ module.exports = {
 
         const copyFields = [
           'relationship', 'firstname', 'middlename', 'lastname', 'contact', 'contact2', 'nrc',
-          'village_id', 'district', 'origin', 'primary_occupation', 'secondary_occupation',
-          'primary_skill', 'secondary_skill', 'year_of_birth', 'gender', 'marital_status',
-          'fisher_village_id'
+          'district', 'origin', 'primary_occupation', 'secondary_occupation',
+          'primary_skill', 'secondary_skill', 'year_of_birth', 'gender', 'marital_status'
         ]
         const updateData = {}
         for (const field of copyFields) {

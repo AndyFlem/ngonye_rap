@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict zVJOCEzTmzToRJcfVyiSBpN2WGLfwj2imlWnsOpKyX75lGpxyBDfmujbRpKh04c
+\restrict awxPp0SH4Rf1Extme8FXwakxD3kO3zRgOH4akfa07G8hIHMC2zYveSs5l7y48m1
 
 -- Dumped from database version 14.23 (Ubuntu 14.23-0ubuntu0.22.04.1)
 -- Dumped by pg_dump version 14.23 (Ubuntu 14.23-0ubuntu0.22.04.1)
@@ -47,10 +47,10 @@ COMMENT ON EXTENSION postgis IS 'PostGIS geometry and geography spatial types an
 
 
 --
--- Name: a_fishers_search(character varying, character varying, character varying, character varying, integer, boolean, boolean, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
+-- Name: a_fishers_search(character varying, character varying, character varying, character varying, integer, boolean, boolean, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, bigint); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.a_fishers_search(p_name character varying DEFAULT NULL::character varying, p_nhs character varying DEFAULT NULL::character varying, p_nrc character varying DEFAULT NULL::character varying, p_type character varying DEFAULT NULL::character varying, p_survey_phase integer DEFAULT NULL::integer, p_social_survey boolean DEFAULT NULL::boolean, p_catch_survey boolean DEFAULT NULL::boolean, p_maungwe_active character varying DEFAULT NULL::character varying, p_limbelo_active character varying DEFAULT NULL::character varying, p_followup_flag boolean DEFAULT NULL::boolean, p_ica_signed boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_household boolean DEFAULT NULL::boolean, p_has_notes boolean DEFAULT NULL::boolean, p_has_grievances boolean DEFAULT NULL::boolean) RETURNS TABLE(nhs character varying)
+CREATE FUNCTION public.a_fishers_search(p_name character varying DEFAULT NULL::character varying, p_nhs character varying DEFAULT NULL::character varying, p_nrc character varying DEFAULT NULL::character varying, p_type character varying DEFAULT NULL::character varying, p_survey_phase integer DEFAULT NULL::integer, p_social_survey boolean DEFAULT NULL::boolean, p_catch_survey boolean DEFAULT NULL::boolean, p_maungwe_active character varying DEFAULT NULL::character varying, p_limbelo_active character varying DEFAULT NULL::character varying, p_followup_flag boolean DEFAULT NULL::boolean, p_ica_signed boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_household boolean DEFAULT NULL::boolean, p_has_notes boolean DEFAULT NULL::boolean, p_has_grievances boolean DEFAULT NULL::boolean, p_village_id bigint DEFAULT NULL::bigint) RETURNS TABLE(nhs character varying)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -68,6 +68,7 @@ BEGIN
     (p_catch_survey IS NULL OR f.catch_survey = p_catch_survey) AND
     (p_maungwe_active IS NULL OR f.maungwe_active = p_maungwe_active) AND
     (p_limbelo_active IS NULL OR f.limbelo_active = p_limbelo_active) AND
+    (p_village_id IS NULL OR f.village_id = p_village_id) AND
     (p_followup_flag IS NULL OR COALESCE(f.followup_flag,false) = p_followup_flag) AND
     (p_ica_signed IS NULL OR (i.date_signed IS NOT NULL) = p_ica_signed) AND
     (p_new_ica_required IS NULL OR COALESCE(f.new_ica_required,false) = p_new_ica_required) AND
@@ -86,10 +87,10 @@ $$;
 
 
 --
--- Name: a_households_search(character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, character varying, bigint, character varying, character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
+-- Name: a_households_search(character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, character varying, bigint, character varying, character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean, character varying); Type: FUNCTION; Schema: public; Owner: -
 --
 
-CREATE FUNCTION public.a_households_search(p_household_head character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_vulnerable boolean DEFAULT NULL::boolean, p_landholding_only boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_icasigned boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_physically_displaced boolean DEFAULT NULL::boolean, p_nrc character varying DEFAULT NULL::character varying, p_village_id bigint DEFAULT NULL::bigint, p_icaoption_primary_structure character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_icaoption_landholding character varying DEFAULT NULL::character varying, p_icaoption_dryland character varying DEFAULT NULL::character varying, p_icaoption_garden character varying DEFAULT NULL::character varying, p_icaoption_transport character varying DEFAULT NULL::character varying, p_has_replacement_structures boolean DEFAULT NULL::boolean, p_has_replacement_land boolean DEFAULT NULL::boolean, p_has_protected boolean DEFAULT NULL::boolean, p_survey_complete boolean DEFAULT NULL::boolean, p_has_current_grievance boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_fisher boolean DEFAULT NULL::boolean, p_has_notes boolean DEFAULT NULL::boolean, p_is_duplicate boolean DEFAULT NULL::boolean) RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
+CREATE FUNCTION public.a_households_search(p_household_head character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_vulnerable boolean DEFAULT NULL::boolean, p_landholding_only boolean DEFAULT NULL::boolean, p_new_ica_required boolean DEFAULT NULL::boolean, p_icasigned boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_physically_displaced boolean DEFAULT NULL::boolean, p_nrc character varying DEFAULT NULL::character varying, p_village_id bigint DEFAULT NULL::bigint, p_icaoption_primary_structure character varying DEFAULT NULL::character varying, p_icaoption_structure_location character varying DEFAULT NULL::character varying, p_icaoption_landholding character varying DEFAULT NULL::character varying, p_icaoption_dryland character varying DEFAULT NULL::character varying, p_icaoption_garden character varying DEFAULT NULL::character varying, p_icaoption_transport character varying DEFAULT NULL::character varying, p_has_replacement_structures boolean DEFAULT NULL::boolean, p_has_replacement_land boolean DEFAULT NULL::boolean, p_has_protected boolean DEFAULT NULL::boolean, p_survey_complete boolean DEFAULT NULL::boolean, p_has_current_grievance boolean DEFAULT NULL::boolean, p_has_multiple_icas boolean DEFAULT NULL::boolean, p_has_linked_fisher boolean DEFAULT NULL::boolean, p_has_notes boolean DEFAULT NULL::boolean, p_is_duplicate boolean DEFAULT NULL::boolean, p_ica_type character varying DEFAULT NULL::character varying) RETURNS TABLE(pah character varying, household_head_fullname text, date_signed date)
     LANGUAGE plpgsql
     AS $$
 BEGIN
@@ -118,6 +119,7 @@ BEGIN
       (h.icaoption_dryland = p_icaoption_dryland OR p_icaoption_dryland IS NULL) AND
       (h.icaoption_garden = p_icaoption_garden OR p_icaoption_garden IS NULL) AND
       (h.icaoption_transport = p_icaoption_transport OR p_icaoption_transport IS NULL) AND
+      (h.ica_type = p_ica_type OR p_ica_type IS NULL) AND
       ((COALESCE(h.replacement_structures_count, 0) > 0) = p_has_replacement_structures OR p_has_replacement_structures IS NULL) AND
       ((COALESCE(h.replacement_land_area, 0) > 0) = p_has_replacement_land OR p_has_replacement_land IS NULL) AND
       (COALESCE(h.has_protected,false) = p_has_protected OR p_has_protected IS NULL) AND
@@ -216,6 +218,29 @@ END;
 $$;
 
 
+--
+-- Name: a_structures_search(character varying, character varying, character varying, character varying, character varying, boolean, boolean, boolean); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.a_structures_search(p_structure_id character varying DEFAULT NULL::character varying, p_pah character varying DEFAULT NULL::character varying, p_structure_class character varying DEFAULT NULL::character varying, p_structure_type character varying DEFAULT NULL::character varying, p_land_zone character varying DEFAULT NULL::character varying, p_protected boolean DEFAULT NULL::boolean, p_followup_flag boolean DEFAULT NULL::boolean, p_has_replacement boolean DEFAULT NULL::boolean) RETURNS TABLE(structure_id character varying, pah character varying)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  RETURN QUERY
+  SELECT s.structure_id, s.pah
+  FROM   v_structures s
+  WHERE  (p_structure_id IS NULL OR s.structure_id = p_structure_id)
+    AND  (p_pah IS NULL OR s.pah ILIKE '%' || p_pah || '%')
+    AND  (p_structure_class IS NULL OR s.structure_class = p_structure_class)
+    AND  (p_structure_type IS NULL OR s.structure_type = p_structure_type)
+    AND  (p_land_zone IS NULL OR s.land_zone = p_land_zone)
+    AND  (p_protected IS NULL OR COALESCE(s.protected,false) = p_protected)
+    AND  (p_followup_flag IS NULL OR COALESCE(s.followup_flag,false) = p_followup_flag)
+    AND  (p_has_replacement IS NULL OR (s.replacement_structure_id IS NOT NULL) = p_has_replacement);
+END;
+$$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -280,7 +305,8 @@ CREATE TABLE public.fishers (
     new_ica_required boolean DEFAULT false NOT NULL,
     followup_flag boolean DEFAULT false NOT NULL,
     lr_fishfarming boolean,
-    lr_goatrearing boolean
+    lr_goatrearing boolean,
+    village_id bigint
 );
 
 
@@ -378,7 +404,6 @@ CREATE TABLE public.households (
     icaoption_dryland character varying(100),
     icaoption_garden character varying(100),
     icaoption_transport character varying(100),
-    village_id bigint,
     householdhead_id bigint,
     cosignatory_id bigint,
     duplicate_pah character varying(20),
@@ -386,7 +411,8 @@ CREATE TABLE public.households (
     sdate_structures date,
     sdate_landholdings date,
     sdate_gardensdryland date,
-    ica_type character varying(100)
+    ica_type character varying(100),
+    village_id bigint
 );
 
 
@@ -676,8 +702,6 @@ CREATE TABLE public.person (
     origin character varying(100),
     fisher boolean,
     year_of_birth bigint,
-    village_id bigint,
-    fisher_village_id bigint,
     photo_file text,
     deceased_date date,
     created_at date,
@@ -991,6 +1015,16 @@ CREATE VIEW public.v_crops AS
 
 
 --
+-- Name: villages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.villages (
+    village_id bigint NOT NULL,
+    village character varying(100) NOT NULL
+);
+
+
+--
 -- Name: v_fishers; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -1036,10 +1070,13 @@ CREATE VIEW public.v_fishers AS
     f.lr_fishfarming,
     f.lr_goatrearing,
     ph.contact,
-    ph.nrc
-   FROM ((public.fishers f
+    ph.nrc,
+    f.village_id,
+    v.village
+   FROM (((public.fishers f
      JOIN public.person ph ON ((f.person_id = ph.person_id)))
-     LEFT JOIN public.icas i ON ((((f.nhs)::text = (i.nhs)::text) AND (i.is_current = true))));
+     LEFT JOIN public.icas i ON ((((f.nhs)::text = (i.nhs)::text) AND (i.is_current = true))))
+     LEFT JOIN public.villages v ON ((f.village_id = v.village_id)));
 
 
 --
@@ -1061,16 +1098,6 @@ CREATE VIEW public.v_graves AS
 
 
 --
--- Name: villages; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.villages (
-    village_id bigint NOT NULL,
-    village character varying(100) NOT NULL
-);
-
-
---
 -- Name: v_person; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -1080,8 +1107,6 @@ CREATE VIEW public.v_person AS
     f.nhs,
     p.household_head,
     p.cosignatory,
-    p.village_id,
-    v.village,
     p.firstname,
     p.middlename,
     p.lastname,
@@ -1106,8 +1131,7 @@ CREATE VIEW public.v_person AS
     p.origin,
     p.photo_file,
     p.deceased_date
-   FROM ((public.person p
-     LEFT JOIN public.villages v ON ((p.village_id = v.village_id)))
+   FROM (public.person p
      LEFT JOIN public.fishers f ON ((p.person_id = f.person_id)));
 
 
@@ -1341,7 +1365,7 @@ CREATE VIEW public.v_households AS
     concat(pc.lastname, ', ', concat_ws(' '::text, pc.firstname, pc.middlename)) AS cosignatory_fullname,
     pc.nrc AS cosignatory_nrc,
     pc.contact AS cosignatory_contact,
-    v.village_id,
+    h.village_id,
     v.village,
     h.linked_pah,
     h.ica_type,
@@ -1433,7 +1457,7 @@ CREATE VIEW public.v_households AS
    FROM (((((public.households h
      LEFT JOIN public.person ph ON ((h.householdhead_id = ph.person_id)))
      LEFT JOIN public.person pc ON ((h.cosignatory_id = pc.person_id)))
-     JOIN public.villages v ON ((h.village_id = v.village_id)))
+     LEFT JOIN public.villages v ON ((h.village_id = v.village_id)))
      LEFT JOIN public.v_households_land_assets hla ON (((h.pah)::text = (hla.pah)::text)))
      LEFT JOIN public.icas i ON ((((h.pah)::text = (i.pah)::text) AND (i.is_current = true))));
 
@@ -1545,7 +1569,7 @@ CREATE VIEW public.v_land_parcels AS
    FROM (((public.land_parcels lp
      JOIN public.land_parcels_geom lpg ON (((lp.land_parcel_id)::text = (lpg.land_parcel_id)::text)))
      JOIN public.households h ON (((lp.pah)::text = (h.pah)::text)))
-     JOIN public.villages v ON ((h.village_id = v.village_id)));
+     LEFT JOIN public.villages v ON ((h.village_id = v.village_id)));
 
 
 --
@@ -1611,9 +1635,11 @@ CREATE VIEW public.v_structures_gis AS
     s.structure_class,
     s.structure_type,
     s.secondary_description,
-    s.protected
-   FROM (public.structures s
-     JOIN public.structures_geom sg ON (((s.structure_id)::text = (sg.structure_id)::text)));
+    s.protected,
+    h.village
+   FROM ((public.structures s
+     JOIN public.structures_geom sg ON (((s.structure_id)::text = (sg.structure_id)::text)))
+     LEFT JOIN public.v_households h ON (((s.pah)::text = (h.pah)::text)));
 
 
 --
@@ -2006,6 +2032,14 @@ ALTER TABLE ONLY public.fishers
 
 
 --
+-- Name: fishers fishers_village_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fishers
+    ADD CONSTRAINT fishers_village_id_fkey FOREIGN KEY (village_id) REFERENCES public.villages(village_id);
+
+
+--
 -- Name: graves graves_pah_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2019,6 +2053,14 @@ ALTER TABLE ONLY public.graves
 
 ALTER TABLE ONLY public.grievances
     ADD CONSTRAINT grievances_user_id_fkey FOREIGN KEY (user_id) REFERENCES public."user"(user_id);
+
+
+--
+-- Name: households households_village_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.households
+    ADD CONSTRAINT households_village_id_fkey FOREIGN KEY (village_id) REFERENCES public.villages(village_id);
 
 
 --
@@ -2065,5 +2107,5 @@ ALTER TABLE ONLY public.replacement_structure_notes
 -- PostgreSQL database dump complete
 --
 
-\unrestrict zVJOCEzTmzToRJcfVyiSBpN2WGLfwj2imlWnsOpKyX75lGpxyBDfmujbRpKh04c
+\unrestrict awxPp0SH4Rf1Extme8FXwakxD3kO3zRgOH4akfa07G8hIHMC2zYveSs5l7y48m1
 

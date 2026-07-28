@@ -16,7 +16,6 @@ watch(local, (v) => emit('update:modelValue', { ...v }), { deep: true })
 
 watch(() => props.modelValue, (v) => Object.assign(local, v), { deep: true })
 
-const villages = ref([])
 const relationshipOptions = ref([])
 const maritalStatusOptions = ref([])
 const residentialStatusOptions = ref([])
@@ -25,8 +24,7 @@ const skillOptions = ref([])
 const educationOptions = ref([])
 
 onMounted(async () => {
-  const [villagesRes, relRes, maritalRes, resStatusRes, primOccRes, secOccRes, primSkillRes, secSkillRes, eduRes] = await Promise.all([
-    axiosSecure.get('/villages'),
+  const [relRes, maritalRes, resStatusRes, primOccRes, secOccRes, primSkillRes, secSkillRes, eduRes] = await Promise.all([
     axiosSecure.get('/people/field-values?field=relationship'),
     axiosSecure.get('/people/field-values?field=marital_status'),
     axiosSecure.get('/people/field-values?field=residential_status'),
@@ -36,7 +34,6 @@ onMounted(async () => {
     axiosSecure.get('/people/field-values?field=secondary_skill'),
     axiosSecure.get('/people/field-values?field=education')
   ])
-  villages.value = villagesRes.data
   relationshipOptions.value = relRes.data
   maritalStatusOptions.value = maritalRes.data
   residentialStatusOptions.value = resStatusRes.data
@@ -69,7 +66,6 @@ onMounted(async () => {
     <!-- Location & Demographics -->
     <v-col cols="12" md="6">
       <div class="text-subtitle-2 mb-2">Location &amp; Demographics</div>
-      <v-select v-model="local.village_id" label="Village" :items="villages" item-title="village" item-value="village_id" density="compact" variant="outlined" class="mb-2" clearable />
       <v-text-field v-model="local.district" label="District" density="compact" variant="outlined" class="mb-2" />
       <v-text-field v-model="local.origin" label="Origin" density="compact" variant="outlined" class="mb-2" />
       <v-combobox v-model="local.relationship" label="Relationship" :items="relationshipOptions" density="compact" variant="outlined" class="mb-2" :readonly="local.relationship === 'Household Head'" />

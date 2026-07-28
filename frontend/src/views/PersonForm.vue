@@ -18,7 +18,6 @@ const form = ref({
   gender: '',
   nrc: '',
   year_of_birth: '',
-  village_id: null,
   district: '',
   origin: '',
   relationship: '',
@@ -69,7 +68,6 @@ const load = async () => {
     form.value.gender = p.gender ?? ''
     form.value.nrc = p.nrc ?? ''
     form.value.year_of_birth = p.year_of_birth ?? ''
-    form.value.village_id = p.village_id ?? null
     form.value.district = p.district ?? ''
     form.value.origin = p.origin ?? ''
     form.value.relationship = p.relationship ?? ''

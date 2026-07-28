@@ -157,9 +157,6 @@ async function saveNrc () {
           </v-col>
         </template>
 
-        <v-col v-if="!slim" cols="12" class="d-flex align-center pl-3">
-          Village: {{ person.village || '—' }}
-        </v-col>
         <!-- Contact -->
         <v-col v-if="!slim" cols="12" class="d-flex align-center pl-3">
           <template v-if="!editingContact">

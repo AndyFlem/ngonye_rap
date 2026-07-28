@@ -30,6 +30,11 @@ const tab = ref('ica')
 const editingDuplicatePah = ref(false)
 const draftDuplicatePah = ref('')
 const savingDuplicatePah = ref(false)
+
+const villages = ref([])
+const editingVillage = ref(false)
+const draftVillage = ref(null)
+const savingVillage = ref(false)
 //const savingNoIcaRequired = ref(false)
 
 const icaOptionChoices = [
@@ -80,6 +85,27 @@ async function saveDuplicatePah () {
     error.value = 'Failed to save Duplicate PAH.'
   } finally {
     savingDuplicatePah.value = false
+  }
+}
+
+function startEditVillage () {
+  draftVillage.value = pah.value?.village_id ?? null
+  editingVillage.value = true
+}
+
+async function saveVillage () {
+  savingVillage.value = true
+  try {
+    const villageId = draftVillage.value ?? null
+    await axiosSecure.patch(`/households/${encodeURIComponent(pahno.value)}`, { village_id: villageId })
+    const village = villages.value.find(v => v.village_id === villageId)?.village ?? null
+    pah.value = { ...pah.value, village_id: villageId, village }
+    editingVillage.value = false
+  } catch (err) {
+    console.error('Failed to save village:', err)
+    error.value = 'Failed to save Village.'
+  } finally {
+    savingVillage.value = false
   }
 }
 
@@ -261,12 +287,22 @@ const loadHousehold = async () => {
   }
 }
 
+const loadVillages = async () => {
+  try {
+    const response = await axiosSecure.get('/villages')
+    villages.value = Array.isArray(response.data) ? response.data : []
+  } catch (err) {
+    console.error('Failed to load villages:', err)
+  }
+}
+
 const goBack = () => {
   router.back()
 }
 
 onMounted(async () => {
   loadHousehold()
+  loadVillages()
 })
 
 </script>
@@ -308,6 +344,24 @@ onMounted(async () => {
             <v-row>
               <v-col cols="12" md="6">
                 <person-view :person-id="pah.householdhead_id" title="Head of Household:" />
+                <div class="d-flex align-center">
+                  <template v-if="!editingVillage">
+                    <strong>Village:</strong>&nbsp;<span class="table-value">{{ pah.village || '—' }}</span>
+                    <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-pencil"
+                      @click="startEditVillage"
+                      style="height: 1em; width: 1em; min-height: unset; min-width: unset; vertical-align: middle;" />
+                  </template>
+                  <template v-else>
+                    <strong>Village:</strong>&nbsp;
+                    <v-autocomplete v-model="draftVillage" :items="villages" item-title="village"
+                      item-value="village_id" density="compact" hide-details variant="underlined"
+                      style="max-width: 220px" clearable no-data-text="No villages found" />
+                    <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-check"
+                      :loading="savingVillage" @click="saveVillage" />
+                    <v-btn size="x-small" class="ml-1 text-grey" variant="text" icon="mdi-close"
+                      @click="editingVillage = false" />
+                  </template>
+                </div>
                 <div class="d-flex align-center">
                   <template v-if="!editingDuplicatePah">
                     <strong>Duplicate PAH:</strong>&nbsp;<span class="table-value">{{ pah.duplicate_pah }}</span>

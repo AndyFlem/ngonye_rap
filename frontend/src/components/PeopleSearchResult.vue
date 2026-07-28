@@ -72,7 +72,6 @@ watch(() => props.personId, async (id) => {
             </v-col>
             <v-col cols="12" sm="6">
               <div v-if="person.gender"><strong>Gender:</strong> <span class="ml-1">{{ person.gender }}</span></div>
-              <div v-if="person.village"><strong>Village:</strong> <span class="ml-1">{{ person.village }}</span></div>
               <div v-if="person.relationship"><strong>Relationship:</strong> <span class="ml-1">{{ person.relationship }}</span></div>
             </v-col>
           </v-row>

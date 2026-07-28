@@ -38,7 +38,7 @@ const addValidationErrors = ref({})
 
 const emptyForm = () => ({
   firstname: '', middlename: '', lastname: '', gender: '', nrc: '',
-  year_of_birth: '', village_id: null, district: '', origin: '',
+  year_of_birth: '', district: '', origin: '',
   relationship: '', marital_status: '', residential_status: '',
   contact: '', contact2: '', primary_occupation: '', secondary_occupation: '',
   primary_skill: '', secondary_skill: '', education: '',

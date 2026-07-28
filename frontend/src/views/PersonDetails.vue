@@ -99,7 +99,6 @@ onMounted(load)
               <v-col cols="12" md="4" class="mt-2">
                 <div><strong>Year of Birth:</strong> <span class="ml-1">{{ person.year_of_birth || '—' }} <span v-if="person.year_of_birth">({{ new Date().getFullYear() - person.year_of_birth }})</span></span></div>
                 <div v-if="person.deceased_date"><strong>Date of death:</strong> <span class="ml-1">{{ person.deceased_date }}</span></div>
-                <div><strong>Village:</strong> <span class="ml-1">{{ person.village || '—' }}</span></div>
                 <div><strong>Relationship:</strong> <span class="ml-1">{{ person.relationship || '—' }}</span></div>
                 <div><strong>Marital Status:</strong> <span class="ml-1">{{ person.marital_status || '—' }}</span></div>
                 <div><strong>District:</strong> <span class="ml-1">{{ person.district || '—' }}</span></div>

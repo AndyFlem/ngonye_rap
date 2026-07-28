@@ -55,6 +55,10 @@ function buildSearchParams (defn) {
   if (defn.catch_survey !== undefined && defn.catch_survey !== null) {
     params.push(`p_catch_survey=> ${defn.catch_survey}`)
   }
+  if (defn.village_id && defn.village_id !== 'all') {
+    const villageId = parseInt(defn.village_id)
+    if (!isNaN(villageId)) { params.push(`p_village_id=> ${villageId}`) }
+  }
   if (defn.maungwe_active) { params.push(`p_maungwe_active=> '${defn.maungwe_active.replace(/'/g, "''")}'`) }
   if (defn.limbelo_active) { params.push(`p_limbelo_active=> '${defn.limbelo_active.replace(/'/g, "''")}'`) }
   if (defn.followup_flag !== undefined && defn.followup_flag !== null) { params.push(`p_followup_flag=> ${defn.followup_flag}`) }
@@ -135,7 +139,8 @@ module.exports = {
 
     const allowed = {
       new_ica_required: 'new_ica_required',
-      followup_flag: 'followup_flag'
+      followup_flag: 'followup_flag',
+      village_id: 'village_id'
     }
     const fields = {}
     for (const [bodyKey, colName] of Object.entries(allowed)) {
