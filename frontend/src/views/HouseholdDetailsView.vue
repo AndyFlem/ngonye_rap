@@ -320,7 +320,9 @@ onMounted(async () => {
           <v-card-title class="d-flex">
             {{ pahno }}&nbsp;<span v-if="pah"> - {{ pah.fullname }}</span>
             <v-spacer/>
-            
+            <v-chip color="red" class="mr-2" size="small" v-if="pah && !pah.date_signed">
+              ICA Unsigned
+            </v-chip>            
             <v-chip color="red" class="mr-2" size="small" v-if="pah && pah.vulnerable">
               Vulnerable
             </v-chip>

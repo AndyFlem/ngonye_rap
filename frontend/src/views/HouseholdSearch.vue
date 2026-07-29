@@ -127,9 +127,13 @@ const loadIcaOptions = async () => {
 function sanitizePah () {
   const val = (search.value.params.pah || '').trim()
   if (!val) return
-  const digits = val.replace(/^PAH0*/i, '').replace(/\D/g, '') || val.replace(/\D/g, '')
-  if (digits) {
-    search.value.params.pah = 'PAH' + digits.padStart(3, '0')
+  const match = val.replace(/^PAH0*/i, '')
+  if (match) {
+    const digits = match.replace(/\D/g, '')
+    const trailingChar = match.replace(/\d/g, '')
+    if (digits) {
+      search.value.params.pah = 'PAH' + digits.padStart(3, '0') + trailingChar
+    }
   }
 }
 
